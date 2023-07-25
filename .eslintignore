@@ -1,0 +1,11 @@
+WorkStation.js
+# app
+build/
+node_modules/
+public/
+serviceWorkerRegistration.js
+service-worker.js
+jsconfig.json
+# documentation
+docs/
+.cache/
