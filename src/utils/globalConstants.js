@@ -6,37 +6,37 @@ export const GLOBAL_CONSTANTS = {
     {
       label: 'Image to Base64',
       route: '/image-to-base64',
-      icon: <PhotoLibrary fontSize="large" />,
+      icon: <PhotoLibrary fontSize="large" sx={{ fontSize: '5rem' }} />,
     },
     {
       label: 'Base64 to Image',
       route: '/base64-to-image',
-      icon: <PhotoLibrary fontSize="large" />,
+      icon: <PhotoLibrary fontSize="large" sx={{ fontSize: '5rem' }} />,
     },
     {
       label: 'QR Generator',
       route: '/qr-generator',
-      icon: <QrCode fontSize="large" />,
+      icon: <QrCode fontSize="large" sx={{ fontSize: '5rem' }} />,
     },
     {
       label: 'Image Resizer',
       route: '/image-resizer',
-      icon: <CropFree fontSize="large" />,
+      icon: <CropFree fontSize="large" sx={{ fontSize: '5rem' }} />,
     },
     {
       label: 'Aspect Ratio',
       route: '/aspect-ratio-calculator',
-      icon: <AspectRatio fontSize="large" />,
+      icon: <AspectRatio fontSize="large" sx={{ fontSize: '5rem' }} />,
     },
     {
       label: 'Decode base64',
       route: '/decode-base64',
-      icon: <ExtensionOff fontSize="large" />,
+      icon: <ExtensionOff fontSize="large" sx={{ fontSize: '5rem' }} />,
     },
     {
       label: 'Encode base64',
       route: '/encode-base64',
-      icon: <Extension fontSize="large" />,
+      icon: <Extension fontSize="large" sx={{ fontSize: '5rem' }} />,
     },
   ],
   APIS: {

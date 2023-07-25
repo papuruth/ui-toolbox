@@ -38,7 +38,7 @@ function Home({ searchQuery }) {
               <StyledLink to={item.route}>
                 <StyledCard>
                   {item.icon}
-                  <Typography sx={{ textAlign: 'center' }}>{item.label}</Typography>
+                  <Typography sx={{ textAlign: 'center', fontWeight: 500 }}>{item.label}</Typography>
                 </StyledCard>
               </StyledLink>
             </Box>
