@@ -19,7 +19,7 @@ export default function QRGenerator() {
 
   const generateQRCode = useCallback(
     (data, logo) => {
-      QRCode.toDataURL(data, { errorCorrectionLevel: 'H', width: width || 500, margin: 0 }).then(async (data) => {
+      QRCode.toDataURL(data, { errorCorrectionLevel: 'H', width: width || 300, margin: 0 }).then(async (data) => {
         const qrImageWithShadow = await applyShadowToQRImage(data, logo);
         if (logo) {
           setQRImageWithLogo(qrImageWithShadow);
@@ -42,10 +42,10 @@ export default function QRGenerator() {
 
   const loadQRPreview = useCallback(() => {
     if (qrImage && (!addLogoSwitch || !qrImageWithLogo)) {
-      return <StyledImageRenderer src={qrImage} alt="qr-preview" width={500} sameDimensions />;
+      return <StyledImageRenderer src={qrImage} alt="qr-preview" width={width} sameDimensions />;
     }
     if (addLogoSwitch && qrImageWithLogo) {
-      return <StyledImageRenderer src={qrImageWithLogo} alt="qr-preview" width={500} sameDimensions />;
+      return <StyledImageRenderer src={qrImageWithLogo} alt="qr-preview" width={width} sameDimensions />;
     }
     return (
       <StyledPaperCenter height={350} width={350}>
@@ -53,14 +53,14 @@ export default function QRGenerator() {
         <Typography variant="h6">QR Preview</Typography>
       </StyledPaperCenter>
     );
-  }, [qrImage, addLogoSwitch, qrImageWithLogo]);
+  }, [qrImage, addLogoSwitch, qrImageWithLogo, width]);
 
   const handleQRInputChange = useCallback(
     (event) => {
       if (event.target.value) {
         setQRData(event.target.value);
         if (!qrData) {
-          setWidth(500);
+          setWidth(300);
         }
         generateQRCode(event.target.value, logoSrc);
       }
@@ -141,7 +141,7 @@ export default function QRGenerator() {
                   setQRData('');
                   setQRImage('');
                   setWidth(0);
-                  setAddLogoSwitch(!addLogoSwitch);
+                  setAddLogoSwitch(false);
                   setQRImageWithLogo('');
                   setLogoSrc('');
                 }}

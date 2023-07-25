@@ -43,18 +43,18 @@ export const StyledPaperCenter = styled(Paper)`
 
 const getImageHeight = (props) => {
   if (props.sameDimensions && props.width) {
-    return props.width;
+    return `${props.width}px`;
   }
   if (props.height) {
-    return props.height;
+    return `${props.height}px`;
   }
   return '100%';
 };
 
 export const StyledImageRenderer = styled.img`
-  width: ${(props) => props.width || '100%'};
+  width: ${(props) => props.width ? `${props.width}px` : '100%'};
   height: ${(props) => getImageHeight(props)};
-  object-fit: fill;
+  object-fit: scale-down;
 `;
 
 export const StyledDivider = styled(Divider)`

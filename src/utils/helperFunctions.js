@@ -16,9 +16,9 @@ export const applyShadowToQRImage = async (qrcodeImage, logo) => {
     imgQRCode.crossOrigin = 'anonymous';
 
     const ratioMultiplier = 2;
-    const margin = 20 * ratioMultiplier;
-    const qrPadding = 20 * ratioMultiplier;
-    const shadowBlur = 20 * ratioMultiplier;
+    const margin = 10 * ratioMultiplier;
+    const qrPadding = 10 * ratioMultiplier;
+    const shadowBlur = 10 * ratioMultiplier;
     const shadowColor = '#00000033';
     const fillStyle = '#FFFFFFFF';
     const radius = 5 * ratioMultiplier;

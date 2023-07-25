@@ -104,8 +104,10 @@ export default function Base64ToImage() {
           if (event.target.value.length > 2097152) {
             toast.error('Base64 string length exceeds 2097152 chars');
             setImageBase64('');
+            setImageError(false)
           } else {
             setImageBase64(event.target.value);
+            setImageError(false)
           }
         }}
       />
