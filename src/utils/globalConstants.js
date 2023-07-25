@@ -42,4 +42,11 @@ export const GLOBAL_CONSTANTS = {
   APIS: {
     urlShortner: 'https://api-ssl.bitly.com/v4/shorten',
   },
+  DEFAULT_GRID_LAYOUT_CONFIG: {
+    i: 'grid_id',
+    x: 0,
+    y: 0,
+    h: 2,
+    w: 2,
+  },
 };

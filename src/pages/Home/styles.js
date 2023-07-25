@@ -16,15 +16,14 @@ const getStyles = (props) => {
 export const StyledContainer = styled.div`
   background-color: ${colors.background};
   color: ${colors.primary};
-  display: flex;
   height: 100vh;
   justify-content: ${(props) => getStyles(props)};
 `;
 
 export const StyledCard = styled(Card)`
   display: flex;
-  width: 150px;
-  height: 150px;
+  width: 100%;
+  height: 100%;
   align-items: center;
   justify-content: center;
   padding: 10px;
