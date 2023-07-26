@@ -6,8 +6,9 @@ import StyledSwitch from 'components/Shared/StyledSwitch';
 import QRCode from 'qrcode';
 import React, { useCallback, useEffect, useState } from 'react';
 import colors from 'styles/colors';
-import { applyShadowToQRImage, downloadFile } from 'utils/helperFunctions';
+import { applyShadowToQRImage, downloadFile, getDataUrl } from 'utils/helperFunctions';
 import toast from 'utils/toast';
+import topLoader from 'utils/topLoader';
 
 export default function QRGenerator() {
   const [qrImage, setQRImage] = useState('');
@@ -99,17 +100,16 @@ export default function QRGenerator() {
   };
   const handleSelectedFiles = useCallback(
     (acceptedFiles) => {
-      acceptedFiles.forEach((file) => {
-        console.log(file);
-        if (Math.floor(file.size / 1024) > 512) {
-          toast.error('Maximum image size allowed is 512 KB');
-          return;
-        }
-        const reader = new FileReader();
-        reader.onabort = () => console.log('file reading was aborted');
-        reader.onerror = () => console.log('file reading has failed');
-        reader.onload = async () => {
-          const { result } = reader || {};
+      const loaderId = Date.now();
+      try {
+        acceptedFiles.forEach(async (file) => {
+          console.log(file);
+          if (Math.floor(file.size / 1024) > 512) {
+            toast.error('Maximum image size allowed is 512 KB');
+            return;
+          }
+          topLoader.show(true, loaderId);
+          const result = await getDataUrl(file);
           if (result) {
             const { width, height } = await loadImage(result);
             if (width > 512 && height > 512) {
@@ -120,9 +120,12 @@ export default function QRGenerator() {
               generateQRCode(qrData, result);
             }
           }
-        };
-        reader.readAsDataURL(file);
-      });
+          topLoader.hide(true, loaderId);
+        });
+      } catch (error) {
+        console.log('Image Load Error', error);
+        topLoader.hide(true, loaderId);
+      }
     },
     [generateQRCode, qrData],
   );

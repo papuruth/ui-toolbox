@@ -6,9 +6,10 @@ import StyledSwitch from 'components/Shared/StyledSwitch';
 import React, { useCallback, useRef, useState } from 'react';
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { downloadFile } from 'utils/helperFunctions';
+import { downloadFile, getDataUrl } from 'utils/helperFunctions';
 import { useDebounceEffect } from 'utils/hooks/useDebounceEffects.hooks';
 import toast from 'utils/toast';
+import topLoader from 'utils/topLoader';
 import { canvasPreview } from './canvasPreview';
 import { StyledContainer } from './styles';
 
@@ -39,28 +40,29 @@ export default function ImageResizer() {
     );
 
   const handleSelectedFiles = useCallback((acceptedFiles) => {
-    acceptedFiles.forEach((file) => {
-      if (Math.floor(file.size / 1024 / 1024) > 2) {
-        toast.error('Maximum image size allowed is 2MB');
-        return;
-      }
+    const loaderId = Date.now();
+    try {
+      acceptedFiles.forEach(async (file) => {
+        if (Math.floor(file.size / 1024 / 1024) > 2) {
+          toast.error('Maximum image size allowed is 2MB');
+          return;
+        }
 
-      let truncateName = file.name.split('.');
-      truncateName.pop();
-      truncateName = truncateName.join('.');
-      setFilename(truncateName);
-      const reader = new FileReader();
-
-      reader.onabort = () => console.log('file reading was aborted');
-      reader.onerror = () => console.log('file reading has failed');
-      reader.onload = async () => {
-        const { result } = reader || {};
+        let truncateName = file.name.split('.');
+        truncateName.pop();
+        truncateName = truncateName.join('.');
+        setFilename(truncateName);
+        topLoader.show(true, loaderId);
+        const result = await getDataUrl(file)
         if (result) {
           setImgSrc(result);
         }
-      };
-      reader.readAsDataURL(file);
-    });
+        topLoader.hide(true, loaderId);
+      });
+    } catch (error) {
+      console.log("Image Load Error", error);
+      topLoader.hide(true, loaderId);
+    }
   }, []);
 
   const onImageLoad = (e) => {

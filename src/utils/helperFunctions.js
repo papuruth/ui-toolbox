@@ -77,3 +77,12 @@ export const getImageAspectRatio = (width, height) => {
 
   return [width / gcd, height / gcd];
 };
+
+export const getDataUrl = async (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.onabort = reject;
+    reader.readAsDataURL(file);
+  });

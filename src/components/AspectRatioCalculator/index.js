@@ -3,8 +3,9 @@ import { Button, IconButton, TextField, Tooltip, Typography } from '@mui/materia
 import ImageDropZone from 'components/ImageDropZone';
 import { StyledBoxCenter, StyledDivider } from 'components/Shared/Styled-Components';
 import React, { useCallback, useState } from 'react';
-import { getImageAspectRatio } from 'utils/helperFunctions';
+import { getDataUrl, getImageAspectRatio } from 'utils/helperFunctions';
 import toast from 'utils/toast';
+import topLoader from 'utils/topLoader';
 import { StyledContainer } from './styles';
 
 export default function AspectRatioCalculator() {
@@ -14,17 +15,15 @@ export default function AspectRatioCalculator() {
   const [copyTooltip, setCopyTooltip] = useState('Copy to clipboard');
 
   const handleSelectedFiles = useCallback((acceptedFiles) => {
-    acceptedFiles.forEach((file) => {
-      if (Math.floor(file.size / 1024 / 1024) > 4) {
-        toast.error('Maximum image size allowed is 4MB');
-        return;
-      }
-      const reader = new FileReader();
-
-      reader.onabort = () => console.log('file reading was aborted');
-      reader.onerror = () => console.log('file reading has failed');
-      reader.onload = async () => {
-        const { result } = reader || {};
+    const loaderId = Date.now();
+    try {
+      acceptedFiles.forEach(async (file) => {
+        if (Math.floor(file.size / 1024 / 1024) > 4) {
+          toast.error('Maximum image size allowed is 4MB');
+          return;
+        }
+        topLoader.show(true, loaderId);
+        const result = await getDataUrl(file);
         if (result) {
           const imageMeta = await getImageMeta(result);
           if (imageMeta) {
@@ -34,9 +33,12 @@ export default function AspectRatioCalculator() {
             setImageHeight(imageMeta.height);
           }
         }
-      };
-      reader.readAsDataURL(file);
-    });
+        topLoader.hide(true, loaderId);
+      });
+    } catch (error) {
+      console.log("Image Load Error", error);
+      topLoader.hide(true, loaderId);
+    }
   }, []);
 
   const getImageMeta = async (dataUrl) => {

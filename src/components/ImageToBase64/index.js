@@ -5,7 +5,8 @@ import React, { useCallback, useState } from 'react';
 import colors from 'styles/colors';
 import toast from 'utils/toast';
 import { StyledBoxCenter, StyledImagePreviewContainer, StyledImageRenderer } from 'components/Shared/Styled-Components';
-import { downloadFile } from 'utils/helperFunctions';
+import { downloadFile, getDataUrl } from 'utils/helperFunctions';
+import topLoader from 'utils/topLoader';
 import { StyledBoxContainer } from './styles';
 
 export default function ImageToBase64() {
@@ -16,31 +17,30 @@ export default function ImageToBase64() {
   const [filename, setFilename] = useState('');
 
   const handleSelectedFiles = useCallback((acceptedFiles) => {
-    acceptedFiles.forEach((file) => {
-      if (Math.floor(file.size / 1024 / 1024) > 2) {
-        toast.error('Maximum image size allowed is 2MB');
-        return;
-      }
-      let truncateName = file.name.split('.');
-      truncateName.pop();
-      truncateName = truncateName.join('.');
-      setFilename(truncateName);
-      const reader = new FileReader();
-
-      reader.onabort = () => console.log('file reading was aborted');
-      reader.onerror = () => console.log('file reading has failed');
-      reader.onload = () => {
-        const { result } = reader || {};
-        if (result) {
-          setImageBase64(reader.result);
-          const htmlIMG = `<img src='${result}' />`;
-          setHTMLImageCode(htmlIMG);
-          const cssBGCode = `background-image: url(${result})`;
-          setCSSBGImage(cssBGCode);
+    const loaderId = Date.now();
+    try {
+      acceptedFiles.forEach(async (file) => {
+        if (Math.floor(file.size / 1024 / 1024) > 2) {
+          toast.error('Maximum image size allowed is 2MB');
+          return;
         }
-      };
-      reader.readAsDataURL(file);
-    });
+        topLoader.show(true, loaderId);
+        let truncateName = file.name.split('.');
+        truncateName.pop();
+        truncateName = truncateName.join('.');
+        setFilename(truncateName);
+        const imageDataUrl = await getDataUrl(file);
+        setImageBase64(imageDataUrl);
+        const htmlIMG = `<img src='${imageDataUrl}' />`;
+        setHTMLImageCode(htmlIMG);
+        const cssBGCode = `background-image: url(${imageDataUrl})`;
+        setCSSBGImage(cssBGCode);
+        topLoader.hide(true, loaderId);
+      });
+    } catch (error) {
+      console.log("Image Load Error", error);
+      topLoader.hide(true, loaderId);
+    }
   }, []);
 
   const handleDownload = useCallback(
@@ -85,7 +85,7 @@ export default function ImageToBase64() {
       <Box sx={{ display: 'flex', width: '100%', border: '1px solid #000', borderRadius: 2, mt: 10 }}>
         <StyledImagePreviewContainer borderRight>
           {imageBase64 ? (
-            <StyledImageRenderer src={imageBase64} />
+            <StyledImageRenderer src={imageBase64} alt="image-preview" />
           ) : (
             <StyledBoxCenter justifyContent="center">
               <Image fontSize="large" />
@@ -127,7 +127,7 @@ export default function ImageToBase64() {
           />
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Typography component="h5" color={colors.primary} fontWeight={700} flexGrow={1}>
-              HTML {'<img>'} code
+              HTML {'<img />'} code
             </Typography>
             <Typography component="p" color={colors.secondary} fontWeight={400}>
               Size: {imageBase64 ? (imageBase64.length / 1024).toFixed(2) : 0} KB, {htmlImageCode.length} chars
@@ -149,7 +149,7 @@ export default function ImageToBase64() {
           </Box>
           <TextField
             id="html-img"
-            placeholder="HTML <img> code"
+            placeholder="HTML <img /> code"
             multiline
             rows={7}
             sx={{ width: '100%', mb: 3 }}

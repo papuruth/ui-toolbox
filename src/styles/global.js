@@ -37,6 +37,10 @@ const GlobalStyle = createGlobalStyle`
       font-size: 14px;
     }
   }
+  #nprogress .bar {
+    background: #ed1430 !important;
+    z-index: 1100 !important;
+  }
 `;
 
 export default GlobalStyle;
