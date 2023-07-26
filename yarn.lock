@@ -2628,6 +2628,11 @@
     "@typescript-eslint/types" "4.33.0"
     eslint-visitor-keys "^2.0.0"
 
+"@use-it/event-listener@^0.1.2":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@use-it/event-listener/-/event-listener-0.1.7.tgz#443a9b6df87f2f2961b74d42997ce723a7078623"
+  integrity sha512-hgfExDzUU9uTRTPDCpw2s9jWTxcxmpJya3fK5ADpf5VDpSy8WYwY/kh28XE0tUcbsljeP8wfan48QvAQTSSa3Q==
+
 "@webassemblyjs/ast@1.9.0":
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.9.0.tgz#bd850604b4042459a5a41cd7d338cbed695ed964"
@@ -8885,7 +8890,7 @@ minimist@0.0.8:
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-0.0.8.tgz#857fcabfc3397d2625b8228262e86aa7a011b05d"
   integrity sha1-hX/Kv8M5fSYluCKCYuhqp6ARsF0=
 
-minimist@^1.1.1, minimist@^1.2.6:
+minimist@^1.1.1, minimist@^1.2.5, minimist@^1.2.6:
   version "1.2.8"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.8.tgz#c1a464e7693302e082a075cee0c057741ac4772c"
   integrity sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==
@@ -10793,6 +10798,20 @@ react-app-polyfill@^2.0.0:
     raf "^3.4.1"
     regenerator-runtime "^0.13.7"
     whatwg-fetch "^3.4.1"
+
+react-clear-cache@^1.4.14:
+  version "1.4.14"
+  resolved "https://registry.yarnpkg.com/react-clear-cache/-/react-clear-cache-1.4.14.tgz#4ef4677cc2304c76eebff076ec6e18d4fc512c6a"
+  integrity sha512-5/9afQ4/utHs+1vODZG1HagirCERqbEYJSjkeKV126BP+r3+1pCvkGOWINhYsiFnOdXh82kD3RlbNv8ljC5Mmw==
+  dependencies:
+    minimist "^1.2.5"
+    use-persisted-state "^0.3.0"
+    uuid "^3.3.2"
+
+react-confirm-alert@2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/react-confirm-alert/-/react-confirm-alert-2.7.0.tgz#7cdbf2e052e03554ac6a7d8956c9c227010c8a53"
+  integrity sha512-21NWtGK/e85+ZX3TLRpMc3IsU5Kj6Z9ElCOrkTIlwMzV9EancyXNlkqHGbtKP63a2iS6g5hOxROokmJOqKQiXA==
 
 react-dev-utils@^11.0.3:
   version "11.0.4"
@@ -13100,6 +13119,13 @@ url@^0.11.0:
   dependencies:
     punycode "1.3.2"
     querystring "0.2.0"
+
+use-persisted-state@^0.3.0:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/use-persisted-state/-/use-persisted-state-0.3.3.tgz#5e0f2236967cec7c34de33abc07ae6818e7c7451"
+  integrity sha512-pCNlvYC8+XjRxwnIut4teGC9f2p9aD88R8OGseQGZa2dvqG/h1vEGk1vRE1IZG0Vf161UDpn+NlW4+UGubQflQ==
+  dependencies:
+    "@use-it/event-listener" "^0.1.2"
 
 use@^3.1.0:
   version "3.1.1"

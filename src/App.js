@@ -1,13 +1,47 @@
-import React from 'react';
+import { CssBaseline, StyledEngineProvider } from '@mui/material';
+import GlobalLayout from 'components/GlobalLayout';
+import AppUpdateUI from 'components/Shared/AppUpdateUI';
+import { assign } from 'lodash';
+import React, { useEffect } from 'react';
+import { useClearCache } from 'react-clear-cache';
+import { confirmAlert } from 'react-confirm-alert';
 import { Provider } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import GlobalLayout from 'components/GlobalLayout';
 import GlobalStyled from 'styles/global';
-import { CssBaseline, StyledEngineProvider } from '@mui/material';
 import store from './store';
 
 function App() {
+  const { isLatestVersion, emptyCacheStorage } = useClearCache();
+
+  useEffect(() => {
+    const updateVersion = () => {
+      const alertProps = {
+        title: 'UI Toolbox',
+        description: 'A new update is available.',
+        yesLabel: 'Update',
+        onClickYes: (e) => {
+          e?.preventDefault();
+          emptyCacheStorage();
+        },
+        showCancel: false,
+      };
+      confirmAlert({
+        customUI: ({ onClose }) => AppUpdateUI(assign(alertProps, { onClose })),
+        closeOnClickOutside: false,
+        closeOnEscape: false,
+      });
+    };
+
+    if (!isLatestVersion) {
+      setTimeout(() => {
+        if (process.env.NODE_ENV === 'production') {
+          updateVersion();
+        }
+      }, 1000);
+    }
+  }, [isLatestVersion, emptyCacheStorage]);
+
   return (
     <Provider store={store}>
       <CssBaseline />

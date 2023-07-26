@@ -3,6 +3,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import 'nprogress/nprogress.css';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';

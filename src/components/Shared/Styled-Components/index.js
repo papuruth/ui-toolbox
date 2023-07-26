@@ -1,4 +1,4 @@
-import { Box, Divider, Paper, TextField } from '@mui/material';
+import { Box, Button, Divider, Paper, TextField, Typography } from '@mui/material';
 import styled from 'styled-components';
 import { styled as muiStyled } from '@mui/material/styles';
 
@@ -52,7 +52,7 @@ const getImageHeight = (props) => {
 };
 
 export const StyledImageRenderer = styled.img`
-  width: ${(props) => props.width ? `${props.width}px` : '100%'};
+  width: ${(props) => (props.width ? `${props.width}px` : '100%')};
   height: ${(props) => getImageHeight(props)};
   object-fit: scale-down;
 `;
@@ -70,3 +70,15 @@ export const StyledTextField = muiStyled(TextField)({
     pointerEvents: 'none',
   },
 });
+
+export const StyledText = muiStyled(Typography)({});
+
+export const StyledButton = styled(Button)``;
+export const StyledBoxContainer = styled(Box)`
+  display: flex;
+  justify-content: flex-end;
+  width: ${(props) => getBoxWidth(props)};
+  height: 100%;
+  margin: auto;
+  margin-top: ${(props) => (props.marginTop ? `${props.marginTop * 8}px` : 'auto')};
+`;
