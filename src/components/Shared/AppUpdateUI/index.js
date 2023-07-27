@@ -21,7 +21,7 @@ export default function AppUpdateUI({
       <StyledText component="p" sx={{ mt: 1, minHeight: '50px' }}>
         {description}
       </StyledText>
-      <StyledBoxContainer>
+      <StyledBoxContainer justifyContent="flex-end">
         {showCancel ? (
           <StyledButton variant="outlined" onClick={onClose} sx={{ mr: 1 }}>
             {noLabel}

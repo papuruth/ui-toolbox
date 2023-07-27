@@ -1,3 +1,6 @@
 export default {
-  appTitle: "UI Toolbox"
+  appTitle: "UI Toolbox",
+  urlValidator: {
+    urlTextPlaceholder: "Enter URL to validate"
+  }
 }

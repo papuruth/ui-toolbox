@@ -22,11 +22,16 @@ function Home({ searchQuery }) {
       gridItems = filter(OPERATIONS_ITEMS, (item) => includes(toLower(item.label), toLower(searchQuery)));
     }
     if (!isEmpty(gridItems)) {
+      let count = 0;
       forEach(gridItems, (item, index) => {
         const layoutConfig = cloneDeep(DEFAULT_GRID_LAYOUT_CONFIG);
         layoutConfig.i = item.route;
-        layoutConfig.x = index % 6 === 0 ? 0 : index * layoutConfig.w;
-        layoutConfig.y = index % 6 === 0 ? Infinity : 0;
+        if (index % 6 === 0) {
+          count = 0;
+        }
+        layoutConfig.x = layoutConfig.w * count;
+        layoutConfig.y = count === 0 ? Infinity : 0;
+        count += 1;
         if (has(newGridLayout, 'lg')) {
           newGridLayout.lg.push(layoutConfig);
         } else {

@@ -71,14 +71,18 @@ export const StyledTextField = muiStyled(TextField)({
   },
 });
 
-export const StyledText = muiStyled(Typography)({});
+export const StyledText = styled(Typography)({});
 
 export const StyledButton = styled(Button)``;
+
 export const StyledBoxContainer = styled(Box)`
   display: flex;
-  justify-content: flex-end;
   width: ${(props) => getBoxWidth(props)};
   height: 100%;
   margin: auto;
   margin-top: ${(props) => (props.marginTop ? `${props.marginTop * 8}px` : 'auto')};
+`;
+
+export const StyledSpacer = styled(Typography).attrs({ component: 'div' })`
+  display: block;
 `;

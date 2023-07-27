@@ -50,4 +50,10 @@ export default [
     exact: true,
     key: 'ENCODEBASE64',
   },
+  {
+    path: '/url-validator',
+    component: Operations,
+    exact: true,
+    key: 'URLVALIDATOR',
+  },
 ];

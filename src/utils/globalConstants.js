@@ -1,4 +1,4 @@
-import { AspectRatio, CropFree, Extension, ExtensionOff, PhotoLibrary, QrCode } from '@mui/icons-material';
+import { AspectRatio, CropFree, Extension, ExtensionOff, Link as LinkIcon, PhotoLibrary, QrCode } from '@mui/icons-material';
 import React from 'react';
 
 export const GLOBAL_CONSTANTS = {
@@ -37,6 +37,11 @@ export const GLOBAL_CONSTANTS = {
       label: 'Encode base64',
       route: '/encode-base64',
       icon: <Extension fontSize="large" sx={{ fontSize: '5rem' }} />,
+    },
+    {
+      label: 'URL Validator',
+      route: '/url-validator',
+      icon: <LinkIcon fontSize="large" sx={{ fontSize: '5rem' }} />,
     },
   ],
   APIS: {

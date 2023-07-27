@@ -1,4 +1,4 @@
-import { each } from 'lodash';
+import { each, forEach, isEmpty, keys, reduce } from 'lodash';
 
 export const downloadFile = (url, filename) => {
   const a = document.createElement('a');
@@ -86,3 +86,38 @@ export const getDataUrl = async (file) =>
     reader.onabort = reject;
     reader.readAsDataURL(file);
   });
+
+export const addParamsToURL = (url, params) => {
+  if (isEmpty(params)) {
+    return url;
+  }
+  let tempUrl = url.trim();
+  if (tempUrl.endsWith('/')) {
+    tempUrl = tempUrl.slice(0, -1);
+    tempUrl += '?';
+  } else {
+    tempUrl += '?';
+  }
+  forEach(keys(params), (k, index) => {
+    if (index < keys(params).length - 1) {
+      tempUrl += `${k}=${params[k]}&`;
+    } else {
+      tempUrl += `${k}=${params[k]}`;
+    }
+  });
+  return tempUrl;
+};
+
+export const queriesToParamsObject = (query) => {
+  const queryString = query.substring(1);
+  const splittedString = queryString.split('&');
+  return reduce(
+    splittedString,
+    (acc, item) => {
+      const [key, value] = item.split('=');
+      acc[key] = value;
+      return acc;
+    },
+    {},
+  );
+};

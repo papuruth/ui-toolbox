@@ -4,10 +4,9 @@ import ImageDropZone from 'components/ImageDropZone';
 import React, { useCallback, useState } from 'react';
 import colors from 'styles/colors';
 import toast from 'utils/toast';
-import { StyledBoxCenter, StyledImagePreviewContainer, StyledImageRenderer } from 'components/Shared/Styled-Components';
+import { StyledBoxCenter, StyledBoxContainer, StyledImagePreviewContainer, StyledImageRenderer } from 'components/Shared/Styled-Components';
 import { downloadFile, getDataUrl } from 'utils/helperFunctions';
 import topLoader from 'utils/topLoader';
-import { StyledBoxContainer } from './styles';
 
 export default function ImageToBase64() {
   const [imageBase64, setImageBase64] = useState('');
@@ -38,7 +37,7 @@ export default function ImageToBase64() {
         topLoader.hide(true, loaderId);
       });
     } catch (error) {
-      console.log("Image Load Error", error);
+      console.log('Image Load Error', error);
       topLoader.hide(true, loaderId);
     }
   }, []);
@@ -93,7 +92,7 @@ export default function ImageToBase64() {
             </StyledBoxCenter>
           )}
         </StyledImagePreviewContainer>
-        <StyledBoxContainer>
+        <StyledBoxContainer width="50%" padding="20px" display="block !important">
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Typography component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
               Base64 Strings

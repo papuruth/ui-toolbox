@@ -37,7 +37,14 @@ const GlobalStyle = createGlobalStyle`
       font-size: 14px;
     }
   }
-
+  #nprogress {
+    pointer-events: bounding-box !important;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1200;
+  }
   #nprogress .bar {
     background: #ed1430 !important;
     z-index: 1100 !important;
