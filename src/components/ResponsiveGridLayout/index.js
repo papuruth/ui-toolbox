@@ -11,7 +11,7 @@ const BREAKPOINTS_CONFIG = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
 
 function ResponsiveGridLayout({ gridLayouts, children, isResizable = false, onLayoutChange, onBreakpointChange, size, isDraggable = false }) {
   let columnWidth = size?.width;
-  const is12GridLayout = columnWidth > 1200;
+  const is12GridLayout = columnWidth >= 1200;
   const is10GridLayout = columnWidth < 1200;
   const is6GridLayout = columnWidth < 996;
   const is4GridLayout = columnWidth < 768;
