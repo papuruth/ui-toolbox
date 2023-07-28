@@ -8,7 +8,7 @@ import {
   StyledText,
   StyledTextField
 } from 'components/Shared/Styled-Components';
-import localization from 'localization/index';
+import localization from 'localization';
 import { capitalize, forEach } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { addParamsToURL, queriesToParamsObject } from 'utils/helperFunctions';

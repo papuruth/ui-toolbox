@@ -7,40 +7,48 @@ import toast from 'utils/toast';
 import { StyledBoxCenter, StyledBoxContainer, StyledImagePreviewContainer, StyledImageRenderer } from 'components/Shared/Styled-Components';
 import { downloadFile, getDataUrl } from 'utils/helperFunctions';
 import topLoader from 'utils/topLoader';
+import localization from 'localization';
 
 export default function ImageToBase64() {
+  const {
+    common: { maxImageSizeText, imageLoadError, copiedToCP, copyToCP, downloadLabel },
+    imageToBase64: { imagePreviewText, htmlImgLabel, cssBGSourceLabel, base64StringsLabel },
+  } = localization;
   const [imageBase64, setImageBase64] = useState('');
   const [htmlImageCode, setHTMLImageCode] = useState('');
   const [cssBgImage, setCSSBGImage] = useState('');
-  const [copyTooltip, setCopyTooltip] = useState('Copy to clipboard');
+  const [copyTooltip, setCopyTooltip] = useState(copyToCP);
   const [filename, setFilename] = useState('');
 
-  const handleSelectedFiles = useCallback((acceptedFiles) => {
-    const loaderId = Date.now();
-    try {
-      acceptedFiles.forEach(async (file) => {
-        if (Math.floor(file.size / 1024 / 1024) > 2) {
-          toast.error('Maximum image size allowed is 2MB');
-          return;
-        }
-        topLoader.show(true, loaderId);
-        let truncateName = file.name.split('.');
-        truncateName.pop();
-        truncateName = truncateName.join('.');
-        setFilename(truncateName);
-        const imageDataUrl = await getDataUrl(file);
-        setImageBase64(imageDataUrl);
-        const htmlIMG = `<img src='${imageDataUrl}' />`;
-        setHTMLImageCode(htmlIMG);
-        const cssBGCode = `background-image: url(${imageDataUrl})`;
-        setCSSBGImage(cssBGCode);
+  const handleSelectedFiles = useCallback(
+    (acceptedFiles) => {
+      const loaderId = Date.now();
+      try {
+        acceptedFiles.forEach(async (file) => {
+          if (Math.floor(file.size / 1024 / 1024) > 2) {
+            toast.error(maxImageSizeText);
+            return;
+          }
+          topLoader.show(true, loaderId);
+          let truncateName = file.name.split('.');
+          truncateName.pop();
+          truncateName = truncateName.join('.');
+          setFilename(truncateName);
+          const imageDataUrl = await getDataUrl(file);
+          setImageBase64(imageDataUrl);
+          const htmlIMG = `<img src='${imageDataUrl}' />`;
+          setHTMLImageCode(htmlIMG);
+          const cssBGCode = `background-image: url(${imageDataUrl})`;
+          setCSSBGImage(cssBGCode);
+          topLoader.hide(true, loaderId);
+        });
+      } catch (error) {
+        console.log(imageLoadError, error);
         topLoader.hide(true, loaderId);
-      });
-    } catch (error) {
-      console.log('Image Load Error', error);
-      topLoader.hide(true, loaderId);
-    }
-  }, []);
+      }
+    },
+    [maxImageSizeText, imageLoadError],
+  );
 
   const handleDownload = useCallback(
     (type) => {
@@ -68,14 +76,14 @@ export default function ImageToBase64() {
       }
       if (window && window.navigator.clipboard) {
         window.navigator.clipboard.writeText(data).then(() => {
-          setCopyTooltip('Copied!');
+          setCopyTooltip(copiedToCP);
           setTimeout(() => {
-            setCopyTooltip('Copy to clipboard');
+            setCopyTooltip(copyToCP);
           }, 1000);
         });
       }
     },
-    [imageBase64, htmlImageCode, cssBgImage],
+    [imageBase64, htmlImageCode, cssBgImage, copiedToCP, copyToCP],
   );
 
   return (
@@ -86,23 +94,23 @@ export default function ImageToBase64() {
           {imageBase64 ? (
             <StyledImageRenderer src={imageBase64} alt="image-preview" />
           ) : (
-            <StyledBoxCenter justifyContent="center">
+            <StyledBoxCenter justifyContent="center" flexDirection="column">
               <Image fontSize="large" />
-              <Typography variant="h6">Image Preview</Typography>
+              <Typography variant="h6">{imagePreviewText}</Typography>
             </StyledBoxCenter>
           )}
         </StyledImagePreviewContainer>
         <StyledBoxContainer width="50%" padding="20px" display="block !important">
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Typography component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
-              Base64 Strings
+              {base64StringsLabel}
             </Typography>
             <Typography component="p" color={colors.secondary} fontWeight={400}>
               Size: {imageBase64 ? (imageBase64.length / 1024).toFixed(2) : 0} KB, {imageBase64.length} chars
             </Typography>
             {imageBase64.length > 0 ? (
               <Toolbar>
-                <Tooltip title="Download">
+                <Tooltip title={downloadLabel}>
                   <IconButton onClick={() => handleDownload('base64')}>
                     <CloudDownload color="primary" />
                   </IconButton>
@@ -117,7 +125,7 @@ export default function ImageToBase64() {
           </Box>
           <TextField
             id="image-base64"
-            placeholder="Base64 Strings"
+            placeholder={base64StringsLabel}
             multiline
             rows={7}
             sx={{ width: '100%', mb: 3 }}
@@ -126,14 +134,14 @@ export default function ImageToBase64() {
           />
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Typography component="h5" color={colors.primary} fontWeight={700} flexGrow={1}>
-              HTML {'<img />'} code
+              {htmlImgLabel}
             </Typography>
             <Typography component="p" color={colors.secondary} fontWeight={400}>
               Size: {imageBase64 ? (imageBase64.length / 1024).toFixed(2) : 0} KB, {htmlImageCode.length} chars
             </Typography>
             {imageBase64.length > 0 ? (
               <Toolbar>
-                <Tooltip title="Download">
+                <Tooltip title={downloadLabel}>
                   <IconButton onClick={() => handleDownload('html')}>
                     <CloudDownload color="primary" />
                   </IconButton>
@@ -148,7 +156,7 @@ export default function ImageToBase64() {
           </Box>
           <TextField
             id="html-img"
-            placeholder="HTML <img /> code"
+            placeholder={htmlImgLabel}
             multiline
             rows={7}
             sx={{ width: '100%', mb: 3 }}
@@ -157,14 +165,14 @@ export default function ImageToBase64() {
           />
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Typography component="h5" color={colors.primary} fontWeight={700} flexGrow={1}>
-              CSS Background Source
+              {cssBGSourceLabel}
             </Typography>
             <Typography component="p" color={colors.secondary} fontWeight={400}>
               Size: {imageBase64 ? (imageBase64.length / 1024).toFixed(2) : 0} KB, {cssBgImage.length} chars
             </Typography>
             {imageBase64.length > 0 ? (
               <Toolbar>
-                <Tooltip title="Download">
+                <Tooltip title={downloadLabel}>
                   <IconButton onClick={() => handleDownload('css')}>
                     <CloudDownload color="primary" />
                   </IconButton>
@@ -179,7 +187,7 @@ export default function ImageToBase64() {
           </Box>
           <TextField
             id="image-css"
-            placeholder="CSS Background Source"
+            placeholder={cssBGSourceLabel}
             multiline
             rows={7}
             sx={{ width: '100%' }}

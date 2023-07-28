@@ -3,6 +3,7 @@ import { Box, Button, IconButton, Slider, TextField, Toolbar, Tooltip, Typograph
 import ImageDropZone from 'components/ImageDropZone';
 import { StyledBoxCenter, StyledImagePreviewContainer, StyledImageRenderer, StyledPaperCenter } from 'components/Shared/Styled-Components';
 import StyledSwitch from 'components/Shared/StyledSwitch';
+import localization from 'localization';
 import QRCode from 'qrcode';
 import React, { useCallback, useEffect, useState } from 'react';
 import colors from 'styles/colors';
@@ -17,6 +18,12 @@ export default function QRGenerator() {
   const [addLogoSwitch, setAddLogoSwitch] = useState(false);
   const [qrImageWithLogo, setQRImageWithLogo] = useState('');
   const [logoSrc, setLogoSrc] = useState('');
+
+  const {
+    appTitle,
+    qrGenerator: { qrPreviewLabel, maxLogoSizeLabel, maxLogoSizePXLabel, enterQRDataLabel, qrWidthLabel },
+    common: { downloadQRLabel },
+  } = localization;
 
   const generateQRCode = useCallback(
     (data, logo) => {
@@ -34,12 +41,13 @@ export default function QRGenerator() {
   );
 
   const handleDownload = useCallback(() => {
+    const fileName = `${appTitle}-QR_code-${Date.now()}.png`;
     if (qrImage && !qrImageWithLogo) {
-      downloadFile(qrImage, 'QR-code.png');
+      downloadFile(qrImage, fileName);
     } else if (qrImageWithLogo) {
-      downloadFile(qrImageWithLogo, 'QR-code-logo.png');
+      downloadFile(qrImageWithLogo, fileName);
     }
-  }, [qrImage, qrImageWithLogo]);
+  }, [qrImage, qrImageWithLogo, appTitle]);
 
   const loadQRPreview = useCallback(() => {
     if (qrImage && (!addLogoSwitch || !qrImageWithLogo)) {
@@ -51,10 +59,10 @@ export default function QRGenerator() {
     return (
       <StyledPaperCenter height={350} width={350}>
         <QrCode fontSize="large" />
-        <Typography variant="h6">QR Preview</Typography>
+        <Typography variant="h6">{qrPreviewLabel}</Typography>
       </StyledPaperCenter>
     );
-  }, [qrImage, addLogoSwitch, qrImageWithLogo, width]);
+  }, [qrImage, addLogoSwitch, qrImageWithLogo, width, qrPreviewLabel]);
 
   const handleQRInputChange = useCallback(
     (event) => {
@@ -98,6 +106,7 @@ export default function QRGenerator() {
       return {};
     }
   };
+
   const handleSelectedFiles = useCallback(
     (acceptedFiles) => {
       const loaderId = Date.now();
@@ -105,7 +114,7 @@ export default function QRGenerator() {
         acceptedFiles.forEach(async (file) => {
           console.log(file);
           if (Math.floor(file.size / 1024) > 512) {
-            toast.error('Maximum image size allowed is 512 KB');
+            toast.error(maxLogoSizeLabel);
             return;
           }
           topLoader.show(true, loaderId);
@@ -113,9 +122,7 @@ export default function QRGenerator() {
           if (result) {
             const { width, height } = await loadImage(result);
             if (width > 512 && height > 512) {
-              toast.error('Maximum logo width and height should not exceed 512px');
-            } else if (width !== height) {
-              toast.error('Please upload square logo for better results!');
+              toast.error(maxLogoSizePXLabel);
             } else if (width > 0 && height > 0) {
               generateQRCode(qrData, result);
             }
@@ -127,14 +134,14 @@ export default function QRGenerator() {
         topLoader.hide(true, loaderId);
       }
     },
-    [generateQRCode, qrData],
+    [generateQRCode, qrData, maxLogoSizeLabel, maxLogoSizePXLabel],
   );
 
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', width: '50%', minHeight: 64 }}>
         <Typography component="p" color={colors.black} fontWeight={700} flexGrow={1}>
-          Enter QR Data
+          {enterQRDataLabel}
         </Typography>
         {qrData.length > 0 ? (
           <Toolbar>
@@ -165,7 +172,7 @@ export default function QRGenerator() {
       />
       <Toolbar sx={{ width: 400 }}>
         <Typography id="qr-width-slider" marginRight={2} width={100} fontWeight={500}>
-          QR Width
+          {qrWidthLabel}
         </Typography>
         <Slider
           aria-label="Width"
@@ -204,7 +211,7 @@ export default function QRGenerator() {
       {qrImage ? (
         <Toolbar>
           <Button onClick={handleDownload} variant="outlined" endIcon={<CloudDownload color="primary" />}>
-            Download QR
+            {downloadQRLabel}
           </Button>
         </Toolbar>
       ) : null}

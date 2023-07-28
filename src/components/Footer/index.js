@@ -1,6 +1,6 @@
 import React from 'react';
 import { Typography } from '@mui/material';
-import localization from 'localization/index';
+import localization from 'localization';
 import { StyledContainer } from './styles';
 
 export default function Footer() {
