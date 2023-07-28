@@ -16,7 +16,8 @@ import { StyledContainer, StyledLayoutContainer } from './styles';
 function Operations({ location }) {
   const { pathname } = location || {};
   const renderComponentConditionally = () => {
-    const { imageToBase64, base64ToImage, qrGenerator, imageResizer, aspectRatioCalculator, base64Encoder, base64Decoder, urlValidator } = localization;
+    const { imageToBase64, base64ToImage, qrGenerator, imageResizer, aspectRatioCalculator, base64Encoder, base64Decoder, urlValidator } =
+      localization;
     switch (pathname) {
       case '/image-to-base64':
         return { title: imageToBase64.pageTitle, component: ImageToBase64 };

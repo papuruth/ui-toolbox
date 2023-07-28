@@ -53,14 +53,14 @@ export default function ImageResizer() {
         truncateName = truncateName.join('.');
         setFilename(truncateName);
         topLoader.show(true, loaderId);
-        const result = await getDataUrl(file)
+        const result = await getDataUrl(file);
         if (result) {
           setImgSrc(result);
         }
         topLoader.hide(true, loaderId);
       });
     } catch (error) {
-      console.log("Image Load Error", error);
+      console.log('Image Load Error', error);
       topLoader.hide(true, loaderId);
     }
   }, []);

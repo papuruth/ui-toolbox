@@ -1,4 +1,4 @@
-import { Card } from '@mui/material';
+import { Card, Grid } from '@mui/material';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import colors from 'styles/colors';
@@ -18,6 +18,7 @@ export const StyledContainer = styled.div`
   color: ${colors.primary};
   height: 100vh;
   justify-content: ${(props) => getStyles(props)};
+  margin: 16px;
 `;
 
 export const StyledCard = styled(Card)`
@@ -34,3 +35,7 @@ export const StyledCard = styled(Card)`
 `;
 
 export const StyledLink = styled(Link)``;
+
+export const StyledGridContainer = styled(Grid)``;
+
+export const StyledGridItem = styled(Grid)``;

@@ -4,9 +4,7 @@ import { Route } from 'react-router-dom';
 import routes from './routes';
 
 function Routes() {
-  return map(routes, (route) => (
-    <Route {...route} />
-  ))
+  return map(routes, (route) => <Route {...route} />);
 }
 
 export default Routes;

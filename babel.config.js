@@ -17,9 +17,9 @@ module.exports = {
           pages: './src/pages',
           utils: './src/utils',
           styles: './src/styles',
-          routes: "./src/routes",
-          localization: "./src/localization",
-          assets: "./src/assets"
+          routes: './src/routes',
+          localization: './src/localization',
+          assets: './src/assets',
         },
       },
     ],

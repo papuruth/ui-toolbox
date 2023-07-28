@@ -37,6 +37,11 @@ const GlobalStyle = createGlobalStyle`
       font-size: 14px;
     }
   }
+  .react-grid-item {
+    max-height: 320px;
+    min-width: 300px;
+    max-width: 300px;
+  }
   #nprogress {
     pointer-events: bounding-box !important;
     position: fixed;
