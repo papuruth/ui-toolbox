@@ -10,16 +10,18 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import GlobalStyled from 'styles/global';
 import store from './store';
+import localization from './localization';
 
 function App() {
   const { isLatestVersion, emptyCacheStorage } = useClearCache();
 
   useEffect(() => {
     const updateVersion = () => {
+      const { appTitle, newVersionMessage, appUpdateCTALabel } = localization;
       const alertProps = {
-        title: 'UI Toolbox',
-        description: 'A new update is available.',
-        yesLabel: 'Update',
+        title: appTitle,
+        description: newVersionMessage,
+        yesLabel: appUpdateCTALabel,
         onClickYes: (e) => {
           e?.preventDefault();
           emptyCacheStorage();

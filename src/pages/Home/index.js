@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { string } from 'prop-types';
 import NoData from 'components/Shared/NoData';
 import ResponsiveGridLayout from 'components/ResponsiveGridLayout';
+import localization from 'localization';
 import { StyledCard, StyledContainer, StyledLink } from './styles';
 
 function Home({ searchQuery }) {
@@ -13,6 +14,7 @@ function Home({ searchQuery }) {
   const [gridChildren, setGridChildren] = useState([]);
 
   const { OPERATIONS_ITEMS, DEFAULT_GRID_LAYOUT_CONFIG } = GLOBAL_CONSTANTS;
+  const { noSearchDataMessage } = localization;
 
   useEffect(() => {
     const newGridLayout = {};
@@ -60,7 +62,7 @@ function Home({ searchQuery }) {
       {!isEmpty(gridChildren) ? (
         <ResponsiveGridLayout gridLayouts={gridLayouts}>{gridChildren}</ResponsiveGridLayout>
       ) : (
-        <NoData title={`No matching data found for ${searchQuery}`} />
+        <NoData title={noSearchDataMessage.replace('[DATA]', searchQuery)} />
       )}
     </StyledContainer>
   );
