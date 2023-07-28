@@ -15,5 +15,5 @@ export default function StepperNavigation({ currentView }) {
 }
 
 StepperNavigation.propTypes = {
-  currentView: string.isRequired
-}
+  currentView: string.isRequired,
+};

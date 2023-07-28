@@ -36,7 +36,7 @@ export default function AspectRatioCalculator() {
         topLoader.hide(true, loaderId);
       });
     } catch (error) {
-      console.log("Image Load Error", error);
+      console.log('Image Load Error', error);
       topLoader.hide(true, loaderId);
     }
   }, []);

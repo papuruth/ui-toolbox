@@ -1,13 +1,7 @@
 import { Check, Warning } from '@mui/icons-material';
 import { Chip, CircularProgress, Paper, Tooltip } from '@mui/material';
 import axios from 'axios';
-import {
-  StyledBoxCenter,
-  StyledBoxContainer,
-  StyledButton,
-  StyledText,
-  StyledTextField
-} from 'components/Shared/Styled-Components';
+import { StyledBoxCenter, StyledBoxContainer, StyledButton, StyledText, StyledTextField } from 'components/Shared/Styled-Components';
 import localization from 'localization';
 import { capitalize, forEach } from 'lodash';
 import React, { useEffect, useState } from 'react';
@@ -137,7 +131,7 @@ export default function UrlValidator() {
         val ? (
           <Chip
             key={key}
-            sx={{ m:2 }}
+            sx={{ m: 2 }}
             color="info"
             label={
               <StyledText>
