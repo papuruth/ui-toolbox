@@ -72,7 +72,7 @@ export default function Base64ToImage() {
 
     return (
         <>
-            <Box sx={{ display: "flex", alignItems: "center", width: "50%", minHeight: 64 }}>
+            <Box sx={{ display: "flex", alignItems: "center", width: { xs: "100%", sm: "100%", md: "50%" }, minHeight: 64 }}>
                 <Typography component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
                     {enterBase64Label}
                 </Typography>
@@ -104,7 +104,7 @@ export default function Base64ToImage() {
                 placeholder="Base64 String"
                 multiline
                 rows={10}
-                sx={{ width: "50%", mb: 3 }}
+                sx={{ width: { xs: "100%", sm: "100%", md: "50%" }, mb: 3 }}
                 value={imageBase64}
                 onChange={(event) => {
                     if (event?.target?.value?.length > 2097152) {

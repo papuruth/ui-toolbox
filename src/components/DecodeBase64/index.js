@@ -1,10 +1,10 @@
 import { ContentCopy, Delete, Settings } from "@mui/icons-material";
-import { Button, IconButton, Toolbar, Tooltip, Typography } from "@mui/material";
+import { Button, IconButton, Toolbar, Tooltip } from "@mui/material";
 import { StyledBoxCenter, StyledTextField } from "components/Shared/Styled-Components";
 import React, { useCallback, useState } from "react";
 import colors from "styles/colors";
 import toast from "utils/toast";
-import { StyledContainer } from "./styles";
+import { StyledContainer, StyledText } from "./styles";
 
 export default function DecodeBase64() {
     const [base64Data, setBase64Data] = useState("");
@@ -33,15 +33,15 @@ export default function DecodeBase64() {
 
     return (
         <StyledContainer>
-            <StyledBoxCenter>
+            <StyledBoxCenter flexDirection={{ xs: "column", sm: "column", md: "row" }}>
                 <StyledBoxCenter justifyContent="center" flexDirection="column">
                     <StyledBoxCenter justifyContent="center" width="90%" sx={{ minHeight: 64 }}>
-                        <Typography component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
+                        <StyledText component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
                             Enter Base64 String
-                        </Typography>
-                        <Typography component="p" color={colors.secondary} fontWeight={400}>
+                        </StyledText>
+                        <StyledText component="p" color={colors.secondary} fontWeight={400}>
                             Size: {base64Data ? (base64Data.length / 1024).toFixed(2) : 0} KB, {base64Data.length} chars
-                        </Typography>
+                        </StyledText>
                         {base64Data.length > 0 ? (
                             <Toolbar>
                                 <Tooltip title="Clear">
@@ -67,7 +67,7 @@ export default function DecodeBase64() {
                             placeholder="Base64 String"
                             multiline
                             rows={7}
-                            sx={{ width: "90%", mb: 3 }}
+                            sx={{ width: { xs: "100%", sm: "100%", md: "90%" }, mb: 3 }}
                             value={base64Data}
                             onChange={(event) => {
                                 setBase64Data(event.target.value);
@@ -77,12 +77,12 @@ export default function DecodeBase64() {
                 </StyledBoxCenter>
                 <StyledBoxCenter justifyContent="center" flexDirection="column">
                     <StyledBoxCenter justifyContent="center" width="90%" sx={{ minHeight: 64 }}>
-                        <Typography component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
+                        <StyledText component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
                             Decoded String
-                        </Typography>
-                        <Typography component="p" color={colors.secondary} fontWeight={400}>
+                        </StyledText>
+                        <StyledText component="p" color={colors.secondary} fontWeight={400}>
                             Size: {decodedStrings ? (decodedStrings.length / 1024).toFixed(2) : 0} KB, {decodedStrings.length} chars
-                        </Typography>
+                        </StyledText>
                         {decodedStrings.length > 0 ? (
                             <Toolbar>
                                 <Tooltip title="Clear">
@@ -108,7 +108,7 @@ export default function DecodeBase64() {
                             placeholder="Decoded String"
                             multiline
                             rows={7}
-                            sx={{ width: "90%", mb: 3 }}
+                            sx={{ width: { xs: "100%", sm: "100%", md: "90%" }, mb: 3 }}
                             value={decodedStrings}
                             disabled
                         />

@@ -67,7 +67,8 @@
         "redux-thunk": "^2.3.0",
         "reduxsauce": "^1.2.1",
         "seamless-immutable": "^7.1.4",
-        "styled-components": "^5.3.9"
+        "styled-components": "^5.3.9",
+        "styled-media-query": "^2.1.2"
     },
     "devDependencies": {
         "@babel/core": "^7.15.0",

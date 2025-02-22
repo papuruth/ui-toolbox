@@ -1,4 +1,4 @@
-import { CssBaseline, StyledEngineProvider } from "@mui/material";
+import { createTheme, CssBaseline, StyledEngineProvider, ThemeProvider } from "@mui/material";
 import GlobalLayout from "components/GlobalLayout";
 import AppUpdateUI from "components/Shared/AppUpdateUI";
 import { assign } from "lodash";
@@ -11,6 +11,18 @@ import "react-toastify/dist/ReactToastify.css";
 import GlobalStyled from "styles/global";
 import store from "./store";
 import localization from "./localization";
+
+const theme = createTheme({
+    breakpoints: {
+        values: {
+            xs: 120,
+            sm: 600,
+            md: 900,
+            lg: 1200,
+            xl: 1536
+        }
+    }
+});
 
 function App() {
     const { isLatestVersion, emptyCacheStorage } = useClearCache();
@@ -49,7 +61,9 @@ function App() {
             <CssBaseline />
             <GlobalStyled />
             <StyledEngineProvider injectFirst>
-                <GlobalLayout />
+                <ThemeProvider theme={theme}>
+                    <GlobalLayout />
+                </ThemeProvider>
             </StyledEngineProvider>
             <ToastContainer
                 position="top-center"

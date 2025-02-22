@@ -1,9 +1,10 @@
 import { ContentCopy, Delete, Settings } from "@mui/icons-material";
-import { Button, IconButton, Toolbar, Tooltip, Typography } from "@mui/material";
+import { Button, IconButton, Toolbar, Tooltip } from "@mui/material";
 import { StyledBoxCenter, StyledTextField } from "components/Shared/Styled-Components";
 import React, { useCallback, useState } from "react";
 import colors from "styles/colors";
 import toast from "utils/toast";
+import { StyledText } from "components/DecodeBase64/styles";
 import { StyledContainer } from "./styles";
 
 export default function EncodeBase64() {
@@ -33,15 +34,15 @@ export default function EncodeBase64() {
 
     return (
         <StyledContainer>
-            <StyledBoxCenter>
+            <StyledBoxCenter flexDirection={{ xs: "column", sm: "column", md: "row" }}>
                 <StyledBoxCenter justifyContent="center" flexDirection="column">
                     <StyledBoxCenter justifyContent="center" width="90%" sx={{ minHeight: 64 }}>
-                        <Typography component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
+                        <StyledText component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
                             Enter PlainText
-                        </Typography>
-                        <Typography component="p" color={colors.secondary} fontWeight={400}>
+                        </StyledText>
+                        <StyledText component="p" color={colors.secondary} fontWeight={400}>
                             Size: {plainText ? (plainText.length / 1024).toFixed(2) : 0} KB, {plainText.length} chars
-                        </Typography>
+                        </StyledText>
                         {plainText.length > 0 ? (
                             <Toolbar>
                                 <Tooltip title="Clear">
@@ -67,7 +68,7 @@ export default function EncodeBase64() {
                             placeholder="Plaintext"
                             multiline
                             rows={7}
-                            sx={{ width: "90%", mb: 3 }}
+                            sx={{ width: { xs: "100%", sm: "100%", md: "90%" }, mb: 3 }}
                             value={plainText}
                             onChange={(event) => {
                                 setPlainText(event.target.value);
@@ -77,12 +78,12 @@ export default function EncodeBase64() {
                 </StyledBoxCenter>
                 <StyledBoxCenter justifyContent="center" flexDirection="column">
                     <StyledBoxCenter justifyContent="center" width="90%" sx={{ minHeight: 64 }}>
-                        <Typography component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
+                        <StyledText component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
                             Encode Base64 String
-                        </Typography>
-                        <Typography component="p" color={colors.secondary} fontWeight={400}>
+                        </StyledText>
+                        <StyledText component="p" color={colors.secondary} fontWeight={400}>
                             Size: {encodeStrings ? (encodeStrings.length / 1024).toFixed(2) : 0} KB, {encodeStrings.length} chars
-                        </Typography>
+                        </StyledText>
                         {encodeStrings.length > 0 ? (
                             <Toolbar>
                                 <Tooltip title="Clear">
@@ -108,7 +109,7 @@ export default function EncodeBase64() {
                             placeholder="Base64 String"
                             multiline
                             rows={7}
-                            sx={{ width: "90%", mb: 3 }}
+                            sx={{ width: { xs: "100%", sm: "100%", md: "90%" }, mb: 3 }}
                             value={encodeStrings}
                             disabled
                         />

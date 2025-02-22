@@ -1,5 +1,5 @@
 import { CloudDownload, ContentCopy, Image } from "@mui/icons-material";
-import { Box, IconButton, TextField, Toolbar, Tooltip, Typography } from "@mui/material";
+import { Box, IconButton, TextField, Toolbar, Tooltip } from "@mui/material";
 import ImageDropZone from "components/ImageDropZone";
 import React, { useCallback, useState } from "react";
 import colors from "styles/colors";
@@ -8,6 +8,7 @@ import { StyledBoxCenter, StyledBoxContainer, StyledImagePreviewContainer, Style
 import { downloadFile, getDataUrl } from "utils/helperFunctions";
 import topLoader from "utils/topLoader";
 import localization from "localization";
+import { StyledContainer, StyledText } from "./styles";
 
 export default function ImageToBase64() {
     const {
@@ -89,25 +90,25 @@ export default function ImageToBase64() {
     return (
         <>
             <ImageDropZone handleOnDrop={handleSelectedFiles} />
-            <Box sx={{ display: "flex", width: "100%", border: "1px solid #000", borderRadius: 2, mt: 10 }}>
-                <StyledImagePreviewContainer borderRight>
+            <StyledContainer>
+                <StyledImagePreviewContainer borderRight borderBottom padding>
                     {imageBase64 ? (
                         <StyledImageRenderer src={imageBase64} alt="image-preview" />
                     ) : (
                         <StyledBoxCenter justifyContent="center" flexDirection="column">
                             <Image fontSize="large" />
-                            <Typography variant="h6">{imagePreviewText}</Typography>
+                            <StyledText variant="h6">{imagePreviewText}</StyledText>
                         </StyledBoxCenter>
                     )}
                 </StyledImagePreviewContainer>
                 <StyledBoxContainer width="50%" padding="20px" display="block !important">
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Typography component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
+                        <StyledText component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
                             {base64StringsLabel}
-                        </Typography>
-                        <Typography component="p" color={colors.secondary} fontWeight={400}>
+                        </StyledText>
+                        <StyledText component="p" color={colors.secondary} fontWeight={400}>
                             Size: {imageBase64 ? (imageBase64.length / 1024).toFixed(2) : 0} KB, {imageBase64.length} chars
-                        </Typography>
+                        </StyledText>
                         {imageBase64.length > 0 ? (
                             <Toolbar>
                                 <Tooltip title={downloadLabel}>
@@ -133,12 +134,12 @@ export default function ImageToBase64() {
                         inputProps={{ readOnly: true }}
                     />
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Typography component="h5" color={colors.primary} fontWeight={700} flexGrow={1}>
+                        <StyledText component="h5" color={colors.primary} fontWeight={700} flexGrow={1}>
                             {htmlImgLabel}
-                        </Typography>
-                        <Typography component="p" color={colors.secondary} fontWeight={400}>
+                        </StyledText>
+                        <StyledText component="p" color={colors.secondary} fontWeight={400}>
                             Size: {imageBase64 ? (imageBase64.length / 1024).toFixed(2) : 0} KB, {htmlImageCode.length} chars
-                        </Typography>
+                        </StyledText>
                         {imageBase64.length > 0 ? (
                             <Toolbar>
                                 <Tooltip title={downloadLabel}>
@@ -164,12 +165,12 @@ export default function ImageToBase64() {
                         inputProps={{ readOnly: true }}
                     />
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Typography component="h5" color={colors.primary} fontWeight={700} flexGrow={1}>
+                        <StyledText component="h5" color={colors.primary} fontWeight={700} flexGrow={1}>
                             {cssBGSourceLabel}
-                        </Typography>
-                        <Typography component="p" color={colors.secondary} fontWeight={400}>
+                        </StyledText>
+                        <StyledText component="p" color={colors.secondary} fontWeight={400}>
                             Size: {imageBase64 ? (imageBase64.length / 1024).toFixed(2) : 0} KB, {cssBgImage.length} chars
-                        </Typography>
+                        </StyledText>
                         {imageBase64.length > 0 ? (
                             <Toolbar>
                                 <Tooltip title={downloadLabel}>
@@ -195,7 +196,7 @@ export default function ImageToBase64() {
                         inputProps={{ readOnly: true }}
                     />
                 </StyledBoxContainer>
-            </Box>
+            </StyledContainer>
         </>
     );
 }

@@ -7,10 +7,11 @@ import ImageToBase64 from "components/ImageToBase64";
 import QRGenerator from "components/QRGenerator";
 import { object, oneOfType } from "prop-types";
 import React from "react";
-import { Divider, Typography } from "@mui/material";
+import { Divider } from "@mui/material";
 import StepperNavigation from "components/StepperNavigation";
 import UrlValidator from "components/UrlValidator";
 import localization from "localization";
+import { StyledText } from "components/Shared/Styled-Components";
 import { StyledContainer, StyledLayoutContainer } from "./styles";
 
 function Operations({ location }) {
@@ -46,9 +47,9 @@ function Operations({ location }) {
             <StepperNavigation currentView={title} />
             <StyledLayoutContainer>
                 <StyledContainer>
-                    <Typography variant="h3" fontWeight={500}>
+                    <StyledText variant="h3" fontWeight={500} className="page-title">
                         {title}
-                    </Typography>
+                    </StyledText>
                     <Divider flexItem sx={{ m: 2 }} />
                     <Component />
                 </StyledContainer>

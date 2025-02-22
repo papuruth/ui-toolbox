@@ -14,7 +14,7 @@ export default {
         imagePreviewText: "Image Preview",
         base64StringsLabel: "Base64 Strings",
         htmlImgLabel: "HTML <img /> code",
-        cssBGSourceLabel: "CSS Background Source"
+        cssBGSourceLabel: "CSS Source"
     },
     qrGenerator: {
         pageTitle: "QR Code Generator",

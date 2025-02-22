@@ -27,7 +27,7 @@ export default function QRGenerator() {
 
     const generateQRCode = useCallback(
         (data, logo) => {
-            QRCode.toDataURL(data, { errorCorrectionLevel: "H", width: width || 300, margin: 0 }).then(async (data) => {
+            QRCode.toDataURL(data, { errorCorrectionLevel: "H", width: width > 0 ? width : 300, margin: 0 }).then(async (data) => {
                 const qrImageWithShadow = await applyShadowToQRImage(data, logo);
                 if (logo) {
                     setQRImageWithLogo(qrImageWithShadow);
@@ -170,7 +170,7 @@ export default function QRGenerator() {
                 onChange={handleQRInputChange}
                 inputProps={{ maxLength: 200 }}
             />
-            <Toolbar sx={{ width: 400 }}>
+            <Toolbar sx={{ width: { xs: "100%", sm: "100%", md: 400 } }}>
                 <Typography id="qr-width-slider" marginRight={2} width={100} fontWeight={500}>
                     {qrWidthLabel}
                 </Typography>
@@ -190,7 +190,7 @@ export default function QRGenerator() {
                     disabled={!qrData}
                 />
             </Toolbar>
-            <StyledBoxCenter width={350} marginTop={2} justifyContent="flex-start">
+            <StyledBoxCenter width={350} marginTop={2} justifyContent="flex-start" isLeftRightPadding>
                 <StyledSwitch
                     label="Add Logo"
                     checked={!!addLogoSwitch}
@@ -207,7 +207,7 @@ export default function QRGenerator() {
                     <ImageDropZone maxImageSize={512} unit="KB" handleOnDrop={handleSelectedFiles} />
                 </StyledBoxCenter>
             ) : null}
-            <StyledImagePreviewContainer>{loadQRPreview()}</StyledImagePreviewContainer>
+            <StyledImagePreviewContainer padding>{loadQRPreview()}</StyledImagePreviewContainer>
             {qrImage ? (
                 <Toolbar>
                     <Button onClick={handleDownload} variant="outlined" endIcon={<CloudDownload color="primary" />}>

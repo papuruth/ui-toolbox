@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 export const StyledContainer = styled.div`
     width: 100%;
+    min-width: 320px !important;
 `;
 
 export const StyledMainViewContainer = styled(Box)`

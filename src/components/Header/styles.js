@@ -25,6 +25,9 @@ export const Search = muiStyled("div")(({ theme }) => ({
     marginRight: theme.spacing(2),
     marginLeft: 0,
     width: "100%",
+    [theme.breakpoints.up("xs")]: {
+        marginRight: 0
+    },
     [theme.breakpoints.up("sm")]: {
         marginLeft: theme.spacing(3),
         width: "auto"
