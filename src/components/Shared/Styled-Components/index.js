@@ -55,7 +55,7 @@ export const StyledPaperCenter = styled(Paper)`
     width: ${(props) => (props.width ? `${props.width}px` : "100%")};
     height: ${(props) => (props.height ? `${props.height}px` : "100%")};
     flex-direction: column;
-    aspect-ratio: 1/1;
+    aspect-ratio: ${(props) => (props?.$isAspectRatio ? 1 / 1 : "")};
     ${styledMedia.lessThan("md")`
       width: 100%;
       height: 100%;

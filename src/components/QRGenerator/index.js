@@ -57,7 +57,7 @@ export default function QRGenerator() {
             return <StyledImageRenderer src={qrImageWithLogo} alt="qr-preview" width={width} sameDimensions />;
         }
         return (
-            <StyledPaperCenter height={350} width={350}>
+            <StyledPaperCenter $isAspectRatio height={350} width={350}>
                 <QrCode fontSize="large" />
                 <Typography variant="h6">{qrPreviewLabel}</Typography>
             </StyledPaperCenter>
@@ -66,8 +66,11 @@ export default function QRGenerator() {
 
     const handleQRInputChange = useCallback(
         (event) => {
+            setQRData(event.target.value);
+            if (!event.target.value) {
+                setWidth(0);
+            }
             if (event.target.value) {
-                setQRData(event.target.value);
                 if (!qrData) {
                     setWidth(300);
                 }
