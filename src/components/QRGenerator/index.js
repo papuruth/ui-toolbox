@@ -190,7 +190,7 @@ export default function QRGenerator() {
                     disabled={!qrData}
                 />
             </Toolbar>
-            <StyledBoxCenter width={350} marginTop={2} justifyContent="flex-start" isLeftRightPadding>
+            <StyledBoxCenter width={350} marginTop={2} justifyContent="flex-start" $isLeftRightPadding>
                 <StyledSwitch
                     label="Add Logo"
                     checked={!!addLogoSwitch}

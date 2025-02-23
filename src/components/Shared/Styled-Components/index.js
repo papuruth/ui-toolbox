@@ -8,7 +8,7 @@ export const StyledImagePreviewContainer = styled.div`
     align-items: center;
     justify-content: center;
     width: 50%;
-    padding: ${(props) => (props?.padding ? "20px" : "0")};
+    padding: ${(props) => (props?.isPadding ? "20px" : "0")};
     text-align: center;
     border-right: ${(props) => (props.borderRight ? "1px solid #000" : "")};
     ${styledMedia.lessThan("sm")`
@@ -44,7 +44,7 @@ export const StyledBoxCenter = styled(Box)`
     ${styledMedia.lessThan("md")`
       width: 100%;
       height: 100%;
-      padding: ${(props) => (props?.isLeftRightPadding ? "0 16px" : "")}
+      padding: ${(props) => (props?.$isLeftRightPadding ? "0 16px" : "")}
     `}
 `;
 

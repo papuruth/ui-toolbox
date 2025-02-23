@@ -6,8 +6,10 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-    const token = storage.getToken();
-
+    let token = storage.getToken();
+    if (!token) {
+        token = process.env.REACT_APP_BITLY_ACCESS_TOKEN;
+    }
     const headers = { ...config.headers };
 
     if (token) {

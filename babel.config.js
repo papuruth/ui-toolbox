@@ -9,6 +9,7 @@ module.exports = {
         "@babel/plugin-transform-object-assign",
         "@babel/plugin-transform-modules-commonjs",
         "@babel/plugin-transform-react-constant-elements",
+        "@babel/plugin-proposal-optional-chaining",
         [
             "module-resolver",
             {
@@ -19,7 +20,8 @@ module.exports = {
                     styles: "./src/styles",
                     routes: "./src/routes",
                     localization: "./src/localization",
-                    assets: "./src/assets"
+                    assets: "./src/assets",
+                    services: "./src/services"
                 }
             }
         ]

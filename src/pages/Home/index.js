@@ -17,7 +17,7 @@ function Home({ searchQuery }) {
     }
 
     return (
-        <StyledContainer search={searchQuery} dataLength={OPERATIONS_ITEMS.length}>
+        <StyledContainer>
             <StyledGridContainer>
                 {!isEmpty(gridItems)
                     ? map(gridItems, (item) => (

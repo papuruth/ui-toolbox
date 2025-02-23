@@ -91,7 +91,7 @@ export default function ImageToBase64() {
         <>
             <ImageDropZone handleOnDrop={handleSelectedFiles} />
             <StyledContainer>
-                <StyledImagePreviewContainer borderRight borderBottom padding>
+                <StyledImagePreviewContainer borderRight borderBottom isPadding>
                     {imageBase64 ? (
                         <StyledImageRenderer src={imageBase64} alt="image-preview" />
                     ) : (

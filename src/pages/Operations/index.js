@@ -12,13 +12,29 @@ import StepperNavigation from "components/StepperNavigation";
 import UrlValidator from "components/UrlValidator";
 import localization from "localization";
 import { StyledText } from "components/Shared/Styled-Components";
+import URLShortner from "components/URLShortner";
+import JSONViewer from "components/JSONViewer";
+import PasswordGenerator from "components/PasswordGenerator";
+import PasswordStrengthMeter from "components/PasswordStrengthMeter";
 import { StyledContainer, StyledLayoutContainer } from "./styles";
 
 function Operations({ location }) {
     const { pathname } = location || {};
     const renderComponentConditionally = () => {
-        const { imageToBase64, base64ToImage, qrGenerator, imageResizer, aspectRatioCalculator, base64Encoder, base64Decoder, urlValidator } =
-            localization;
+        const {
+            imageToBase64,
+            base64ToImage,
+            qrGenerator,
+            imageResizer,
+            aspectRatioCalculator,
+            base64Encoder,
+            base64Decoder,
+            urlValidator,
+            urlShortner,
+            jsonViewer,
+            passwordGen,
+            passwordStrengthMeter
+        } = localization;
         switch (pathname) {
             case "/image-to-base64":
                 return { title: imageToBase64.pageTitle, component: ImageToBase64 };
@@ -36,6 +52,14 @@ function Operations({ location }) {
                 return { title: base64Decoder.pageTitle, component: DecodeBase64 };
             case "/url-validator":
                 return { title: urlValidator.pageTitle, component: UrlValidator };
+            case "/url-shortener":
+                return { title: urlShortner.pageTitle, component: URLShortner };
+            case "/json-viewer":
+                return { title: jsonViewer.pageTitle, component: JSONViewer };
+            case "/password-gen":
+                return { title: passwordGen.pageTitle, component: PasswordGenerator };
+            case "/password-strength-meter":
+                return { title: passwordStrengthMeter.pageTitle, component: PasswordStrengthMeter };
             default:
                 return null;
         }

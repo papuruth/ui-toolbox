@@ -55,5 +55,29 @@ export default [
         component: Operations,
         exact: true,
         key: "URLVALIDATOR"
+    },
+    {
+        path: "/url-shortener",
+        component: Operations,
+        exact: true,
+        key: "URLSHORTENER"
+    },
+    {
+        path: "/json-viewer",
+        component: Operations,
+        exact: true,
+        key: "JSONVIEWER"
+    },
+    {
+        path: "/password-gen",
+        component: Operations,
+        exact: true,
+        key: "PASSWORDGEN"
+    },
+    {
+        path: "/password-strength-meter",
+        component: Operations,
+        exact: true,
+        key: "PASSWORDSTRENGTHMETER"
     }
 ];

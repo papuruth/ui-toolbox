@@ -11,7 +11,8 @@
             "styles/*": ["./styles/*"],
             "routes/*": ["./routes/*"],
             "localization/*": ["./localization/*"],
-            "assets/*": ["./assets/*"]
+            "assets/*": ["./assets/*"],
+            "services/*": ["./services/*"]
         }
     },
     "exclude": ["node_modules", "**/node_modules/*", "build/"]

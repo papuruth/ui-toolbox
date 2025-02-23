@@ -61,10 +61,10 @@ export const StyledGridItem = styled.div`
     transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
     border-radius: 4px;
     box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
-    ${styledMedia.lessThan("desktop")`
+    ${styledMedia.lessThan("lg")`
       width: 31%;
     `}
-    ${styledMedia.lessThan("tablet")`
+    ${styledMedia.lessThan("md")`
       width: 48%;
     `}
 `;

@@ -45,6 +45,18 @@ export default {
         urlTextPlaceholder: "Enter URL to shorten",
         creditText: "Powered by bitly"
     },
+    passwordGen: {
+        pageTitle: "Password Generator",
+        passwordFieldPlaceholderText: "Enter password length"
+    },
+    jsonViewer: {
+        pageTitle: "JSON Viewer",
+        urlTextPlaceholder: "Enter JSON"
+    },
+    passwordStrengthMeter: {
+        pageTitle: "Password Strength Meter",
+        passwordFieldPlaceholderText: "Enter password"
+    },
     common: {
         maxImageSizeText: "Maximum image size allowed is 2MB",
         imageLoadError: "Image Load Error",

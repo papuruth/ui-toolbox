@@ -47,7 +47,8 @@
                     ["styles", "./src/styles"],
                     ["routes", "./src/routes"],
                     ["localization", "./src/localization"],
-                    ["assets", "./src/assets"]
+                    ["assets", "./src/assets"],
+                    ["services", "./src/services"]
                 ]
             }
         }
