@@ -160,5 +160,37 @@ export const GLOBAL_CONSTANTS = {
         Lowers: "abcdefghijklmnopqrstuvwxyz",
         Numbers: "1234567890",
         Symbols: "!#$%&*+-.@^_~%()=`"
-    }
+    },
+    JSON_EDITOR_CTA: [
+        {
+            id: "paste",
+            label: "Paste",
+            enabled: true
+        },
+        {
+            id: "copy",
+            label: "Copy",
+            enabled: true
+        },
+        {
+            id: "clear",
+            label: "Clear",
+            enabled: true
+        },
+        {
+            id: "format",
+            label: "Format",
+            enabled: true
+        },
+        {
+            id: "removeWhitespace",
+            label: "Remove Whitespace",
+            enabled: true
+        },
+        {
+            id: "loadJSONData",
+            label: "Load JSON Data",
+            enabled: true
+        }
+    ]
 };

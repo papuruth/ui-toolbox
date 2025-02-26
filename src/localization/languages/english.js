@@ -55,7 +55,11 @@ export default {
     },
     passwordStrengthMeter: {
         pageTitle: "Password Strength Meter",
-        passwordFieldPlaceholderText: "Enter password"
+        passwordFieldPlaceholderText: "Enter password to check",
+        weak: "weak",
+        medium: "medium",
+        strong: "strong",
+        veryStrong: "Very Strong"
     },
     common: {
         maxImageSizeText: "Maximum image size allowed is 2MB",

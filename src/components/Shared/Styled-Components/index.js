@@ -3,6 +3,28 @@ import styled from "styled-components";
 import { styled as muiStyled } from "@mui/material/styles";
 import { styledMedia } from "styles/global";
 
+const getBoxWidth = (props) => {
+    const { width } = props || {};
+    if (typeof width === "number") {
+        return `${width}px`;
+    }
+    if (typeof width === "string") {
+        return width;
+    }
+    return "100%";
+};
+
+const getBoxHeight = (props) => {
+    const { height } = props || {};
+    if (typeof height === "number") {
+        return `${height}px`;
+    }
+    if (typeof height === "string") {
+        return height;
+    }
+    return "100%";
+};
+
 export const StyledImagePreviewContainer = styled.div`
     display: flex;
     align-items: center;
@@ -22,17 +44,6 @@ export const StyledImagePreviewContainer = styled.div`
       border-bottom: ${(props) => (props.borderBottom ? "1px solid #000" : "")};
     `}
 `;
-
-const getBoxWidth = (props) => {
-    const { width } = props || {};
-    if (typeof width === "number") {
-        return `${width}px`;
-    }
-    if (typeof width === "string") {
-        return width;
-    }
-    return "100%";
-};
 
 export const StyledBoxCenter = styled(Box)`
     display: flex;
@@ -87,12 +98,15 @@ export const StyledDivider = styled(Divider)`
 `;
 
 export const StyledTextField = muiStyled(TextField)({
-    "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
         borderColor: "black",
         borderWidth: "1px"
     },
     "&[readonly=\"read-only\"]": {
         pointerEvents: "none"
+    },
+    "#placeholder": {
+        textAlign: "center"
     }
 });
 
@@ -114,7 +128,7 @@ export const StyledButton = styled(Button)``;
 export const StyledBoxContainer = styled(Box)`
     display: flex;
     width: ${(props) => getBoxWidth(props)};
-    height: 100%;
+    height: ${(props) => getBoxHeight(props)};
     margin: auto;
     margin-top: ${(props) => (props.marginTop ? `${props.marginTop * 8}px` : "auto")};
     ${styledMedia.lessThan("md")`

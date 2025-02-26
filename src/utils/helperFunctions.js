@@ -177,9 +177,23 @@ export const passwordGenerator = (length = 8, compositionRule = {}, allowedList 
     return scrambleArray(chars).join("");
 };
 
-export function formatNumberToUnits(val) {
+export function formatNumberToUnits(val, showFullUnits) {
     // Thousands, millions, billions, trillions, quadrillions, etc..
-    const units = ["", "K", "M", "B", "T", "q", "Q", "s", "S", "o", "n", "d"];
+    const units = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"];
+    const fullUnits = [
+        "",
+        "Thousand",
+        "Million",
+        "Billion",
+        "Trillion",
+        "Quadrillion",
+        "Quintillion",
+        "Sextillion",
+        "Septillion",
+        "Octillion",
+        "Nonillion",
+        "Decillion"
+    ];
     // Dividing the value by 3.
     const sNum = Math.floor(`${val}`.length / 3);
     // Calculating the precised value.
@@ -189,7 +203,26 @@ export function formatNumberToUnits(val) {
         sVal = sVal.toFixed(1);
     }
     // Appending the letter to precised val.
-    return sVal + units[sNum];
+    return `${sVal} ${showFullUnits ? fullUnits[sNum] : units[sNum]}`;
 }
 
 export const getRandomNumbers = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+export function getFixedNumber(x) {
+    let num = x;
+    if (Math.abs(num) < 1.0) {
+        const e = parseInt(num.toString().split("e-")[1], 10);
+        if (e) {
+            num *= 10 ** (e - 1);
+            num = `0.${new Array(e).join("0")}${num.toString().substring(2)}`;
+        }
+    } else {
+        let e = parseInt(num.toString().split("+")[1], 10);
+        if (e > 20) {
+            e -= 20;
+            num /= 10 ** e;
+            num += new Array(e + 1).join("0");
+        }
+    }
+    return num;
+}
