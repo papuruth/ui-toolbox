@@ -56,9 +56,9 @@ export default {
     passwordStrengthMeter: {
         pageTitle: "Password Strength Meter",
         passwordFieldPlaceholderText: "Enter password to check",
-        weak: "weak",
-        medium: "medium",
-        strong: "strong",
+        weak: "Weak",
+        medium: "Medium",
+        strong: "Strong",
         veryStrong: "Very Strong"
     },
     common: {

@@ -88,6 +88,21 @@ export default function PasswordStrengthMeter() {
         }
     };
 
+    const getPasswordBgColor = () => {
+        switch (passwordStrengthDetails?.score) {
+            case 0:
+            case 1:
+                return colors.error;
+            case 2:
+                return colors.warning;
+            case 3:
+            case 4:
+                return colors.success;
+            default:
+                return colors.grey;
+        }
+    };
+
     const { crackTime, score, hasUpperCase, hasLowerCase, hasNumbers, hasSymbols } = passwordStrengthDetails || {};
     return (
         <StyledBoxCenter flexDirection="column" justifyContent="center" marginTop={4} gap={3}>
@@ -111,7 +126,7 @@ export default function PasswordStrengthMeter() {
                             flexDirection="column"
                             gap={1}
                             $marginLeft="5px"
-                            bgcolor="red"
+                            bgcolor={getPasswordBgColor()}
                             width={600}
                         >
                             <StyledTextField

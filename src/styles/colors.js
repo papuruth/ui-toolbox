@@ -2,6 +2,7 @@ export default {
     white: "#fff",
     lighter: "#eee",
     light: "#ddd",
+    grey: "#d0d0d0",
     regular: "#999",
     dark: "#666",
     darker: "#333",
@@ -12,9 +13,9 @@ export default {
     background: "#f5f5f5",
 
     info: "#2299ff",
-    success: "#22cc99",
-    error: "#dd5555",
-    warning: "#bbcc11",
+    success: "#2e7d32",
+    error: "#e40808",
+    warning: "#ffd800",
 
     transparent: "transparent",
     blackTransparent: "rgba(0,0,0,0.6)",

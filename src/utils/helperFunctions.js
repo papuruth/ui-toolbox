@@ -177,7 +177,7 @@ export const passwordGenerator = (length = 8, compositionRule = {}, allowedList 
     return scrambleArray(chars).join("");
 };
 
-export function formatNumberToUnits(val, showFullUnits) {
+export function formatNumberToUnits(number, showFullUnits) {
     // Thousands, millions, billions, trillions, quadrillions, etc..
     const units = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"];
     const fullUnits = [
@@ -194,16 +194,17 @@ export function formatNumberToUnits(val, showFullUnits) {
         "Nonillion",
         "Decillion"
     ];
-    // Dividing the value by 3.
-    const sNum = Math.floor(`${val}`.length / 3);
-    // Calculating the precised value.
-    let sVal = parseFloat((sNum !== 0 ? val / 1000 ** sNum : val).toPrecision(2));
+    if (number >= 1e3) {
+        // Divide to get Unit style numbers (1e3,1e6,1e9, etc)
+        const unit = Math.floor((number.toFixed(0).length - 1) / 3) * 3;
+        const num = (number / `1e${unit}`).toFixed(1).replace(/\.0+$/, "");
 
-    if (sVal % 1 !== 0) {
-        sVal = sVal.toFixed(1);
+        const unitName = showFullUnits ? fullUnits[Math.floor(unit / 3) - 1] : units[Math.floor(unit / 3) - 1];
+        // return num + unitName;
+        return `${num} ${unitName}`;
     }
-    // Appending the letter to precised val.
-    return `${sVal} ${showFullUnits ? fullUnits[sNum] : units[sNum]}`;
+    // To fix issue like --> 0.1 + 0.2 --> 0.30000000000000004
+    return Math.round(number * 1e12) / 1e12;
 }
 
 export const getRandomNumbers = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
