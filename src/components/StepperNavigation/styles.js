@@ -8,7 +8,7 @@ export const StyledContainer = styled(Paper)`
     padding: 10px 40px;
     margin: 0 40px;
     ${styledMedia.lessThan("sm")`
-        padding: 10px 20px
+        padding: 10px 20px;
         margin: 20px;
     `}
     ${styledMedia.lessThan("xs")`

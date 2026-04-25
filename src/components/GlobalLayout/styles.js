@@ -10,8 +10,10 @@ export const StyledContainer = styled.div`
 export const StyledMainViewContainer = styled(Box)`
     width: 100%;
     margin-top: 80px;
+    padding-bottom: 60px;
+    background-color: var(--bg-page);
     ${styledMedia.lessThan("sm")`
       margin-top:65px;
-      margin-bottom:25px;
+      padding-bottom:60px;
     `}
 `;

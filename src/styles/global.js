@@ -12,6 +12,26 @@ export const styledMedia = generateMedia({
 });
 
 const GlobalStyle = createGlobalStyle`
+  /* Color mode tokens */
+  :root {
+    --bg-page: #f5f5f5;
+    --bg-surface: #ffffff;
+    --bg-card: #ffffff;
+    --text-primary: rgba(0, 0, 0, 0.87);
+    --text-secondary: rgba(0, 0, 0, 0.54);
+    --border-color: rgba(0, 0, 0, 0.12);
+    --hero-gradient: linear-gradient(135deg, #1f1e29 0%, #22cc99 100%);
+  }
+  [data-theme="dark"] {
+    --bg-page: #121212;
+    --bg-surface: #1e1e2e;
+    --bg-card: #252535;
+    --text-primary: rgba(255, 255, 255, 0.87);
+    --text-secondary: rgba(255, 255, 255, 0.6);
+    --border-color: rgba(255, 255, 255, 0.12);
+    --hero-gradient: linear-gradient(135deg, #0d0c14 0%, #1a9970 100%);
+  }
+
   /* Default */
   * {
     box-sizing: border-box;
@@ -20,9 +40,10 @@ const GlobalStyle = createGlobalStyle`
     padding: 0;
   }
   body {
-    background-color: ${colors.background};
+    background-color: var(--bg-page);
     text-rendering: optimizeLegibility !important;
     -webkit-font-smoothing: antialiased !important;
+    overflow-x: hidden;
   }
   body, input, textarea {
     font-family: 'Ubuntu', sans-serif !important;
@@ -48,7 +69,7 @@ const GlobalStyle = createGlobalStyle`
   }
   .react-grid-item {
     max-height: 320px;
-    min-width: 300px;
+    min-width: 0;
     max-width: 300px;
   }
   #nprogress {

@@ -2,7 +2,7 @@ import { createTheme, CssBaseline, StyledEngineProvider, ThemeProvider } from "@
 import GlobalLayout from "components/GlobalLayout";
 import AppUpdateUI from "components/Shared/AppUpdateUI";
 import { assign } from "lodash";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useClearCache } from "react-clear-cache";
 import { confirmAlert } from "react-confirm-alert";
 import { Provider } from "react-redux";
@@ -11,20 +11,9 @@ import "react-toastify/dist/ReactToastify.css";
 import GlobalStyled from "styles/global";
 import isPropValid from "@emotion/is-prop-valid";
 import { StyleSheetManager } from "styled-components";
+import ColorModeContext from "./context/ColorModeContext";
 import store from "./store";
 import localization from "./localization";
-
-const theme = createTheme({
-    breakpoints: {
-        values: {
-            xs: 120,
-            sm: 600,
-            md: 900,
-            lg: 1200,
-            xl: 1536
-        }
-    }
-});
 
 // This implements the default behavior from styled-components v5
 function shouldForwardProp(propName, target) {
@@ -37,7 +26,60 @@ function shouldForwardProp(propName, target) {
 }
 
 function App() {
+    const [mode, setMode] = useState(() => localStorage.getItem("ui-toolbox-theme") || "light");
     const { isLatestVersion, emptyCacheStorage } = useClearCache();
+
+    useEffect(() => {
+        localStorage.setItem("ui-toolbox-theme", mode);
+        document.documentElement.setAttribute("data-theme", mode);
+    }, [mode]);
+
+    const colorMode = useMemo(
+        () => ({
+            mode,
+            toggleColorMode: () => setMode((prev) => (prev === "light" ? "dark" : "light"))
+        }),
+        [mode]
+    );
+
+    const theme = useMemo(
+        () =>
+            createTheme({
+                palette: {
+                    mode,
+                    primary: { main: "#22cc99" },
+                    secondary: { main: "#1f1e29" }
+                },
+                breakpoints: {
+                    values: {
+                        xs: 120,
+                        sm: 600,
+                        md: 900,
+                        lg: 1200,
+                        xl: 1536
+                    }
+                },
+                components: {
+                    MuiIconButton: {
+                        styleOverrides: {
+                            root: {
+                                minWidth: 44,
+                                minHeight: 44,
+                                touchAction: "manipulation"
+                            }
+                        }
+                    },
+                    MuiButtonBase: {
+                        styleOverrides: {
+                            root: {
+                                touchAction: "manipulation"
+                            }
+                        }
+                    }
+                }
+            }),
+        [mode]
+    );
 
     useEffect(() => {
         const updateVersion = () => {
@@ -69,31 +111,33 @@ function App() {
     }, [isLatestVersion, emptyCacheStorage]);
 
     return (
-        <Provider store={store}>
-            <StyleSheetManager shouldForwardProp={shouldForwardProp}>
-                <CssBaseline />
-                <GlobalStyled />
+        <ColorModeContext.Provider value={colorMode}>
+            <Provider store={store}>
+                <StyleSheetManager shouldForwardProp={shouldForwardProp}>
+                    <CssBaseline />
+                    <GlobalStyled />
 
-                <StyledEngineProvider injectFirst>
-                    <ThemeProvider theme={theme}>
-                        <GlobalLayout />
-                    </ThemeProvider>
-                </StyledEngineProvider>
-                <ToastContainer
-                    position="top-center"
-                    autoClose={3000}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable={false}
-                    pauseOnHover
-                    theme="colored"
-                    closeButton={false}
-                />
-            </StyleSheetManager>
-        </Provider>
+                    <StyledEngineProvider injectFirst>
+                        <ThemeProvider theme={theme}>
+                            <GlobalLayout />
+                        </ThemeProvider>
+                    </StyledEngineProvider>
+                    <ToastContainer
+                        position="top-center"
+                        autoClose={3000}
+                        hideProgressBar={false}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable={false}
+                        pauseOnHover
+                        theme="colored"
+                        closeButton={false}
+                    />
+                </StyleSheetManager>
+            </Provider>
+        </ColorModeContext.Provider>
     );
 }
 

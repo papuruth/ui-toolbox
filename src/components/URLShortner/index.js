@@ -28,11 +28,8 @@ function URLShortner({ dispatch, shortenedLink }) {
     const shortenURL = async () => {
         try {
             const urlObj = new URL(url);
-            const requestPayload = {
-                long_url: urlObj.href
-            };
             setisLoading(true);
-            dispatch(getShortURL({ requestPayload }));
+            dispatch(getShortURL({ longUrl: urlObj.href }));
         } catch (error) {
             toast.error(error?.message);
         }

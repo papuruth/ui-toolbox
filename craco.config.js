@@ -11,7 +11,8 @@ module.exports = {
             routes: path.resolve(__dirname, "src/routes"),
             localization: path.resolve(__dirname, "src/localization"),
             assets: path.resolve(__dirname, "src/assets"),
-            services: path.resolve(__dirname, "src/services")
+            services: path.resolve(__dirname, "src/services"),
+            context: path.resolve(__dirname, "src/context")
         }
     },
     jest: {

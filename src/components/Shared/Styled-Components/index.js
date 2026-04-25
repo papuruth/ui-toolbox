@@ -33,11 +33,6 @@ export const StyledImagePreviewContainer = styled.div`
     padding: ${(props) => (props?.isPadding ? "20px" : "0")};
     text-align: center;
     border-right: ${(props) => (props.borderRight ? "1px solid #000" : "")};
-    ${styledMedia.lessThan("sm")`
-      width: 100%;
-      border-right: 0;
-      border-bottom: ${(props) => (props.borderBottom ? "1px solid #000" : "")};
-    `}
     ${styledMedia.lessThan("md")`
       width: 100%;
       border-right: 0;
@@ -49,6 +44,7 @@ export const StyledBoxCenter = styled(Box)`
     display: flex;
     align-items: center;
     width: ${(props) => getBoxWidth(props)};
+    max-width: 100%;
     height: 100%;
     margin: auto;
     margin-top: ${(props) => (props.marginTop ? `${props.marginTop * 8}px` : "auto")};
@@ -57,6 +53,14 @@ export const StyledBoxCenter = styled(Box)`
       height: 100%;
       padding: ${(props) => (props?.$isLeftRightPadding ? "0 16px" : "")}
     `}
+    ${styledMedia.lessThan("sm")`
+      width: 100%;
+      padding: ${(props) => (props?.$isLeftRightPadding ? "0 12px" : "")}
+    `}
+    ${styledMedia.lessThan("xs")`
+      width: 100%;
+      padding: ${(props) => (props?.$isLeftRightPadding ? "0 8px" : "")}
+    `}
 `;
 
 export const StyledPaperCenter = styled(Paper)`
@@ -64,10 +68,19 @@ export const StyledPaperCenter = styled(Paper)`
     align-items: center;
     justify-content: center;
     width: ${(props) => (props.width ? `${props.width}px` : "100%")};
+    max-width: 100%;
     height: ${(props) => (props.height ? `${props.height}px` : "100%")};
     flex-direction: column;
     aspect-ratio: ${(props) => (props?.$isAspectRatio ? 1 / 1 : "")};
     ${styledMedia.lessThan("md")`
+      width: 100%;
+      height: 100%;
+    `}
+    ${styledMedia.lessThan("sm")`
+      width: 100%;
+      height: 100%;
+    `}
+    ${styledMedia.lessThan("xs")`
       width: 100%;
       height: 100%;
     `}
@@ -90,6 +103,14 @@ export const StyledImageRenderer = styled.img`
     ${styledMedia.lessThan("md")`
       width: 100%;
       height: 100%;
+    `}
+    ${styledMedia.lessThan("sm")`
+      width: 100%;
+      height: auto;
+    `}
+    ${styledMedia.lessThan("xs")`
+      width: 100%;
+      height: auto;
     `}
 `;
 
@@ -128,10 +149,17 @@ export const StyledButton = styled(Button)``;
 export const StyledBoxContainer = styled(Box)`
     display: flex;
     width: ${(props) => getBoxWidth(props)};
+    max-width: 100%;
     height: ${(props) => getBoxHeight(props)};
     margin: auto;
     margin-top: ${(props) => (props.marginTop ? `${props.marginTop * 8}px` : "auto")};
     ${styledMedia.lessThan("md")`
+      width: 100%;
+    `}
+    ${styledMedia.lessThan("sm")`
+      width: 100%;
+    `}
+    ${styledMedia.lessThan("xs")`
       width: 100%;
     `}
 `;

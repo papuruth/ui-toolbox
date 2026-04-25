@@ -43,8 +43,8 @@ export default function ImageResizer() {
         const loaderId = Date.now();
         try {
             acceptedFiles.forEach(async (file) => {
-                if (Math.floor(file.size / 1024 / 1024) > 2) {
-                    toast.error("Maximum image size allowed is 2MB");
+                if (Math.floor(file.size / 1024 / 1024) > 5) {
+                    toast.error("Maximum image size allowed is 5MB");
                     return;
                 }
 

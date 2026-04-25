@@ -5,11 +5,10 @@ import { setShortURL, UrlShortenerActions } from "./URLShortnerActions";
 
 function* getShortURLSaga(action) {
     try {
-        const { requestPayload } = action.payload || {};
-        const response = yield call(api.post, "https://api-ssl.bitly.com/v4/shorten", requestPayload);
-        if (response?.data?.link) {
-            const { link } = response.data;
-            yield put(setShortURL({ shortenedLink: link }));
+        const { longUrl } = action.payload || {};
+        const response = yield call(api.get, `https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
+        if (response?.data) {
+            yield put(setShortURL({ shortenedLink: response.data }));
         }
     } catch (error) {
         toast.error(error?.message);

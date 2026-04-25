@@ -12,7 +12,8 @@
             "routes/*": ["./routes/*"],
             "localization/*": ["./localization/*"],
             "assets/*": ["./assets/*"],
-            "services/*": ["./services/*"]
+            "services/*": ["./services/*"],
+            "context/*": ["./context/*"]
         }
     },
     "exclude": ["node_modules", "**/node_modules/*", "build/"]

@@ -18,8 +18,8 @@ export default function AspectRatioCalculator() {
         const loaderId = Date.now();
         try {
             acceptedFiles.forEach(async (file) => {
-                if (Math.floor(file.size / 1024 / 1024) > 4) {
-                    toast.error("Maximum image size allowed is 4MB");
+                if (Math.floor(file.size / 1024 / 1024) > 5) {
+                    toast.error("Maximum image size allowed is 5MB");
                     return;
                 }
                 topLoader.show(true, loaderId);

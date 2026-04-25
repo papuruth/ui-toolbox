@@ -9,16 +9,10 @@ export default [
         key: "HOMECOMPONENT"
     },
     {
-        path: "/image-to-base64",
+        path: "/base64-image",
         component: Operations,
         exact: true,
-        key: "IMAGETOBASE64"
-    },
-    {
-        path: "/base64-to-image",
-        component: Operations,
-        exact: true,
-        key: "BASE64TOIMAGE"
+        key: "BASE64IMAGE"
     },
     {
         path: "/qr-generator",
@@ -39,16 +33,10 @@ export default [
         key: "ASPECTRATIOCALCULATOR"
     },
     {
-        path: "/decode-base64",
+        path: "/base64-text",
         component: Operations,
         exact: true,
-        key: "DECODEBASE64"
-    },
-    {
-        path: "/encode-base64",
-        component: Operations,
-        exact: true,
-        key: "ENCODEBASE64"
+        key: "BASE64TEXT"
     },
     {
         path: "/url-validator",
@@ -69,15 +57,87 @@ export default [
         key: "JSONVIEWER"
     },
     {
-        path: "/password-gen",
+        path: "/password-tools",
         component: Operations,
         exact: true,
-        key: "PASSWORDGEN"
+        key: "PASSWORDTOOLS"
     },
     {
-        path: "/password-strength-meter",
+        path: "/color-converter",
         component: Operations,
         exact: true,
-        key: "PASSWORDSTRENGTHMETER"
+        key: "COLORCONVERTER"
+    },
+    {
+        path: "/text-case",
+        component: Operations,
+        exact: true,
+        key: "TEXTCASE"
+    },
+    {
+        path: "/hash-generator",
+        component: Operations,
+        exact: true,
+        key: "HASHGENERATOR"
+    },
+    {
+        path: "/regex-tester",
+        component: Operations,
+        exact: true,
+        key: "REGEXTESTER"
+    },
+    {
+        path: "/jwt-decoder",
+        component: Operations,
+        exact: true,
+        key: "JWTDECODER"
+    },
+    {
+        path: "/uuid-generator",
+        component: Operations,
+        exact: true,
+        key: "UUIDGENERATOR"
+    },
+    {
+        path: "/timestamp",
+        component: Operations,
+        exact: true,
+        key: "TIMESTAMP"
+    },
+    {
+        path: "/number-base",
+        component: Operations,
+        exact: true,
+        key: "NUMBERBASE"
+    },
+    {
+        path: "/yaml-json",
+        component: Operations,
+        exact: true,
+        key: "YAMLJSON"
+    },
+    {
+        path: "/text-diff",
+        component: Operations,
+        exact: true,
+        key: "TEXTDIFF"
+    },
+    {
+        path: "/lorem-ipsum",
+        component: Operations,
+        exact: true,
+        key: "LOREMIPSUM"
+    },
+    {
+        path: "/word-counter",
+        component: Operations,
+        exact: true,
+        key: "WORDCOUNTER"
+    },
+    {
+        path: "/csv-json",
+        component: Operations,
+        exact: true,
+        key: "CSVJSON"
     }
 ];

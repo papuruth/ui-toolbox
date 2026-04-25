@@ -26,7 +26,7 @@ export default function ImageToBase64() {
             const loaderId = Date.now();
             try {
                 acceptedFiles.forEach(async (file) => {
-                    if (Math.floor(file.size / 1024 / 1024) > 2) {
+                    if (Math.floor(file.size / 1024 / 1024) > 5) {
                         toast.error(maxImageSizeText);
                         return;
                     }
