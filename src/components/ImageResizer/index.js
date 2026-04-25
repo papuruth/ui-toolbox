@@ -3,6 +3,7 @@ import { Button, Slider, Typography } from "@mui/material";
 import ImageDropZone from "components/ImageDropZone";
 import { StyledBoxCenter, StyledImageRenderer } from "components/Shared/Styled-Components";
 import StyledSwitch from "components/Shared/StyledSwitch";
+import localization from "localization";
 import React, { useCallback, useRef, useState } from "react";
 import ReactCrop, { centerCrop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
@@ -12,6 +13,11 @@ import toast from "utils/toast";
 import topLoader from "utils/topLoader";
 import { canvasPreview } from "./canvasPreview";
 import { StyledContainer } from "./styles";
+
+const {
+    imageResizer: L,
+    common: { maxImageSizeText }
+} = localization;
 
 export default function ImageResizer() {
     const [imgSrc, setImgSrc] = useState("");
@@ -44,7 +50,7 @@ export default function ImageResizer() {
         try {
             acceptedFiles.forEach(async (file) => {
                 if (Math.floor(file.size / 1024 / 1024) > 5) {
-                    toast.error("Maximum image size allowed is 5MB");
+                    toast.error(maxImageSizeText);
                     return;
                 }
 
@@ -113,7 +119,7 @@ export default function ImageResizer() {
                 <StyledBoxCenter marginTop={2} flexDirection="column" justifyContent="center">
                     <StyledBoxCenter width={400} justifyContent="center">
                         <Typography marginRight={4} width={155} fontWeight={500}>
-                            Scale Image
+                            {L.scaleLabel}
                         </Typography>
                         <Slider
                             id="scale-input"
@@ -134,7 +140,7 @@ export default function ImageResizer() {
                     </StyledBoxCenter>
                     <StyledBoxCenter width={400} marginTop={2} justifyContent="center">
                         <Typography marginRight={4} width={155} fontWeight={500}>
-                            Rotate Image
+                            {L.rotateLabel}
                         </Typography>
                         <Slider
                             id="rotate-input"
@@ -154,7 +160,7 @@ export default function ImageResizer() {
                         />
                     </StyledBoxCenter>
                     <StyledBoxCenter width={400} marginTop={2} justifyContent="flex-start">
-                        <StyledSwitch label="Toggle Aspect" checked={!!aspect} onChange={handleToggleAspectClick} disabled={!imgSrc} />
+                        <StyledSwitch label={L.toggleAspectLabel} checked={!!aspect} onChange={handleToggleAspectClick} disabled={!imgSrc} />
                     </StyledBoxCenter>
                     {imgSrc ? (
                         <StyledBoxCenter marginTop={5} justifyContent="center">
@@ -175,7 +181,7 @@ export default function ImageResizer() {
                             </ReactCrop>
                             {completedCrop ? (
                                 <StyledBoxCenter flexDirection="column" width={500} marginLeft={10} justifyContent="center">
-                                    <Typography variant="h6">Crop Preview</Typography>
+                                    <Typography variant="h6">{L.cropPreviewLabel}</Typography>
                                     <canvas
                                         ref={previewCanvasRef}
                                         style={{
@@ -186,7 +192,7 @@ export default function ImageResizer() {
                                         }}
                                     />
                                     <Button variant="outlined" endIcon={<CloudDownload />} onClick={onDownloadCropClick} sx={{ mt: 2 }}>
-                                        Download Image
+                                        {L.downloadImageBtn}
                                     </Button>
                                 </StyledBoxCenter>
                             ) : null}

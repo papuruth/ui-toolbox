@@ -2,24 +2,30 @@ import { ContentCopy, Delete, Settings } from "@mui/icons-material";
 import { Button, IconButton, TextField, Tooltip, Typography } from "@mui/material";
 import ImageDropZone from "components/ImageDropZone";
 import { StyledBoxCenter, StyledDivider } from "components/Shared/Styled-Components";
+import localization from "localization";
 import React, { useCallback, useState } from "react";
 import { getDataUrl, getImageAspectRatio } from "utils/helperFunctions";
 import toast from "utils/toast";
 import topLoader from "utils/topLoader";
 import { StyledContainer } from "./styles";
 
+const {
+    aspectRatioCalculator: L,
+    common: { copyToCP, copiedToCP, maxImageSizeText }
+} = localization;
+
 export default function AspectRatioCalculator() {
     const [imageWidth, setImageWidth] = useState(0);
     const [imageHeight, setImageHeight] = useState(0);
     const [aspectRatio, setAspectRatio] = useState(null);
-    const [copyTooltip, setCopyTooltip] = useState("Copy to clipboard");
+    const [copyTooltip, setCopyTooltip] = useState(copyToCP);
 
     const handleSelectedFiles = useCallback((acceptedFiles) => {
         const loaderId = Date.now();
         try {
             acceptedFiles.forEach(async (file) => {
                 if (Math.floor(file.size / 1024 / 1024) > 5) {
-                    toast.error("Maximum image size allowed is 5MB");
+                    toast.error(maxImageSizeText);
                     return;
                 }
                 topLoader.show(true, loaderId);
@@ -57,7 +63,7 @@ export default function AspectRatioCalculator() {
     const handleCopyToClipBoard = useCallback(() => {
         if (window && window.navigator.clipboard) {
             window.navigator.clipboard.writeText(aspectRatio).then(() => {
-                setCopyTooltip("Copied!");
+                setCopyTooltip(copiedToCP);
                 setTimeout(() => {
                     setCopyTooltip("Copy to clipboard");
                 }, 1000);
@@ -84,7 +90,7 @@ export default function AspectRatioCalculator() {
             </StyledBoxCenter>
             <StyledBoxCenter flexDirection="column" justifyContent="center" marginTop={4}>
                 <Typography variant="h6" fontWeight={500}>
-                    Image Dimensions in PX
+                    {L.imageDimensionsLabel}
                 </Typography>
                 <StyledBoxCenter
                     justifyContent="center"
@@ -94,7 +100,7 @@ export default function AspectRatioCalculator() {
                     }}
                 >
                     <TextField
-                        label="Image Width"
+                        label={L.imageWidthLabel}
                         type="number"
                         id="image-width"
                         value={imageWidth}
@@ -102,7 +108,7 @@ export default function AspectRatioCalculator() {
                         variant="outlined"
                     />
                     <TextField
-                        label="Image Height"
+                        label={L.imageHeightLabel}
                         type="number"
                         id="image-width"
                         value={imageHeight}
@@ -110,14 +116,14 @@ export default function AspectRatioCalculator() {
                         variant="outlined"
                     />
                     <Button variant="outlined" endIcon={<Settings />} onClick={calculateRatio} disabled={!imageWidth || !imageHeight}>
-                        Calculate
+                        {L.calculateBtn}
                     </Button>
                 </StyledBoxCenter>
             </StyledBoxCenter>
             {aspectRatio ? (
                 <StyledBoxCenter justifyContent="center" marginTop={4}>
                     <Typography variant="h6" fontWeight={500}>
-                        Image Aspect Ratio:
+                        {L.aspectRatioLabel}
                     </Typography>
                     <Typography variant="h6" fontWeight={500} marginLeft={2} color="blueviolet">
                         {aspectRatio}
@@ -127,7 +133,7 @@ export default function AspectRatioCalculator() {
                             <ContentCopy color="primary" />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Reset">
+                    <Tooltip title={L.resetTooltip}>
                         <IconButton
                             onClick={() => {
                                 setImageWidth(0);

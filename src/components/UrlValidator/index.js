@@ -1,8 +1,7 @@
 import { Check, Warning } from "@mui/icons-material";
 import { Chip, CircularProgress, Paper, Tooltip } from "@mui/material";
 import axios from "axios";
-import { StyledText } from "components/DecodeBase64/styles";
-import { StyledBoxCenter, StyledBoxContainer, StyledButton, StyledTextField } from "components/Shared/Styled-Components";
+import { StyledBoxCenter, StyledBoxContainer, StyledButton, StyledText, StyledTextField } from "components/Shared/Styled-Components";
 import localization from "localization";
 import { capitalize, forEach } from "lodash";
 import React, { useEffect, useState } from "react";
@@ -147,7 +146,17 @@ export default function UrlValidator() {
         return urlInfoJSX;
     };
     const {
-        urlValidator: { urlTextPlaceholder }
+        urlValidator: {
+            urlTextPlaceholder,
+            checkStatusBtn,
+            checkingLabel,
+            urlCleanerBtn,
+            queriesRemoverBtn,
+            unshortUrlBtn,
+            replaceProtocolBtn,
+            replaceProtocolTooltip,
+            restoreBtn
+        }
     } = localization;
 
     const disabledCTAs = !url;
@@ -168,12 +177,12 @@ export default function UrlValidator() {
             <StyledBoxContainer marginTop={4} justifyContent="center" sx={{ flexWrap: "wrap", gap: 1 }}>
                 <StyledText component="div" marginRight={2}>
                     <StyledButton sx={{ width: 200 }} variant="outlined" onClick={() => handleUrl("status")} disabled={disabledCTAs}>
-                        Check Status
+                        {checkStatusBtn}
                     </StyledButton>
                     {status || statusChecking ? (
                         <Chip
                             icon={statusChecking ? <CircularProgress size={20} /> : <Check />}
-                            label={statusChecking ? "Checking..." : `${status} ${statusText}`}
+                            label={statusChecking ? checkingLabel : `${status} ${statusText}`}
                             variant="outlined"
                             color={getStatusColor()}
                             size="medium"
@@ -188,7 +197,7 @@ export default function UrlValidator() {
                         onClick={() => handleUrl("clean-ref")}
                         disabled={disabledCTAs || !isQueryAvailable}
                     >
-                        URL Cleaner
+                        {urlCleanerBtn}
                     </StyledButton>
                 </StyledText>
                 <StyledText component="div" marginRight={2}>
@@ -198,7 +207,7 @@ export default function UrlValidator() {
                         onClick={() => handleUrl("remove-all")}
                         disabled={disabledCTAs || !isQueryAvailable}
                     >
-                        Queries Remover
+                        {queriesRemoverBtn}
                     </StyledButton>
                 </StyledText>
                 <StyledText component="div" marginRight={2}>
@@ -208,19 +217,19 @@ export default function UrlValidator() {
                         onClick={() => handleUrl("short-url")}
                         disabled={disabledCTAs || (!isQueryAvailable && !isHashAvailable)}
                     >
-                        Unshort URL
+                        {unshortUrlBtn}
                     </StyledButton>
                 </StyledText>
                 {url && url?.indexOf("https") === -1 ? (
                     <StyledText component="div" marginRight={2}>
-                        <Tooltip title="http link, consider using https">
+                        <Tooltip title={replaceProtocolTooltip}>
                             <StyledButton
                                 sx={{ width: 200 }}
                                 variant="outlined"
                                 onClick={() => handleUrl("protocol-replace")}
                                 endIcon={<Warning color="warning" />}
                             >
-                                Replace Protocol
+                                {replaceProtocolBtn}
                             </StyledButton>
                         </Tooltip>
                     </StyledText>
@@ -228,7 +237,7 @@ export default function UrlValidator() {
                 {restoreEnable ? (
                     <StyledText component="div" marginRight={2}>
                         <StyledButton sx={{ width: 200 }} variant="outlined" onClick={() => handleUrl("restore")} disabled={disabledCTAs}>
-                            Restore Original URL
+                            {restoreBtn}
                         </StyledButton>
                     </StyledText>
                 ) : null}

@@ -17,18 +17,17 @@ import TimestampConverter from "components/TimestampConverter";
 import UUIDGenerator from "components/UUIDGenerator";
 import WordCounter from "components/WordCounter";
 import YAMLJSONConverter from "components/YAMLJSONConverter";
+import { Box, Chip, Typography } from "@mui/material";
 import { object, oneOfType } from "prop-types";
 import React, { useEffect } from "react";
-import { Divider } from "@mui/material";
 import StepperNavigation from "components/StepperNavigation";
 import UrlValidator from "components/UrlValidator";
 import localization from "localization";
-import { StyledText } from "components/Shared/Styled-Components";
 import URLShortner from "components/URLShortner";
 import JSONViewer from "components/JSONViewer";
 import { GLOBAL_CONSTANTS, TOOL_CATEGORIES } from "utils/globalConstants";
 import storage from "utils/storage";
-import { StyledContainer, StyledLayoutContainer } from "./styles";
+import { StyledHeroContent, StyledToolBody, StyledToolCard, StyledToolHero, StyledToolPage } from "./styles";
 
 function Operations({ location }) {
     const { pathname } = location || {};
@@ -122,18 +121,42 @@ function Operations({ location }) {
     const category = currentItem ? TOOL_CATEGORIES.find((c) => c.id === currentItem.category) : null;
 
     return (
-        <>
-            <StepperNavigation currentView={title} category={category} />
-            <StyledLayoutContainer>
-                <StyledContainer>
-                    <StyledText variant="h3" fontWeight={500} className="page-title">
-                        {title}
-                    </StyledText>
-                    <Divider flexItem sx={{ m: 2 }} />
+        <StyledToolPage>
+            <StyledToolHero $categoryColor={category?.color}>
+                <StepperNavigation currentView={title} category={category} />
+                <StyledHeroContent>
+                    <Box>
+                        <Typography variant="h5" fontWeight={700} sx={{ lineHeight: 1.2 }}>
+                            {title}
+                        </Typography>
+                        {currentItem?.description && (
+                            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, maxWidth: 540 }}>
+                                {currentItem.description}
+                            </Typography>
+                        )}
+                    </Box>
+                    {category && (
+                        <Chip
+                            label={category.label}
+                            size="small"
+                            sx={{
+                                bgcolor: `${category.color}22`,
+                                color: category.color,
+                                fontWeight: 600,
+                                border: `1px solid ${category.color}55`,
+                                alignSelf: "flex-start",
+                                mt: 0.5
+                            }}
+                        />
+                    )}
+                </StyledHeroContent>
+            </StyledToolHero>
+            <StyledToolBody>
+                <StyledToolCard elevation={2}>
                     <Component />
-                </StyledContainer>
-            </StyledLayoutContainer>
-        </>
+                </StyledToolCard>
+            </StyledToolBody>
+        </StyledToolPage>
     );
 }
 

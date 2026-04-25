@@ -111,11 +111,11 @@ export default function PasswordStrengthMeter() {
                     <StyledBoxCenter justifyContent="center" sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }} gap={1} marginTop={2}>
                         <StyledText sx={{ mr: 3 }}>
                             <b>Tip:</b>
-                            &nbsp; Strong password uses different types of characters
+                            &nbsp; {passwordStrengthMeter.tipText}
                         </StyledText>
                         <FormControlLabel
                             labelPlacement="start"
-                            label="Show password"
+                            label={passwordStrengthMeter.showPasswordLabel}
                             control={<Checkbox sx={{ ml: 1 }} checked={showPasword} onChange={(e) => setShowPassword(e.target.checked)} />}
                         />
                     </StyledBoxCenter>

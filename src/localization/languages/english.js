@@ -31,10 +31,21 @@ export default {
         qrWidthLabel: "QR Width"
     },
     aspectRatioCalculator: {
-        pageTitle: "Aspect Ratio Calculator"
+        pageTitle: "Aspect Ratio Calculator",
+        imageDimensionsLabel: "Image Dimensions in PX",
+        imageWidthLabel: "Image Width",
+        imageHeightLabel: "Image Height",
+        calculateBtn: "Calculate",
+        aspectRatioLabel: "Image Aspect Ratio:",
+        resetTooltip: "Reset"
     },
     imageResizer: {
-        pageTitle: "Image Resizer"
+        pageTitle: "Image Resizer",
+        scaleLabel: "Scale Image",
+        rotateLabel: "Rotate Image",
+        toggleAspectLabel: "Toggle Aspect",
+        cropPreviewLabel: "Crop Preview",
+        downloadImageBtn: "Download Image"
     },
     base64Encoder: {
         pageTitle: "Base64 Encoder"
@@ -44,16 +55,37 @@ export default {
     },
     urlValidator: {
         pageTitle: "URL Validator",
-        urlTextPlaceholder: "Enter URL to validate"
+        urlTextPlaceholder: "Enter URL to validate",
+        checkStatusBtn: "Check Status",
+        checkingLabel: "Checking...",
+        urlCleanerBtn: "URL Cleaner",
+        queriesRemoverBtn: "Queries Remover",
+        unshortUrlBtn: "Unshort URL",
+        replaceProtocolBtn: "Replace Protocol",
+        replaceProtocolTooltip: "http link, consider using https",
+        restoreBtn: "Restore Original URL"
     },
     urlShortner: {
         pageTitle: "URL Shortner",
         urlTextPlaceholder: "Enter URL to shorten",
-        creditText: "Powered by TinyURL"
+        creditText: "Powered by TinyURL",
+        shortLinkLabel: "Short Link:",
+        shortenBtn: "Shorten URL",
+        resetBtn: "Reset"
     },
     passwordGen: {
         pageTitle: "Password Generator",
-        passwordFieldPlaceholderText: "Enter password length"
+        passwordFieldPlaceholderText: "Enter password length",
+        passwordLengthLabel: "Password length:",
+        passwordCompositionLabel: "Password composition:",
+        uppercaseLabel: "Uppercase",
+        lowercaseLabel: "Lowercase",
+        numbersLabel: "Numbers",
+        symbolsLabel: "Symbols",
+        generatedPasswordLabel: "Generated password:",
+        passwordStrengthLabel: "Password strength:",
+        generateBtn: "Generate",
+        resetBtn: "Reset"
     },
     passwordTools: {
         pageTitle: "Password Tools"
@@ -179,7 +211,9 @@ export default {
         weak: "Weak",
         medium: "Medium",
         strong: "Strong",
-        veryStrong: "Very Strong"
+        veryStrong: "Very Strong",
+        tipText: "Strong password uses different types of characters",
+        showPasswordLabel: "Show password"
     },
     common: {
         maxImageSizeText: "Maximum image size allowed is 5MB",

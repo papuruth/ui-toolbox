@@ -1,5 +1,4 @@
-import { StyledText } from "components/DecodeBase64/styles";
-import { StyledBoxCenter, StyledButton, StyledTextField } from "components/Shared/Styled-Components";
+import { StyledBoxCenter, StyledButton, StyledText, StyledTextField } from "components/Shared/Styled-Components";
 import localization from "localization/index";
 import { func, string } from "prop-types";
 import React, { useCallback, useEffect, useState } from "react";
@@ -10,7 +9,7 @@ import { ContentCopy } from "@mui/icons-material";
 import { getShortURL, reserURLShortenerReducerState } from "./URLShortnerActions";
 
 const {
-    urlShortner: { urlTextPlaceholder },
+    urlShortner: { urlTextPlaceholder, shortLinkLabel, shortenBtn, resetBtn },
     common: { copyToCP, copiedToCP }
 } = localization;
 
@@ -71,7 +70,7 @@ function URLShortner({ dispatch, shortenedLink }) {
                         color="info"
                         label={
                             <>
-                                <b>Short Link: </b>
+                                <b>{shortLinkLabel} </b>
                                 {shortenedLink}
                             </>
                         }
@@ -93,12 +92,12 @@ function URLShortner({ dispatch, shortenedLink }) {
                         loading={isLoading}
                         loadingPosition="end"
                     >
-                        Shorten URL
+                        {shortenBtn}
                     </StyledButton>
                 </StyledText>
                 <StyledText component="div">
                     <StyledButton sx={{ width: 200 }} variant="outlined" onClick={resetState} disabled={isLoading || !url}>
-                        Reset
+                        {resetBtn}
                     </StyledButton>
                 </StyledText>
             </StyledBoxCenter>

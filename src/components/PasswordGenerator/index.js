@@ -13,8 +13,7 @@ import {
     Select,
     Tooltip
 } from "@mui/material";
-import { StyledText } from "components/DecodeBase64/styles";
-import { StyledBoxCenter, StyledBoxContainer, StyledButton } from "components/Shared/Styled-Components";
+import { StyledBoxCenter, StyledBoxContainer, StyledButton, StyledText } from "components/Shared/Styled-Components";
 import StyledNumberInput from "components/Shared/StyledNumberInput";
 import localization from "localization/index";
 import { filter, keys, reduce } from "lodash";
@@ -27,6 +26,7 @@ import zxcvbn from "zxcvbn";
 const { PASSWORD_GEN_LIST } = GLOBAL_CONSTANTS;
 const {
     passwordGen,
+    passwordStrengthMeter: psm,
     common: { copiedToCP, copyToCP }
 } = localization;
 
@@ -114,11 +114,11 @@ export default function PasswordGenerator() {
             case 0:
             case 1:
             case 2:
-                return "Weak";
+                return psm.weak;
             case 3:
-                return "Strong";
+                return psm.strong;
             case 4:
-                return "Very Strong";
+                return psm.veryStrong;
             default:
                 return null;
         }
@@ -130,7 +130,7 @@ export default function PasswordGenerator() {
                 <StyledBoxCenter justifyContent="center" sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }} gap={1}>
                     <FormGroup sx={{ flexDirection: "row", alignItems: "center", minWidth: 520 }}>
                         <FormLabel sx={{ mr: 3, minWidth: 181 }} color="info" required htmlFor="passwordLength">
-                            Password length:
+                            {passwordGen.passwordLengthLabel}
                         </FormLabel>
                         <FormGroup>
                             <FormControl sx={{ minHeight: 40 }} size="small">
@@ -151,7 +151,7 @@ export default function PasswordGenerator() {
                 <StyledBoxCenter justifyContent="center" sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }} gap={1}>
                     <FormGroup sx={{ flexDirection: "row", alignItems: "center", minHeight: 250, minWidth: 520 }}>
                         <FormLabel component="legend" sx={{ mr: 3 }} color="info" required>
-                            Password composition:
+                            {passwordGen.passwordCompositionLabel}
                         </FormLabel>
                         <FormGroup sx={{ minHeight: 225 }}>
                             <StyledBoxCenter>
@@ -163,7 +163,7 @@ export default function PasswordGenerator() {
                                             checked={!compositionRule.upperCase.forbidden}
                                         />
                                     }
-                                    label="Uppercase"
+                                    label={passwordGen.uppercaseLabel}
                                     sx={{ width: 120 }}
                                 />
                                 {!compositionRule.upperCase.forbidden ? (
@@ -195,7 +195,7 @@ export default function PasswordGenerator() {
                                             checked={!compositionRule.lowerCase.forbidden}
                                         />
                                     }
-                                    label="LowerCase"
+                                    label={passwordGen.lowercaseLabel}
                                     sx={{ width: 120 }}
                                 />
                                 {!compositionRule.lowerCase.forbidden ? (
@@ -223,7 +223,7 @@ export default function PasswordGenerator() {
                                     control={
                                         <Checkbox name="numbers" onChange={handleCompositionChange} checked={!compositionRule.numbers.forbidden} />
                                     }
-                                    label="Numbers"
+                                    label={passwordGen.numbersLabel}
                                     sx={{ width: 120 }}
                                 />
                                 {!compositionRule.numbers.forbidden ? (
@@ -251,7 +251,7 @@ export default function PasswordGenerator() {
                                     control={
                                         <Checkbox name="symbols" onChange={handleCompositionChange} checked={!compositionRule.symbols.forbidden} />
                                     }
-                                    label="Symbols"
+                                    label={passwordGen.symbolsLabel}
                                     sx={{ width: 120 }}
                                 />
                                 {!compositionRule.symbols.forbidden ? (
@@ -280,7 +280,7 @@ export default function PasswordGenerator() {
                 {password ? (
                     <StyledBoxCenter justifyContent="center" sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }} gap={1}>
                         <StyledBoxContainer width={520} alignItems="center">
-                            <StyledText sx={{ mr: 3, minWidth: 181 }}>Generated password:</StyledText>
+                            <StyledText sx={{ mr: 3, minWidth: 181 }}>{passwordGen.generatedPasswordLabel}</StyledText>
                             <StyledText sx={{ background: colors.black, color: colors.primary, borderRadius: 1, padding: 1 }}>{password}</StyledText>
                             <Tooltip
                                 title={copyTooltip}
@@ -298,7 +298,7 @@ export default function PasswordGenerator() {
                 {password ? (
                     <StyledBoxCenter justifyContent="center" sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }} gap={1} marginTop={2}>
                         <StyledBoxContainer width={520}>
-                            <StyledText sx={{ mr: 3, minWidth: 181 }}>Password strength:</StyledText>
+                            <StyledText sx={{ mr: 3, minWidth: 181 }}>{passwordGen.passwordStrengthLabel}</StyledText>
                             <StyledText>{getPasswordStrength()}</StyledText>
                         </StyledBoxContainer>
                     </StyledBoxCenter>
@@ -311,12 +311,12 @@ export default function PasswordGenerator() {
                 >
                     <StyledText component="div">
                         <StyledButton sx={{ width: 200 }} variant="outlined" onClick={handlePasswordGenerate}>
-                            Generate
+                            {passwordGen.generateBtn}
                         </StyledButton>
                     </StyledText>
                     <StyledText component="div">
                         <StyledButton sx={{ width: 200 }} variant="outlined" onClick={resetState} disabled={!password}>
-                            Reset
+                            {passwordGen.resetBtn}
                         </StyledButton>
                     </StyledText>
                 </StyledBoxCenter>
