@@ -1,10 +1,13 @@
-import { ContentCopy } from "@mui/icons-material";
+import { CheckCircle, ContentCopy } from "@mui/icons-material";
 import { Box, Chip, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import { StyledBoxCenter, StyledBoxContainer, StyledTextField } from "components/Shared/Styled-Components";
+import HistoryDropdown from "components/Shared/HistoryDropdown";
+import ShareButton from "components/Shared/ShareButton";
 import { camelCase, kebabCase, snakeCase, startCase } from "lodash";
 import localization from "localization";
-import React, { useState } from "react";
-import toast from "utils/toast";
+import React, { useEffect, useState } from "react";
+import { useToolHistory } from "utils/hooks/useToolHistory.hooks";
+import { useShareableURL } from "utils/hooks/useShareableURL.hooks";
 
 const { textCaseConverter: L, common: C } = localization;
 
@@ -22,6 +25,13 @@ export default function TextCaseConverter() {
     const [input, setInput] = useState("");
     const [output, setOutput] = useState("");
     const [activeCase, setActiveCase] = useState("");
+    const [copied, setCopied] = useState(false);
+    const { history: inputHistory, addHistory, clearHistory } = useToolHistory("text-case");
+    const { initialValue, shareURL } = useShareableURL("text");
+
+    useEffect(() => {
+        if (initialValue) setInput(initialValue);
+    }, [initialValue]);
 
     const applyCase = (caseObj) => {
         setActiveCase(caseObj.id);
@@ -30,6 +40,7 @@ export default function TextCaseConverter() {
 
     const handleInputChange = (value) => {
         setInput(value);
+        if (value.trim()) addHistory(value.trim());
         if (activeCase) {
             const fn = CASES.find((c) => c.id === activeCase)?.fn;
             if (fn) setOutput(fn(value));
@@ -39,12 +50,17 @@ export default function TextCaseConverter() {
     const handleCopy = () => {
         if (window?.navigator?.clipboard && output) {
             window.navigator.clipboard.writeText(output);
-            toast.success("Copied!");
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
         }
     };
 
     return (
         <StyledBoxContainer flexDirection="column" gap={3}>
+            <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}>
+                <HistoryDropdown history={inputHistory} onSelect={(v) => handleInputChange(v)} onClear={clearHistory} />
+                <ShareButton onShare={() => shareURL(input)} disabled={!input} />
+            </Box>
             <StyledTextField multiline rows={5} placeholder={L.inputPlaceholder} value={input} onChange={(e) => handleInputChange(e.target.value)} />
             <Stack direction="row" flexWrap="wrap" gap={1}>
                 {CASES.map((c) => (
@@ -57,9 +73,9 @@ export default function TextCaseConverter() {
                         <Typography variant="subtitle2" fontWeight={600}>
                             {L.outputLabel}
                         </Typography>
-                        <Tooltip title={C.copyToCP}>
+                        <Tooltip title={copied ? "Copied!" : C.copyToCP}>
                             <IconButton size="small" onClick={handleCopy}>
-                                <ContentCopy fontSize="small" />
+                                {copied ? <CheckCircle fontSize="small" color="success" /> : <ContentCopy fontSize="small" />}
                             </IconButton>
                         </Tooltip>
                     </StyledBoxCenter>

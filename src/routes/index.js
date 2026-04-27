@@ -1,6 +1,7 @@
 import { map } from "lodash";
 import React from "react";
-import { Redirect, Route, Switch } from "react-router-dom";
+import { Redirect, Route, Switch, useLocation } from "react-router-dom";
+import styled, { keyframes } from "styled-components";
 import routes from "./routes";
 
 const REDIRECTS = [
@@ -12,16 +13,28 @@ const REDIRECTS = [
     { from: "/password-strength-meter", to: "/password-tools" }
 ];
 
+const fadeIn = keyframes`
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0);   }
+`;
+
+const PageWrapper = styled.div`
+    animation: ${fadeIn} 0.22s ease both;
+`;
+
 function Routes() {
+    const location = useLocation();
     return (
-        <Switch>
-            {REDIRECTS.map(({ from, to }) => (
-                <Redirect key={from} exact from={from} to={to} />
-            ))}
-            {map(routes, (route) => (
-                <Route {...route} />
-            ))}
-        </Switch>
+        <PageWrapper key={location.pathname}>
+            <Switch location={location}>
+                {REDIRECTS.map(({ from, to }) => (
+                    <Redirect key={from} exact from={from} to={to} />
+                ))}
+                {map(routes, (route) => (
+                    <Route {...route} />
+                ))}
+            </Switch>
+        </PageWrapper>
     );
 }
 

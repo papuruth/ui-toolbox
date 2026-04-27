@@ -1,5 +1,5 @@
 import { Tabs } from "@mui/base/Tabs";
-import { Paper, TextField, Typography, Button } from "@mui/material";
+import { Autocomplete, Button, Paper, TextField, Typography } from "@mui/material";
 import { StyledBoxContainer } from "components/Shared/Styled-Components";
 import { StyledTab, StyledTabPanel, StyledTabsList } from "components/Shared/StyledTabs";
 import localization from "localization";
@@ -8,12 +8,54 @@ import React, { useState } from "react";
 
 const { timestampConverter: L } = localization;
 
-const FORMATS = [
-    { label: "Local", fn: (ts) => moment.unix(ts).format("YYYY-MM-DD HH:mm:ss") },
-    { label: "UTC", fn: (ts) => moment.unix(ts).utc().format("YYYY-MM-DD HH:mm:ss [UTC]") },
-    { label: "ISO 8601", fn: (ts) => moment.unix(ts).toISOString() },
-    { label: "Relative", fn: (ts) => moment.unix(ts).fromNow() }
+const COMMON_TIMEZONES = [
+    "UTC",
+    "America/New_York",
+    "America/Chicago",
+    "America/Denver",
+    "America/Los_Angeles",
+    "America/Sao_Paulo",
+    "Europe/London",
+    "Europe/Paris",
+    "Europe/Berlin",
+    "Europe/Moscow",
+    "Asia/Dubai",
+    "Asia/Kolkata",
+    "Asia/Shanghai",
+    "Asia/Tokyo",
+    "Asia/Singapore",
+    "Australia/Sydney",
+    "Pacific/Auckland"
 ];
+
+const ALL_TIMEZONES = (() => {
+    try {
+        const intl = Intl.supportedValuesOf("timeZone");
+        return [...new Set([...COMMON_TIMEZONES, ...intl])].sort();
+    } catch {
+        return COMMON_TIMEZONES;
+    }
+})();
+
+function formatInTz(unixSec, tz) {
+    try {
+        const date = new Date(unixSec * 1000);
+        return new Intl.DateTimeFormat("en-CA", {
+            timeZone: tz,
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false
+        })
+            .format(date)
+            .replace(",", "");
+    } catch {
+        return "—";
+    }
+}
 
 export default function TimestampConverter() {
     const [unixInput, setUnixInput] = useState("");
@@ -22,6 +64,14 @@ export default function TimestampConverter() {
     const [unixResult, setUnixResult] = useState(null);
     const [unixError, setUnixError] = useState("");
     const [dateError, setDateError] = useState("");
+    const [tz, setTz] = useState("UTC");
+
+    const getFormats = (ts) => [
+        { label: `Timezone (${tz})`, value: formatInTz(ts, tz) },
+        { label: "UTC", value: formatInTz(ts, "UTC") },
+        { label: "ISO 8601", value: new Date(ts * 1000).toISOString() },
+        { label: "Relative", value: moment.unix(ts).fromNow() }
+    ];
 
     const convertUnixToDate = () => {
         setUnixError("");
@@ -36,7 +86,7 @@ export default function TimestampConverter() {
             setUnixError(L.invalidTimestampError);
             return;
         }
-        setDateResults(FORMATS.map(({ label, fn }) => ({ label, value: fn(ts) })));
+        setDateResults(getFormats(ts));
     };
 
     const convertDateToUnix = () => {
@@ -56,6 +106,16 @@ export default function TimestampConverter() {
                 <StyledTab value={0}>{L.unixToDateTab}</StyledTab>
                 <StyledTab value={1}>{L.dateToUnixTab}</StyledTab>
             </StyledTabsList>
+
+            <Autocomplete
+                options={ALL_TIMEZONES}
+                value={tz}
+                onChange={(_, val) => setTz(val || "UTC")}
+                renderInput={(params) => <TextField {...params} label="Timezone" size="small" sx={{ mt: 2, maxWidth: 320 }} />}
+                disableClearable
+                size="small"
+            />
+
             <StyledTabPanel value={0}>
                 <StyledBoxContainer flexDirection="column" gap={2} sx={{ pt: 2 }}>
                     <TextField
@@ -83,6 +143,7 @@ export default function TimestampConverter() {
                         ))}
                 </StyledBoxContainer>
             </StyledTabPanel>
+
             <StyledTabPanel value={1}>
                 <StyledBoxContainer flexDirection="column" gap={2} sx={{ pt: 2 }}>
                     <TextField

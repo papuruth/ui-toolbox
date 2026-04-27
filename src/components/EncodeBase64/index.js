@@ -1,20 +1,27 @@
-import { ContentCopy, Delete } from "@mui/icons-material";
+import { CheckCircle, ContentCopy, Delete } from "@mui/icons-material";
 import { Divider, IconButton, Toolbar, Tooltip, Typography } from "@mui/material";
 import { StyledBoxCenter, StyledTextField } from "components/Shared/Styled-Components";
-import React, { useMemo, useState } from "react";
-import colors from "styles/colors";
 import { StyledText } from "components/DecodeBase64/styles";
+import ShareButton from "components/Shared/ShareButton";
+import React, { useEffect, useMemo, useState } from "react";
+import colors from "styles/colors";
+import { useShareableURL } from "utils/hooks/useShareableURL.hooks";
 import { StyledContainer } from "./styles";
 
 export default function EncodeBase64() {
     const [plainText, setPlainText] = useState("");
-    const [copyTooltip, setCopyTooltip] = useState("Copy to clipboard");
+    const [copied, setCopied] = useState(false);
+    const { initialValue, shareURL } = useShareableURL("enc");
+
+    useEffect(() => {
+        if (initialValue) setPlainText(initialValue);
+    }, [initialValue]);
 
     const handleCopyToClipBoard = (data) => {
         if (window && window.navigator.clipboard) {
             window.navigator.clipboard.writeText(data).then(() => {
-                setCopyTooltip("Copied!");
-                setTimeout(() => setCopyTooltip("Copy to clipboard"), 1000);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 1500);
             });
         }
     };
@@ -50,7 +57,7 @@ export default function EncodeBase64() {
                                         <Delete color="error" />
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title={copyTooltip}>
+                                <Tooltip title={copied ? "Copied!" : "Copy to clipboard"}>
                                     <IconButton onClick={() => handleCopyToClipBoard(plainText)}>
                                         <ContentCopy color="primary" />
                                     </IconButton>
@@ -83,9 +90,10 @@ export default function EncodeBase64() {
                         </StyledText>
                         {encodeStrings.length > 0 ? (
                             <Toolbar>
-                                <Tooltip title={copyTooltip}>
+                                <ShareButton onShare={() => shareURL(plainText)} disabled={!plainText} />
+                                <Tooltip title={copied ? "Copied!" : "Copy to clipboard"}>
                                     <IconButton onClick={() => handleCopyToClipBoard(encodeStrings)}>
-                                        <ContentCopy color="primary" />
+                                        {copied ? <CheckCircle color="success" /> : <ContentCopy color="primary" />}
                                     </IconButton>
                                 </Tooltip>
                             </Toolbar>

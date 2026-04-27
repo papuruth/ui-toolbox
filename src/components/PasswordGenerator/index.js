@@ -303,6 +303,38 @@ export default function PasswordGenerator() {
                         </StyledBoxContainer>
                     </StyledBoxCenter>
                 ) : null}
+                {password
+                    ? (() => {
+                          let charsetSize = 0;
+                          if (!compositionRule.upperCase.forbidden) charsetSize += 26;
+                          if (!compositionRule.lowerCase.forbidden) charsetSize += 26;
+                          if (!compositionRule.numbers.forbidden) charsetSize += 10;
+                          if (!compositionRule.symbols.forbidden) charsetSize += 32;
+                          const entropy = charsetSize > 0 ? Math.round(password.length * Math.log2(charsetSize)) : 0;
+                          let entropyLabel = "Strong";
+                          if (entropy < 40) entropyLabel = "Weak";
+                          else if (entropy < 60) entropyLabel = "Fair";
+                          else if (entropy < 80) entropyLabel = "Good";
+                          let entropyColor = "#22cc99";
+                          if (entropy < 60) entropyColor = "#f44336";
+                          else if (entropy < 80) entropyColor = "#ff9800";
+                          return (
+                              <StyledBoxCenter
+                                  justifyContent="center"
+                                  sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }}
+                                  gap={1}
+                                  marginTop={1}
+                              >
+                                  <StyledBoxContainer width={520}>
+                                      <StyledText sx={{ mr: 3, minWidth: 181 }}>Entropy:</StyledText>
+                                      <StyledText sx={{ color: entropyColor }}>
+                                          {entropy} bits ({entropyLabel})
+                                      </StyledText>
+                                  </StyledBoxContainer>
+                              </StyledBoxCenter>
+                          );
+                      })()
+                    : null}
                 <StyledBoxCenter
                     justifyContent="center"
                     sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }}

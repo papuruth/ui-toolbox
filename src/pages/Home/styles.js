@@ -376,12 +376,26 @@ export const StyledGridItem = styled.div`
     border-radius: 10px;
     border-left: 4px solid ${(props) => props.$accentColor || "#22cc99"};
     box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08);
-    transition: transform 200ms ease, box-shadow 200ms ease;
+    transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
     position: relative;
     overflow: hidden;
     &:hover {
         transform: translateY(-4px);
-        box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.15);
+        box-shadow: 0px 8px 28px rgba(0, 0, 0, 0.2), 0 0 0 1px ${(props) => props.$accentColor || "#22cc99"}44;
+        border-color: ${(props) => props.$accentColor || "#22cc99"};
+    }
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 10px;
+        background: radial-gradient(circle at 30% 50%, ${(props) => props.$accentColor || "#22cc99"}0a, transparent 70%);
+        opacity: 0;
+        transition: opacity 300ms ease;
+        pointer-events: none;
+    }
+    &:hover::after {
+        opacity: 1;
     }
     ${styledMedia.lessThan("lg")`
       width: calc(33.33% - 11px);

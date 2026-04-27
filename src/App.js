@@ -12,6 +12,7 @@ import GlobalStyled from "styles/global";
 import isPropValid from "@emotion/is-prop-valid";
 import { StyleSheetManager } from "styled-components";
 import ColorModeContext from "./context/ColorModeContext";
+import { ToolChainProvider } from "./context/ToolChainContext";
 import store from "./store";
 import localization from "./localization";
 
@@ -135,7 +136,9 @@ function App() {
 
                     <StyledEngineProvider injectFirst>
                         <ThemeProvider theme={theme}>
-                            <GlobalLayout />
+                            <ToolChainProvider>
+                                <GlobalLayout />
+                            </ToolChainProvider>
                         </ThemeProvider>
                     </StyledEngineProvider>
                     <ToastContainer
