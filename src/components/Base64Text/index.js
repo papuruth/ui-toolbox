@@ -2,6 +2,7 @@ import { Check, ContentCopy, DeleteOutline, IosShare } from "@mui/icons-material
 import { Box, Typography } from "@mui/material";
 import localization from "localization";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useShareableURL } from "utils/hooks/useShareableURL.hooks";
 import { useToolChain } from "context/ToolChainContext";
 import styled from "styled-components";
@@ -69,11 +70,19 @@ const CodeArea = styled(BaseCodeArea)`
 /* ─── Component ──────────────────────────────────────── */
 
 export default function Base64Text() {
+    const { state } = useLocation();
     const [mode, setMode] = useState("encode");
     const [input, setInput] = useState("");
     const [copied, setCopied] = useState(false);
     const { initialValue, shareURL } = useShareableURL("enc");
     const { consumeChain } = useToolChain();
+
+    useEffect(() => {
+        if (state?.prefill) {
+            setMode("decode");
+            setInput(state.prefill);
+        }
+    }, [state?.prefill]);
 
     useEffect(() => {
         if (initialValue) setInput(initialValue);

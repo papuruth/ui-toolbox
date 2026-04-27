@@ -1,6 +1,7 @@
 import { Check, ContentCopy } from "@mui/icons-material";
 import localization from "localization";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useToolChain } from "context/ToolChainContext";
 import styled from "styled-components";
 import {
@@ -110,10 +111,15 @@ const BtnGroup = styled(ActionBtnGroup)`
 const TABS = ["header", "payload", "signature"];
 
 export default function JWTDecoder() {
+    const { state } = useLocation();
     const [token, setToken] = useState("");
     const [tab, setTab] = useState("header");
     const [copied, setCopied] = useState(false);
     const { consumeChain } = useToolChain();
+
+    useEffect(() => {
+        if (state?.prefill) setToken(state.prefill);
+    }, [state?.prefill]);
 
     useEffect(() => {
         const chained = consumeChain("/jwt-decoder");

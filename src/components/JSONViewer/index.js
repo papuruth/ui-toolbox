@@ -2,6 +2,7 @@ import ReactJsonView from "@microlink/react-json-view";
 import HistoryDropdown from "components/Shared/HistoryDropdown";
 import localization from "localization";
 import React, { useContext, useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { ActionBtn, ActionBtnGroup, Panel, PanelHeader, PanelLabel, TabBtn, TabStrip } from "components/Shared/ToolKit";
 import { useToolHistory } from "utils/hooks/useToolHistory.hooks";
@@ -101,6 +102,7 @@ const ViewerBtnGroup = styled(ActionBtnGroup)`
 
 export default function JSONViewer() {
     const { mode } = useContext(ColorModeContext);
+    const { state } = useLocation();
     const [tab, setTab] = useState("editor");
     const [jsonInput, setJSONInput] = useState("");
     const [showLinkModal, setShowLinkModal] = useState(false);
@@ -108,6 +110,10 @@ export default function JSONViewer() {
     const [collapsed, setCollapsed] = useState(1);
     const { history: jsonHistory, addHistory: addJsonHistory, clearHistory: clearJsonHistory } = useToolHistory("json-viewer");
     const { consumeChain } = useToolChain();
+
+    useEffect(() => {
+        if (state?.prefill) setJSONInput(state.prefill);
+    }, [state?.prefill]);
 
     useEffect(() => {
         const chained = consumeChain("/json-viewer");

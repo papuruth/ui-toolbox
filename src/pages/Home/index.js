@@ -72,6 +72,7 @@ function HeroSearch({ onOpenPalette }) {
     const [activeIndex, setActiveIndex] = useState(0);
     const [focused, setFocused] = useState(false);
     const [smartHint, setSmartHint] = useState(null);
+    const [pastedText, setPastedText] = useState("");
     const inputRef = useRef(null);
     const wrapperRef = useRef(null);
 
@@ -88,9 +89,9 @@ function HeroSearch({ onOpenPalette }) {
     const showDropdown = focused && allItems.length > 0;
 
     const navigateTo = useCallback(
-        (route) => {
+        (route, prefill) => {
             storage.setRecentTool(route);
-            dispatch(push(route));
+            dispatch(push({ pathname: route, state: prefill ? { prefill } : undefined }));
         },
         [dispatch]
     );
@@ -104,6 +105,7 @@ function HeroSearch({ onOpenPalette }) {
 
     const handlePaste = (e) => {
         const text = e.clipboardData.getData("text");
+        setPastedText(text);
         setTimeout(() => {
             const detected = detectInputType(text);
             setSmartHint(detected || null);
@@ -120,8 +122,10 @@ function HeroSearch({ onOpenPalette }) {
             setActiveIndex((i) => Math.max(i - 1, 0));
         } else if (e.key === "Enter") {
             e.preventDefault();
-            if (allItems[activeIndex]) navigateTo(allItems[activeIndex].route);
-            else onOpenPalette();
+            if (allItems[activeIndex]) {
+                const item = allItems[activeIndex];
+                navigateTo(item.route, item.kind === "smart" ? pastedText : undefined);
+            } else onOpenPalette();
         } else if (e.key === "Escape") {
             setFocused(false);
             inputRef.current?.blur();
@@ -172,7 +176,7 @@ function HeroSearch({ onOpenPalette }) {
                                     onMouseEnter={() => setActiveIndex(i)}
                                     onMouseDown={(e) => {
                                         e.preventDefault();
-                                        navigateTo(item.route);
+                                        navigateTo(item.route, pastedText);
                                     }}
                                 >
                                     <span>🧠</span>

@@ -2,6 +2,7 @@ import { IosShare, Language } from "@mui/icons-material";
 import axios from "axios";
 import localization from "localization";
 import React, { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useToolChain } from "context/ToolChainContext";
 import styled from "styled-components";
 import { styledMedia } from "styles/global";
@@ -213,6 +214,7 @@ const ActionDesc = styled.span`
 `;
 
 export default function UrlValidator() {
+    const { state } = useLocation();
     const [url, setUrl] = useState("");
     const [status, setStatus] = useState("");
     const [statusText, setStatusText] = useState("");
@@ -221,6 +223,10 @@ export default function UrlValidator() {
     const [statusChecking, setStatusChecking] = useState(false);
     const { initialValue, shareURL } = useShareableURL("u");
     const { consumeChain } = useToolChain();
+
+    useEffect(() => {
+        if (state?.prefill) setUrl(state.prefill);
+    }, [state?.prefill]);
 
     useEffect(() => {
         if (initialValue) setUrl(initialValue);
