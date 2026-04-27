@@ -169,14 +169,14 @@ export default function ImageResizer() {
                         <ControlValue>{rotate}°</ControlValue>
                     </ControlRow>
                     <ControlRow>
-                        <ControlLabel>Aspect Ratio</ControlLabel>
+                        <ControlLabel>{L.aspectRatioLabel}</ControlLabel>
                         <AspectToggle $active={!!aspect} onClick={handleAspectToggle} disabled={!imgSrc}>
                             {aspectLabel}
                         </AspectToggle>
                     </ControlRow>
                     {cropDims && (
                         <ControlRow>
-                            <ControlLabel>Crop Output</ControlLabel>
+                            <ControlLabel>{L.cropOutputLabel}</ControlLabel>
                             <MetaText>
                                 {cropDims.w}×{cropDims.h}px
                             </MetaText>
@@ -187,7 +187,7 @@ export default function ImageResizer() {
 
             <Panel>
                 <PanelHeader>
-                    <PanelLabel>Preview</PanelLabel>
+                    <PanelLabel>{L.previewLabel}</PanelLabel>
                     {fileName && <MetaText>{fileName}</MetaText>}
                 </PanelHeader>
                 <CropWrap>
@@ -210,7 +210,7 @@ export default function ImageResizer() {
                         <EmptyState>
                             <CropOriginal sx={{ fontSize: 48 }} />
                             <Typography variant="body2" sx={{ fontSize: "13px" }}>
-                                Upload an image to start cropping
+                                {L.emptyStateMessage}
                             </Typography>
                         </EmptyState>
                     )}
@@ -218,7 +218,7 @@ export default function ImageResizer() {
                 {completedCrop && (
                     <CanvasWrap>
                         <PanelHeader>
-                            <PanelLabel>Cropped Result</PanelLabel>
+                            <PanelLabel>{L.croppedResultLabel}</PanelLabel>
                             {cropDims && (
                                 <MetaText>
                                     {cropDims.w}×{cropDims.h}px

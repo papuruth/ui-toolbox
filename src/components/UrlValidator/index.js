@@ -2,6 +2,7 @@ import { IosShare, Language } from "@mui/icons-material";
 import axios from "axios";
 import localization from "localization";
 import React, { useEffect, useMemo, useState } from "react";
+import { useToolChain } from "context/ToolChainContext";
 import styled from "styled-components";
 import { styledMedia } from "styles/global";
 import { ActionBar, ActionBtn, ActionBtnGroup, EmptyState, Panel, PanelHeader, PanelLabel } from "components/Shared/ToolKit";
@@ -219,10 +220,16 @@ export default function UrlValidator() {
     const [restoreEnable, setRestoreEnable] = useState(false);
     const [statusChecking, setStatusChecking] = useState(false);
     const { initialValue, shareURL } = useShareableURL("u");
+    const { consumeChain } = useToolChain();
 
     useEffect(() => {
         if (initialValue) setUrl(initialValue);
     }, [initialValue]);
+
+    useEffect(() => {
+        const chained = consumeChain("/url-validator");
+        if (chained) setUrl(chained);
+    }, [consumeChain]);
 
     const { isQueryAvailable, isHashAvailable } = useMemo(() => {
         try {

@@ -195,6 +195,13 @@ export default function CSVToJSON() {
                     autoFocus
                     style={{ minHeight: 360 }}
                 />
+                {csv && (
+                    <ActionBar>
+                        <ActionBtnGroup>
+                            <ActionBtn $danger onClick={() => setCsv("")}>{C.clearBtn}</ActionBtn>
+                        </ActionBtnGroup>
+                    </ActionBar>
+                )}
             </Panel>
 
             <Panel>

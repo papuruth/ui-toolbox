@@ -1,6 +1,7 @@
 import { Check, ContentCopy } from "@mui/icons-material";
 import localization from "localization";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useToolChain } from "context/ToolChainContext";
 import styled from "styled-components";
 import {
     ActionBar,
@@ -15,8 +16,9 @@ import {
     TabStrip,
     ToolLayout
 } from "components/Shared/ToolKit";
+import LocalBadge from "components/Shared/LocalBadge";
 
-const { jwtDecoder: L } = localization;
+const { jwtDecoder: L, common: C } = localization;
 
 function safeDecodeSegment(str) {
     try {
@@ -111,6 +113,12 @@ export default function JWTDecoder() {
     const [token, setToken] = useState("");
     const [tab, setTab] = useState("header");
     const [copied, setCopied] = useState(false);
+    const { consumeChain } = useToolChain();
+
+    useEffect(() => {
+        const chained = consumeChain("/jwt-decoder");
+        if (chained) setToken(chained);
+    }, [consumeChain]);
 
     const { header, payload, signature, badges, error } = useMemo(() => {
         if (!token.trim()) return { header: null, payload: null, signature: null, badges: [], error: "" };
@@ -118,7 +126,7 @@ export default function JWTDecoder() {
         if (parts.length !== 3) return { header: null, payload: null, signature: null, badges: [], error: L.invalidJwtError };
         const h = safeDecodeSegment(parts[0]);
         const p = safeDecodeSegment(parts[1]);
-        if (!h || !p) return { header: null, payload: null, signature: null, badges: [], error: "Failed to decode JWT segments" };
+        if (!h || !p) return { header: null, payload: null, signature: null, badges: [], error: L.decodeError };
         const now = Math.floor(Date.now() / 1000);
         const computed = [];
         if (h.alg) computed.push({ label: h.alg, type: "info" });
@@ -149,16 +157,26 @@ export default function JWTDecoder() {
         <ToolLayout>
             <Panel>
                 <PanelHeader>
-                    <PanelLabel>JWT Token</PanelLabel>
-                    {error && <ErrorBadge>{error}</ErrorBadge>}
+                    <PanelLabel>{L.jwtTokenLabel}</PanelLabel>
+                    <BtnGroup>
+                        {error && <ErrorBadge>{error}</ErrorBadge>}
+                        <LocalBadge />
+                    </BtnGroup>
                 </PanelHeader>
                 <CodeArea
                     value={token}
                     onChange={(e) => setToken(e.target.value)}
-                    placeholder="Paste your JWT token here…"
+                    placeholder={L.placeholder}
                     spellCheck={false}
                     autoFocus
                 />
+                {token && (
+                    <ActionBar>
+                        <BtnGroup>
+                            <ActionBtn $danger onClick={() => setToken("")}>{C.clearBtn}</ActionBtn>
+                        </BtnGroup>
+                    </ActionBar>
+                )}
                 {badges.length > 0 && (
                     <BadgeRow>
                         {badges.map((b) => (
@@ -189,7 +207,7 @@ export default function JWTDecoder() {
                             <BtnGroup>
                                 <ActionBtn $success={copied} onClick={handleCopy}>
                                     {copied ? <Check style={{ fontSize: 11 }} /> : <ContentCopy style={{ fontSize: 11 }} />}
-                                    {copied ? "Copied" : "Copy"}
+                                    {copied ? L.copiedLabel : L.copyBtn}
                                 </ActionBtn>
                             </BtnGroup>
                         </ActionBar>
@@ -197,7 +215,7 @@ export default function JWTDecoder() {
                 ) : (
                     <EmptyState>
                         <span style={{ fontSize: 22, fontFamily: "JetBrains Mono, monospace" }}>{}</span>
-                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>Paste a JWT token to decode it</span>
+                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>{L.emptyStateMessage}</span>
                     </EmptyState>
                 )}
             </Panel>

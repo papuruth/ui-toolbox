@@ -39,7 +39,11 @@ function paragraph() {
     return Array.from({ length: numSentences }, sentence).join(" ");
 }
 
-const UNITS = ["words", "sentences", "paragraphs"];
+const UNITS = [
+    { id: "words", label: L.wordsOption },
+    { id: "sentences", label: L.sentencesOption },
+    { id: "paragraphs", label: L.paragraphsOption }
+];
 
 const ControlRow = styled.div`
     display: flex;
@@ -117,22 +121,22 @@ export default function LoremIpsum() {
                     />
                 </ControlRow>
                 <ModeToggle>
-                    {UNITS.map((u) => (
-                        <ModeBtn key={u} $active={unit === u} onClick={() => setUnit(u)}>
-                            {u.charAt(0).toUpperCase() + u.slice(1)}
+                    {UNITS.map(({ id, label }) => (
+                        <ModeBtn key={id} $active={unit === id} onClick={() => setUnit(id)}>
+                            {label}
                         </ModeBtn>
                     ))}
                 </ModeToggle>
                 <ActionBar>
                     <BtnGroup>
-                        <ActionBtn onClick={generate}>Generate</ActionBtn>
+                        <ActionBtn onClick={generate}>{L.generateBtn}</ActionBtn>
                     </BtnGroup>
                 </ActionBar>
             </Panel>
 
             <Panel>
                 <PanelHeader>
-                    <PanelLabel>Output</PanelLabel>
+                    <PanelLabel>{L.outputLabel}</PanelLabel>
                 </PanelHeader>
                 {output ? (
                     <>
@@ -141,7 +145,7 @@ export default function LoremIpsum() {
                             <BtnGroup>
                                 <ActionBtn $success={copied} onClick={handleCopy}>
                                     {copied ? <Check style={{ fontSize: 11 }} /> : <ContentCopy style={{ fontSize: 11 }} />}
-                                    {copied ? "Copied" : "Copy"}
+                                    {copied ? L.copiedLabel : L.copyBtn}
                                 </ActionBtn>
                             </BtnGroup>
                         </ActionBar>
@@ -149,7 +153,7 @@ export default function LoremIpsum() {
                 ) : (
                     <EmptyState>
                         <span style={{ fontSize: 22, fontFamily: "JetBrains Mono, monospace" }}>Aa</span>
-                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>Click Generate to create lorem ipsum text</span>
+                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>{L.emptyStateMessage}</span>
                     </EmptyState>
                 )}
             </Panel>

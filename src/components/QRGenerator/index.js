@@ -45,10 +45,7 @@ export default function QRGenerator() {
     const [logoSrc, setLogoSrc] = useState("");
     const [logoQr, setLogoQr] = useState("");
 
-    const {
-        appTitle,
-        qrGenerator: { qrPreviewLabel, maxLogoSizeLabel, maxLogoSizePXLabel }
-    } = localization;
+    const { appTitle, qrGenerator: L } = localization;
 
     const generateQR = useCallback(async (data, logo, currentSize, fg, bg) => {
         if (!data) {
@@ -130,7 +127,7 @@ export default function QRGenerator() {
             try {
                 acceptedFiles.forEach(async (file) => {
                     if (Math.floor(file.size / 1024) > 512) {
-                        toast.error(maxLogoSizeLabel);
+                        toast.error(L.maxLogoSizeLabel);
                         return;
                     }
                     topLoader.show(true, loaderId);
@@ -138,7 +135,7 @@ export default function QRGenerator() {
                     if (result) {
                         const { width, height } = await loadLogoImage(result);
                         if (width > 512 && height > 512) {
-                            toast.error(maxLogoSizePXLabel);
+                            toast.error(L.maxLogoSizePXLabel);
                         } else if (width > 0 && height > 0) {
                             setLogoSrc(result);
                         }
@@ -150,7 +147,7 @@ export default function QRGenerator() {
                 topLoader.hide(true, loaderId);
             }
         },
-        [maxLogoSizeLabel, maxLogoSizePXLabel]
+        [L.maxLogoSizeLabel, L.maxLogoSizePXLabel]
     );
 
     const disableLogo = useCallback(() => {
@@ -170,12 +167,12 @@ export default function QRGenerator() {
         <ToolLayout>
             <Panel>
                 <PanelHeader>
-                    <PanelLabel>QR Data</PanelLabel>
+                    <PanelLabel>{L.qrDataLabel}</PanelLabel>
                     {hasData && <MetaText>{qrData.length} chars</MetaText>}
                 </PanelHeader>
                 <QrInputWrap>
                     <QrInput
-                        placeholder="Enter URL, text, or any data…"
+                        placeholder={L.inputPlaceholder}
                         value={qrData}
                         onChange={(e) => setQrData(e.target.value)}
                         maxLength={2000}
@@ -183,30 +180,30 @@ export default function QRGenerator() {
                 </QrInputWrap>
                 <ControlsSection>
                     <ControlRow>
-                        <ControlLabel>Size</ControlLabel>
+                        <ControlLabel>{L.sizeLabel}</ControlLabel>
                         <SliderWrap>
                             <input type="range" min={100} max={1000} step={50} value={size} onChange={(e) => setSize(Number(e.target.value))} />
                         </SliderWrap>
                         <ControlValue>{size}px</ControlValue>
                     </ControlRow>
                     <ControlRow>
-                        <ControlLabel>Foreground</ControlLabel>
+                        <ControlLabel>{L.foregroundLabel}</ControlLabel>
                         <ColorInput type="color" value={fgColor} onChange={(e) => setFgColor(e.target.value)} />
                         <ControlValue>{fgColor}</ControlValue>
                     </ControlRow>
                     <ControlRow>
-                        <ControlLabel>Background</ControlLabel>
+                        <ControlLabel>{L.backgroundLabel}</ControlLabel>
                         <ColorInput type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} />
                         <ControlValue>{bgColor}</ControlValue>
                     </ControlRow>
                     <ControlRow>
-                        <ControlLabel>Logo</ControlLabel>
+                        <ControlLabel>{L.logoLabel}</ControlLabel>
                         <ModeToggle>
                             <ModeBtn $active={!addLogo} onClick={disableLogo}>
-                                Off
+                                {L.logoOffLabel}
                             </ModeBtn>
                             <ModeBtn $active={addLogo} onClick={enableLogo}>
-                                On
+                                {L.logoOnLabel}
                             </ModeBtn>
                         </ModeToggle>
                     </ControlRow>
@@ -216,7 +213,7 @@ export default function QRGenerator() {
 
             <Panel>
                 <PanelHeader>
-                    <PanelLabel>{qrPreviewLabel}</PanelLabel>
+                    <PanelLabel>{L.qrPreviewLabel}</PanelLabel>
                     {activeQr && (
                         <MetaText>
                             {size}×{size}px
@@ -230,7 +227,7 @@ export default function QRGenerator() {
                         <EmptyState>
                             <QrCode sx={{ fontSize: 48 }} />
                             <Typography variant="body2" sx={{ fontSize: "13px" }}>
-                                Enter data to generate QR
+                                {L.emptyStateMessage}
                             </Typography>
                         </EmptyState>
                     )}
@@ -238,14 +235,14 @@ export default function QRGenerator() {
                 <ActionBar>
                     <ActionBtnGroup>
                         <ActionBtn onClick={handleDownloadPNG} disabled={!activeQr}>
-                            <CloudDownload sx={{ fontSize: 13 }} /> PNG
+                            <CloudDownload sx={{ fontSize: 13 }} /> {L.pngBtn}
                         </ActionBtn>
                         <ActionBtn onClick={handleDownloadSVG} disabled={!hasData}>
-                            <CloudDownload sx={{ fontSize: 13 }} /> SVG
+                            <CloudDownload sx={{ fontSize: 13 }} /> {L.svgBtn}
                         </ActionBtn>
                     </ActionBtnGroup>
                     <ActionBtn $danger onClick={handleClear} disabled={!hasData}>
-                        Clear
+                        {L.clearBtn}
                     </ActionBtn>
                 </ActionBar>
             </Panel>

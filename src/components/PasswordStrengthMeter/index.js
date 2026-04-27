@@ -1,8 +1,13 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import localization from "localization";
 import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
-import { EmptyState, Panel, PanelHeader, PanelLabel, ToolLayout } from "components/Shared/ToolKit";
+import { ActionBar, ActionBtn, ActionBtnGroup, EmptyState, Panel, PanelHeader, PanelLabel, ToolLayout } from "components/Shared/ToolKit";
+import LocalBadge from "components/Shared/LocalBadge";
+
 import zxcvbn from "zxcvbn";
+
+const { passwordStrengthMeter: L, common: C } = localization;
 
 function formatCrackTime(seconds) {
     const YEAR = 365.25 * 24 * 3600;
@@ -35,10 +40,10 @@ function formatCrackTime(seconds) {
 }
 
 function getStrengthLabel(score) {
-    if (score <= 1) return "Weak";
+    if (score <= 1) return L.weak;
     if (score === 2) return "Fair";
-    if (score === 3) return "Strong";
-    return "Very Strong";
+    if (score === 3) return L.strong;
+    return L.veryStrong;
 }
 
 function getStrengthColor(score) {
@@ -210,63 +215,71 @@ export default function PasswordStrengthMeter() {
         <ToolLayout>
             <Panel>
                 <PanelHeader>
-                    <PanelLabel>Password Input</PanelLabel>
+                    <PanelLabel>{L.passwordInputLabel}</PanelLabel>
+                    <LocalBadge />
                 </PanelHeader>
                 <TipText>
-                    <b>Tip:</b> A strong password uses uppercase, lowercase, numbers, and symbols — at least 12 characters long.
+                    <b>{L.tipLabel}</b> {L.tipFullText}
                 </TipText>
                 <PasswordInputWrap>
                     <PasswordInput
                         type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter a password to analyze…"
+                        placeholder={L.passwordFieldPlaceholderText}
                         autoComplete="new-password"
                         spellCheck={false}
                     />
-                    <ShowToggle onClick={() => setShowPassword((v) => !v)} title={showPassword ? "Hide" : "Show"}>
+                    <ShowToggle onClick={() => setShowPassword((v) => !v)} title={showPassword ? L.hideLabel : L.showLabel}>
                         {showPassword ? <VisibilityOff style={{ fontSize: 16 }} /> : <Visibility style={{ fontSize: 16 }} />}
                     </ShowToggle>
                 </PasswordInputWrap>
+                {password && (
+                    <ActionBar>
+                        <ActionBtnGroup>
+                            <ActionBtn $danger onClick={() => setPassword("")}>{C.clearBtn}</ActionBtn>
+                        </ActionBtnGroup>
+                    </ActionBar>
+                )}
             </Panel>
 
             <Panel>
                 <PanelHeader>
-                    <PanelLabel>Analysis</PanelLabel>
+                    <PanelLabel>{L.analysisLabel}</PanelLabel>
                 </PanelHeader>
                 {analysis ? (
                     <>
                         <ResultSection>
                             <MetaRow>
-                                <MetaLabel>Strength</MetaLabel>
+                                <MetaLabel>{L.strengthLabel}</MetaLabel>
                                 <StrengthBar>
                                     <StrengthFill $score={analysis.score} />
                                 </StrengthBar>
                                 <MetaValue $color={getStrengthColor(analysis.score)}>{getStrengthLabel(analysis.score)}</MetaValue>
                             </MetaRow>
                             <MetaRow>
-                                <MetaLabel>Crack Time</MetaLabel>
+                                <MetaLabel>{L.crackTimeLabel}</MetaLabel>
                                 <MetaValue>{analysis.crackTime}</MetaValue>
                             </MetaRow>
                             <MetaRow>
-                                <MetaLabel>Length</MetaLabel>
+                                <MetaLabel>{L.lengthLabel}</MetaLabel>
                                 <MetaValue>{password.length} characters</MetaValue>
                             </MetaRow>
                         </ResultSection>
                         <CharTypeSection>
-                            <CharTypeLabel>Contains</CharTypeLabel>
+                            <CharTypeLabel>{L.containsLabel}</CharTypeLabel>
                             <CharTypePills>
-                                <CharPill $active={analysis.hasUpperCase}>Uppercase</CharPill>
-                                <CharPill $active={analysis.hasLowerCase}>Lowercase</CharPill>
-                                <CharPill $active={analysis.hasNumbers}>Numbers</CharPill>
-                                <CharPill $active={analysis.hasSymbols}>Symbols</CharPill>
+                                <CharPill $active={analysis.hasUpperCase}>{L.uppercaseLabel}</CharPill>
+                                <CharPill $active={analysis.hasLowerCase}>{L.lowercaseLabel}</CharPill>
+                                <CharPill $active={analysis.hasNumbers}>{L.numbersLabel}</CharPill>
+                                <CharPill $active={analysis.hasSymbols}>{L.symbolsLabel}</CharPill>
                             </CharTypePills>
                         </CharTypeSection>
                     </>
                 ) : (
                     <EmptyState>
                         <span style={{ fontSize: 22, fontFamily: "JetBrains Mono, monospace" }}>••••••••</span>
-                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>Enter a password to analyze its strength</span>
+                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>{L.emptyStateMessage}</span>
                     </EmptyState>
                 )}
             </Panel>

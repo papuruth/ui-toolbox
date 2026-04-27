@@ -17,10 +17,11 @@ import {
     PanelLabel,
     ToolLayout
 } from "components/Shared/ToolKit";
+import LocalBadge from "components/Shared/LocalBadge";
 import { useToolChain } from "context/ToolChainContext";
 import { useShareableURL } from "utils/hooks/useShareableURL.hooks";
 
-const { hashGenerator: L } = localization;
+const { hashGenerator: L, common: C } = localization;
 
 const ALGOS = [
     { id: "md5", label: "MD5", fn: (s) => CryptoJS.MD5(s).toString() },
@@ -166,7 +167,10 @@ export default function HashGenerator() {
             <Panel>
                 <PanelHeader>
                     <PanelLabel>{L.inputLabel}</PanelLabel>
-                    {fileName ? <MetaText>{fileName}</MetaText> : input && <MetaText>{input.length.toLocaleString()} chars</MetaText>}
+                    <ActionBtnGroup>
+                        {fileName ? <MetaText>{fileName}</MetaText> : input && <MetaText>{input.length.toLocaleString()} chars</MetaText>}
+                        <LocalBadge />
+                    </ActionBtnGroup>
                 </PanelHeader>
                 <InputArea
                     value={input}
@@ -187,6 +191,13 @@ export default function HashGenerator() {
                         {fileName && <FileName>{fileName}</FileName>}
                     </DropTarget>
                 </DropWrap>
+                {(input || fileName) && (
+                    <ActionBar>
+                        <ActionBtnGroup>
+                            <ActionBtn $danger onClick={() => { setInput(""); setFileName(null); setFileHashes({}); }}>{C.clearBtn}</ActionBtn>
+                        </ActionBtnGroup>
+                    </ActionBar>
+                )}
             </Panel>
 
             <Panel>
@@ -203,7 +214,7 @@ export default function HashGenerator() {
                                 {hashes[id] && (
                                     <ActionBtn $success={copiedId === id} onClick={() => handleCopy(id, hashes[id])}>
                                         {copiedId === id ? <Check style={{ fontSize: 11 }} /> : <ContentCopy style={{ fontSize: 11 }} />}
-                                        {copiedId === id ? "Copied" : "Copy"}
+                                        {copiedId === id ? L.copiedLabel : L.copyBtn}
                                     </ActionBtn>
                                 )}
                             </HashRow>
@@ -212,7 +223,7 @@ export default function HashGenerator() {
                             <ActionBar>
                                 <ActionBtnGroup>
                                     <ActionBtn onClick={() => shareURL(input)}>
-                                        <IosShare style={{ fontSize: 11 }} /> Share
+                                        <IosShare style={{ fontSize: 11 }} /> {L.shareBtn}
                                     </ActionBtn>
                                 </ActionBtnGroup>
                             </ActionBar>
@@ -221,7 +232,7 @@ export default function HashGenerator() {
                 ) : (
                     <EmptyState>
                         <span style={{ fontSize: 26, fontFamily: "JetBrains Mono, monospace" }}>#</span>
-                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>Type text or drop a file to generate hashes</span>
+                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>{L.emptyStateMessage}</span>
                     </EmptyState>
                 )}
             </Panel>

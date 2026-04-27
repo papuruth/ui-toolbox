@@ -1,20 +1,25 @@
 import { Check, ContentCopy } from "@mui/icons-material";
 import { filter, keys, reduce } from "lodash";
+import localization from "localization";
 import React, { useCallback, useState } from "react";
 import styled from "styled-components";
 import { ActionBar, ActionBtn, ActionBtnGroup, EmptyState, Panel, PanelHeader, PanelLabel, ToolLayout } from "components/Shared/ToolKit";
+import LocalBadge from "components/Shared/LocalBadge";
+
 import SendToButton from "components/Shared/SendToButton";
 import { GLOBAL_CONSTANTS } from "utils/globalConstants";
 import { getRandomNumbers, passwordGenerator } from "utils/helperFunctions";
 import zxcvbn from "zxcvbn";
 
+const { passwordGen: L } = localization;
+
 const { PASSWORD_GEN_LIST } = GLOBAL_CONSTANTS;
 
 const CHAR_TYPES = [
-    { key: "upperCase", label: "Uppercase" },
-    { key: "lowerCase", label: "Lowercase" },
-    { key: "numbers", label: "Numbers" },
-    { key: "symbols", label: "Symbols" }
+    { key: "upperCase", label: L.uppercaseLabel },
+    { key: "lowerCase", label: L.lowercaseLabel },
+    { key: "numbers", label: L.numbersLabel },
+    { key: "symbols", label: L.symbolsLabel }
 ];
 
 const ControlRow = styled.div`
@@ -163,9 +168,9 @@ const BtnGroup = styled(ActionBtnGroup)`
 `;
 
 function getPasswordStrengthLabel(score) {
-    if (score <= 2) return "Weak";
-    if (score === 3) return "Strong";
-    return "Very Strong";
+    if (score <= 2) return L.weakLabel;
+    if (score === 3) return L.strongLabel;
+    return L.veryStrongLabel;
 }
 
 export default function PasswordGenerator() {
@@ -255,9 +260,9 @@ export default function PasswordGenerator() {
     if (!compositionRule.numbers.forbidden) charsetSize += 10;
     if (!compositionRule.symbols.forbidden) charsetSize += 32;
     const entropy = password && charsetSize > 0 ? Math.round(password.length * Math.log2(charsetSize)) : 0;
-    let entropyLabel = "Strong";
-    if (entropy < 40) entropyLabel = "Weak";
-    else if (entropy < 60) entropyLabel = "Fair";
+    let entropyLabel = L.strongLabel;
+    if (entropy < 40) entropyLabel = L.weakLabel;
+    else if (entropy < 60) entropyLabel = L.fairLabel;
     else if (entropy < 80) entropyLabel = "Good";
     let entropyColor = "#22cc99";
     if (entropy < 60) entropyColor = "#ef4444";
@@ -267,10 +272,11 @@ export default function PasswordGenerator() {
         <ToolLayout>
             <Panel>
                 <PanelHeader>
-                    <PanelLabel>Settings</PanelLabel>
+                    <PanelLabel>{L.settingsLabel}</PanelLabel>
+                    <LocalBadge />
                 </PanelHeader>
                 <ControlRow>
-                    <ControlLabel>Length</ControlLabel>
+                    <ControlLabel>{L.lengthLabel}</ControlLabel>
                     <LengthInput type="number" min={8} max={32} value={passwordLength} onChange={handlePasswordLength} />
                 </ControlRow>
                 {CHAR_TYPES.map(({ key, label }) => (
@@ -279,7 +285,7 @@ export default function PasswordGenerator() {
                         <RuleLabel>{label}</RuleLabel>
                         {!compositionRule[key].forbidden && (
                             <>
-                                <MinLabel>Min</MinLabel>
+                                <MinLabel>{L.minLabel}</MinLabel>
                                 <MinSelect name={key} value={compositionRule[key].min} onChange={handleCompositionLength}>
                                     {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
                                         <option key={n} value={n}>
@@ -293,28 +299,28 @@ export default function PasswordGenerator() {
                 ))}
                 <ActionBar>
                     <BtnGroup>
-                        <ActionBtn onClick={handleGenerate}>Generate</ActionBtn>
+                        <ActionBtn onClick={handleGenerate}>{L.generateBtn}</ActionBtn>
                     </BtnGroup>
                 </ActionBar>
             </Panel>
 
             <Panel>
                 <PanelHeader>
-                    <PanelLabel>Password</PanelLabel>
+                    <PanelLabel>{L.passwordLabel}</PanelLabel>
                 </PanelHeader>
                 {password ? (
                     <>
                         <PasswordDisplay>{password}</PasswordDisplay>
                         <MetaSection>
                             <MetaRow>
-                                <MetaLabel>Strength</MetaLabel>
+                                <MetaLabel>{L.strengthLabel}</MetaLabel>
                                 <StrengthBar>
                                     <StrengthFill $score={passwordScore} />
                                 </StrengthBar>
                                 <MetaValue>{getPasswordStrengthLabel(passwordScore)}</MetaValue>
                             </MetaRow>
                             <MetaRow>
-                                <MetaLabel>Entropy</MetaLabel>
+                                <MetaLabel>{L.entropyLabel}</MetaLabel>
                                 <MetaValue $color={entropyColor}>
                                     {entropy} bits ({entropyLabel})
                                 </MetaValue>
@@ -324,7 +330,7 @@ export default function PasswordGenerator() {
                             <BtnGroup>
                                 <ActionBtn $success={copied} onClick={handleCopy}>
                                     {copied ? <Check style={{ fontSize: 11 }} /> : <ContentCopy style={{ fontSize: 11 }} />}
-                                    {copied ? "Copied" : "Copy"}
+                                    {copied ? L.copiedLabel : L.copyBtn}
                                 </ActionBtn>
                                 <SendToButton
                                     value={password}
@@ -339,7 +345,7 @@ export default function PasswordGenerator() {
                 ) : (
                     <EmptyState>
                         <span style={{ fontSize: 22, fontFamily: "JetBrains Mono, monospace" }}>••••••••</span>
-                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>Click Generate to create a password</span>
+                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>{L.emptyStateMessage}</span>
                     </EmptyState>
                 )}
             </Panel>

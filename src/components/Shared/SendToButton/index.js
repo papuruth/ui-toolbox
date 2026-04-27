@@ -1,5 +1,6 @@
 import { CallSplit } from "@mui/icons-material";
 import { Button, ListItemIcon, ListItemText, MenuItem, MenuList, Paper, Popover, Typography } from "@mui/material";
+import { arrayOf, node, shape, string } from "prop-types";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { push } from "connected-react-router";
@@ -11,6 +12,16 @@ import { useToolChain } from "context/ToolChainContext";
  * @param {string} value  The value to send
  * @param {Array<{label: string, route: string, icon: ReactNode}>} targets  Compatible tools
  */
+SendToButton.propTypes = {
+    value: string,
+    targets: arrayOf(shape({ label: string, route: string, icon: node }))
+};
+
+SendToButton.defaultProps = {
+    value: "",
+    targets: []
+};
+
 export default function SendToButton({ value, targets = [] }) {
     const dispatch = useDispatch();
     const { sendTo } = useToolChain();

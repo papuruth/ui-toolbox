@@ -387,5 +387,6 @@ export const GLOBAL_CONSTANTS = {
             enabled: true
         }
     ],
-    GIT_REPO_URL: "https://github.com/papuruth/ui-toolbox"
+    GIT_REPO_URL: "https://github.com/papuruth/ui-toolbox",
+    APP_CREATED_YEAR: 2023
 };

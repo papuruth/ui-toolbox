@@ -1,7 +1,10 @@
 import { Check, ContentCopy } from "@mui/icons-material";
+import localization from "localization";
 import React, { useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
-import { EmptyState, ModeBtn, ModeToggle, Panel, PanelHeader, PanelLabel, ToolLayout } from "components/Shared/ToolKit";
+import { ActionBar, ActionBtn, ActionBtnGroup, EmptyState, ModeBtn, ModeToggle, Panel, PanelHeader, PanelLabel, ToolLayout } from "components/Shared/ToolKit";
+
+const { numberBaseConverter: L, common: C } = localization;
 
 const BASES = [
     { value: 2, label: "Bin" },
@@ -97,7 +100,7 @@ export default function NumberBaseConverter() {
     const { results, error } = useMemo(() => {
         if (!input.trim()) return { results: null, error: "" };
         const decimal = parseInt(input.trim(), sourceBase);
-        if (Number.isNaN(decimal)) return { results: null, error: `Invalid input "${input}" for base ${sourceBase}` };
+        if (Number.isNaN(decimal)) return { results: null, error: L.invalidInputError.replace("[INPUT]", input.trim()).replace("[BASE]", sourceBase) };
         return {
             results: OUTPUTS.map(({ base, label, prefix }) => ({
                 label,
@@ -119,7 +122,7 @@ export default function NumberBaseConverter() {
         <ToolLayout>
             <Panel>
                 <PanelHeader>
-                    <PanelLabel>Input</PanelLabel>
+                    <PanelLabel>{L.inputLabel}</PanelLabel>
                     {error && <ErrorBadge>{error}</ErrorBadge>}
                 </PanelHeader>
                 <ModeToggle>
@@ -129,12 +132,19 @@ export default function NumberBaseConverter() {
                         </ModeBtn>
                     ))}
                 </ModeToggle>
-                <NumberInput value={input} onChange={(e) => setInput(e.target.value)} placeholder="Enter a number…" spellCheck={false} autoFocus />
+                <NumberInput value={input} onChange={(e) => setInput(e.target.value)} placeholder={L.numberInputPlaceholder} spellCheck={false} autoFocus />
+                {input && (
+                    <ActionBar>
+                        <ActionBtnGroup>
+                            <ActionBtn $danger onClick={() => setInput("")}>{C.clearBtn}</ActionBtn>
+                        </ActionBtnGroup>
+                    </ActionBar>
+                )}
             </Panel>
 
             <Panel>
                 <PanelHeader>
-                    <PanelLabel>Conversions</PanelLabel>
+                    <PanelLabel>{L.conversionsLabel}</PanelLabel>
                 </PanelHeader>
                 {results ? (
                     <ResultRows>
@@ -142,7 +152,7 @@ export default function NumberBaseConverter() {
                             <ResultRow key={label}>
                                 <ResultLabel>{label}</ResultLabel>
                                 <ResultValue>{value}</ResultValue>
-                                <RowCopyBtn onClick={() => handleCopy(label, value)} title="Copy">
+                                <RowCopyBtn onClick={() => handleCopy(label, value)} title={C.copyBtn}>
                                     {copiedLabel === label ? <Check style={{ fontSize: 13 }} /> : <ContentCopy style={{ fontSize: 13 }} />}
                                 </RowCopyBtn>
                             </ResultRow>
@@ -151,7 +161,7 @@ export default function NumberBaseConverter() {
                 ) : (
                     <EmptyState>
                         <span style={{ fontSize: 22, fontFamily: "JetBrains Mono, monospace" }}>0x</span>
-                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>Enter a number to convert between bases</span>
+                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>{L.emptyStateMessage}</span>
                     </EmptyState>
                 )}
             </Panel>

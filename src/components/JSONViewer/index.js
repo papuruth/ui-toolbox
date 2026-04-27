@@ -1,19 +1,17 @@
 import ReactJsonView from "@microlink/react-json-view";
-import { Dialog, DialogContent, DialogTitle } from "@mui/material";
 import HistoryDropdown from "components/Shared/HistoryDropdown";
 import localization from "localization";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { ActionBtn, ActionBtnGroup, Panel, PanelHeader, PanelLabel, TabBtn, TabStrip } from "components/Shared/ToolKit";
-import ToolSkeleton from "components/Shared/ToolSkeleton";
-import api from "services/api";
-import toast from "utils/toast";
 import { useToolHistory } from "utils/hooks/useToolHistory.hooks";
 import { useToolChain } from "context/ToolChainContext";
 import ColorModeContext from "../../context/ColorModeContext";
+import LoadJSONModal from "./components/LoadJSONModal";
+
+import Editor from "./components/Editor";
 
 const { jsonViewer: L } = localization;
-import Editor from "./components/Editor";
 
 function filterJsonByQuery(obj, query) {
     if (!query) return obj;
@@ -96,24 +94,6 @@ const NoMatch = styled.div`
     opacity: 0.6;
 `;
 
-const DialogInput = styled.input`
-    width: 100%;
-    background: var(--bg-input);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    color: var(--text-primary);
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    padding: 8px 12px;
-    outline: none;
-    box-sizing: border-box;
-    &:focus {
-        border-color: #22cc99;
-    }
-    &::placeholder {
-        color: var(--text-secondary);
-    }
-`;
 
 const ViewerBtnGroup = styled(ActionBtnGroup)`
     flex-shrink: 0;
@@ -123,9 +103,7 @@ export default function JSONViewer() {
     const { mode } = useContext(ColorModeContext);
     const [tab, setTab] = useState("editor");
     const [jsonInput, setJSONInput] = useState("");
-    const [jsonLink, setJSONLink] = useState("");
     const [showLinkModal, setShowLinkModal] = useState(false);
-    const [jsonLoading, setJSONLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [collapsed, setCollapsed] = useState(1);
     const { history: jsonHistory, addHistory: addJsonHistory, clearHistory: clearJsonHistory } = useToolHistory("json-viewer");
@@ -185,17 +163,9 @@ export default function JSONViewer() {
         }
     };
 
-    const fetchJSONData = async () => {
-        try {
-            setJSONLoading(true);
-            const urlObj = new URL(jsonLink);
-            const response = await api.get(urlObj.href);
-            if (response.data) setJSONInput(JSON.stringify(response.data));
-            setShowLinkModal(false);
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setJSONLoading(false);
+    const handleModalLoad = (jsonString) => {
+        setJSONInput(jsonString);
+        if (jsonString.trim().length > 5) addJsonHistory(jsonString.trim());
     };
 
     const parsedJson = useMemo(() => {
@@ -219,16 +189,16 @@ export default function JSONViewer() {
         <ToolWrap>
             <TabStrip>
                 <TabBtn $active={tab === "editor"} onClick={() => setTab("editor")}>
-                    Editor
+                    {L.editorTab}
                 </TabBtn>
                 <TabBtn $active={tab === "viewer"} onClick={() => setTab("viewer")} disabled={!jsonInput}>
-                    Viewer
+                    {L.viewerTab}
                 </TabBtn>
             </TabStrip>
 
             <Panel>
                 <PanelHeader>
-                    <PanelLabel>{tab === "editor" ? "JSON Input" : "JSON Viewer"}</PanelLabel>
+                    <PanelLabel>{tab === "editor" ? L.jsonInputLabel : L.jsonViewerLabel}</PanelLabel>
                     {tab === "editor" && <HistoryDropdown history={jsonHistory} onSelect={(v) => setJSONInput(v)} onClear={clearJsonHistory} />}
                 </PanelHeader>
 
@@ -240,12 +210,12 @@ export default function JSONViewer() {
                             <SearchInput
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search keys / values..."
+                                placeholder={L.searchPlaceholder}
                                 spellCheck={false}
                             />
                             <ViewerBtnGroup>
-                                <ActionBtn onClick={() => setCollapsed(false)}>Expand All</ActionBtn>
-                                <ActionBtn onClick={() => setCollapsed(true)}>Collapse All</ActionBtn>
+                                <ActionBtn onClick={() => setCollapsed(false)}>{L.expandAllBtn}</ActionBtn>
+                                <ActionBtn onClick={() => setCollapsed(true)}>{L.collapseAllBtn}</ActionBtn>
                             </ViewerBtnGroup>
                         </ViewerControls>
                         <ViewerArea>
@@ -264,33 +234,18 @@ export default function JSONViewer() {
                                     onDelete={searchQuery ? undefined : handleJsonMutation}
                                 />
                             ) : (
-                                <NoMatch>{searchQuery ? "No matches found" : "No valid JSON to display"}</NoMatch>
+                                <NoMatch>{searchQuery ? L.noMatchesMessage : L.noValidJsonMessage}</NoMatch>
                             )}
                         </ViewerArea>
                     </>
                 )}
             </Panel>
 
-            <Dialog onClose={() => setShowLinkModal(false)} open={showLinkModal} sx={{ width: "100%" }}>
-                <DialogTitle>Load JSON Data</DialogTitle>
-                <DialogContent sx={{ flexDirection: "column", display: "flex", width: 500, gap: 1, alignItems: "center" }}>
-                    {jsonLoading ? (
-                        <ToolSkeleton rows={2} />
-                    ) : (
-                        <>
-                            <DialogInput
-                                name="jsonLink"
-                                placeholder="Enter JSON URL"
-                                onChange={(e) => setJSONLink(e.target.value)}
-                                autoComplete="off"
-                            />
-                            <ActionBtn disabled={!jsonLink} onClick={fetchJSONData}>
-                                Load Data
-                            </ActionBtn>
-                        </>
-                    )}
-                </DialogContent>
-            </Dialog>
+            <LoadJSONModal
+                open={showLinkModal}
+                onClose={() => setShowLinkModal(false)}
+                onLoad={handleModalLoad}
+            />
         </ToolWrap>
     );
 }

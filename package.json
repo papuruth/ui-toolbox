@@ -1,5 +1,6 @@
 {
-    "name": "ui-toolbox",
+    "name": "devdeck",
+    "description": "A free, open-source, all-in-one developer toolbox — 22 utilities available in a single progressive web app, with dark mode, search, and offline support.",
     "version": "1.0.1",
     "license": "MIT",
     "scripts": {

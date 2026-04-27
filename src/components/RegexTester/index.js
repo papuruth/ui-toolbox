@@ -1,4 +1,5 @@
 import { IosShare } from "@mui/icons-material";
+import localization from "localization";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "utils/toast";
 import styled from "styled-components";
@@ -16,6 +17,8 @@ import {
 } from "components/Shared/ToolKit";
 import { useToolChain } from "context/ToolChainContext";
 import { useShareableURL } from "utils/hooks/useShareableURL.hooks";
+
+const { regexTester: L, common: C } = localization;
 
 const FLAGS_LIST = ["g", "i", "m", "s"];
 
@@ -243,8 +246,8 @@ export default function RegexTester() {
         <ToolLayout>
             <Panel>
                 <PanelHeader>
-                    <PanelLabel>Pattern</PanelLabel>
-                    {error && <ErrorBadge>Invalid regex</ErrorBadge>}
+                    <PanelLabel>{L.patternInputLabel}</PanelLabel>
+                    {error && <ErrorBadge>{L.invalidRegexError}</ErrorBadge>}
                 </PanelHeader>
                 <PatternWrap>
                     <Slash>/</Slash>
@@ -259,7 +262,7 @@ export default function RegexTester() {
                     <Slash>/</Slash>
                 </PatternWrap>
                 <FlagStrip>
-                    <FlagLabel>Flags</FlagLabel>
+                    <FlagLabel>{L.flagsLabel}</FlagLabel>
                     {FLAGS_LIST.map((f) => (
                         <FlagBtn key={f} $active={flags[f]} onClick={() => toggleFlag(f)}>
                             {f}
@@ -274,21 +277,22 @@ export default function RegexTester() {
                     ))}
                 </PresetStrip>
                 <SubHeader>
-                    <PanelLabel>Test String</PanelLabel>
+                    <PanelLabel>{L.testStringLabel}</PanelLabel>
                     {testStr && <MetaText>{testStr.length.toLocaleString()} chars</MetaText>}
                 </SubHeader>
                 <CodeArea
                     value={testStr}
                     onChange={(e) => setTestStr(e.target.value)}
-                    placeholder="Paste test string here…"
+                    placeholder={L.testStringPlaceholder}
                     spellCheck={false}
                     style={{ minHeight: 160 }}
                 />
                 {(pattern || testStr) && (
                     <ActionBar>
                         <ActionBtnGroup>
+                            <ActionBtn $danger onClick={() => { setPattern(""); setTestStr(""); }}>{C.clearBtn}</ActionBtn>
                             <ActionBtn onClick={handleShare}>
-                                <IosShare style={{ fontSize: 11 }} /> Share
+                                <IosShare style={{ fontSize: 11 }} /> {L.shareBtn}
                             </ActionBtn>
                         </ActionBtnGroup>
                     </ActionBar>
@@ -297,13 +301,13 @@ export default function RegexTester() {
 
             <Panel>
                 <PanelHeader>
-                    <PanelLabel>Matches</PanelLabel>
+                    <PanelLabel>{L.matchesLabel}</PanelLabel>
                     {matchCount > 0 && (
                         <MetaText style={{ color: "#22cc99" }}>
                             {matchCount} match{matchCount !== 1 ? "es" : ""}
                         </MetaText>
                     )}
-                    {!matchCount && pattern && testStr && !error && <MetaText>No matches</MetaText>}
+                    {!matchCount && pattern && testStr && !error && <MetaText>{L.noMatches}</MetaText>}
                 </PanelHeader>
                 {testStr ? (
                     <>
@@ -337,7 +341,7 @@ export default function RegexTester() {
                 ) : (
                     <EmptyState>
                         <span style={{ fontSize: 22, fontFamily: "JetBrains Mono, monospace" }}>/.*/ </span>
-                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>Enter a pattern and test string to see matches</span>
+                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>{L.emptyStateMessage}</span>
                     </EmptyState>
                 )}
             </Panel>

@@ -59,7 +59,7 @@ export default function HistoryDropdown({ history, onSelect, onClear }) {
                     </Box>
                     {onClear && (
                         <Tooltip title={C.clearHistoryLabel}>
-                            <IconButton size="small" onClick={onClear} sx={{ color: "var(--text-secondary)", "&:hover": { color: "#f44336" } }}>
+                            <IconButton size="small" onClick={() => { onClear(); handleClose(); }} sx={{ color: "var(--text-secondary)", "&:hover": { color: "#f44336" } }}>
                                 <Delete sx={{ fontSize: "0.85rem" }} />
                             </IconButton>
                         </Tooltip>

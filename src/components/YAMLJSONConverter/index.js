@@ -18,7 +18,7 @@ import {
     ToolLayout
 } from "components/Shared/ToolKit";
 
-const { yamlJsonConverter: L } = localization;
+const { yamlJsonConverter: L, common: C } = localization;
 
 const ToolWrap = styled.div`
     display: flex;
@@ -107,6 +107,13 @@ export default function YAMLJSONConverter() {
                         {input && <MetaText>{input.length.toLocaleString()} chars</MetaText>}
                     </PanelHeader>
                     <CodeArea value={input} onChange={(e) => setInput(e.target.value)} placeholder={inputPlaceholder} spellCheck={false} autoFocus />
+                    {input && (
+                        <ActionBar>
+                            <ActionBtnGroup>
+                                <ActionBtn $danger onClick={() => setInput("")}>{C.clearBtn}</ActionBtn>
+                            </ActionBtnGroup>
+                        </ActionBar>
+                    )}
                 </Panel>
 
                 <Panel>

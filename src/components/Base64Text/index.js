@@ -3,6 +3,7 @@ import { Box, Typography } from "@mui/material";
 import localization from "localization";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useShareableURL } from "utils/hooks/useShareableURL.hooks";
+import { useToolChain } from "context/ToolChainContext";
 import styled from "styled-components";
 import { styledMedia } from "styles/global";
 import {
@@ -72,10 +73,19 @@ export default function Base64Text() {
     const [input, setInput] = useState("");
     const [copied, setCopied] = useState(false);
     const { initialValue, shareURL } = useShareableURL("enc");
+    const { consumeChain } = useToolChain();
 
     useEffect(() => {
         if (initialValue) setInput(initialValue);
     }, [initialValue]);
+
+    useEffect(() => {
+        const chained = consumeChain("/base64-text");
+        if (chained) {
+            setMode("decode");
+            setInput(chained);
+        }
+    }, [consumeChain]);
 
     const { output, error } = useMemo(() => {
         if (!input.trim()) return { output: "", error: "" };

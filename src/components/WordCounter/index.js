@@ -18,7 +18,7 @@ import SendToButton from "components/Shared/SendToButton";
 import { useToolChain } from "context/ToolChainContext";
 import { useShareableURL } from "utils/hooks/useShareableURL.hooks";
 
-const { wordCounter: L } = localization;
+const { wordCounter: L, common: C } = localization;
 
 const STOP_WORDS = new Set([
     "a",
@@ -272,6 +272,7 @@ export default function WordCounter() {
                 {text && (
                     <ActionBar>
                         <ActionBtnGroup>
+                            <ActionBtn $danger onClick={() => setText("")}>{C.clearBtn}</ActionBtn>
                             <ActionBtn onClick={() => shareURL(text)}>
                                 <IosShare style={{ fontSize: 11 }} /> {L.shareBtn}
                             </ActionBtn>

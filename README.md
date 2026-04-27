@@ -1,6 +1,6 @@
-[![Netlify Status](https://api.netlify.com/api/v1/badges/74b15c5e-4c32-4bc0-b93f-829768a2342e/deploy-status)](https://app.netlify.com/sites/ui-toolbox/deploys)
+[![Deployment Status](https://api.netlify.com/api/v1/badges/74b15c5e-4c32-4bc0-b93f-829768a2342e/deploy-status)](https://app.netlify.com/sites/devdeck/deploys)
 
-# UI Toolbox
+# DevDeck
 
 A free, open-source, all-in-one developer toolbox — 22 utilities available in a single progressive web app, with dark mode, search, and offline support.
 

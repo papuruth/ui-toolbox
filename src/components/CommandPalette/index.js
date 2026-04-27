@@ -7,6 +7,7 @@ import localization from "localization";
 import storage from "utils/storage";
 import { fuzzyFilter } from "utils/fuzzySearch";
 import { detectInputType } from "utils/inputDetector";
+import { useToolChain } from "context/ToolChainContext";
 import { buildActions, CATEGORY_EMOJI, ENRICHED_TOOLS, getRecentToolEntries } from "./paletteData";
 import {
     Backdrop,
@@ -34,6 +35,7 @@ const isMac = /Mac|iPhone|iPod|iPad/i.test(navigator.userAgent);
 
 export default function CommandPalette({ open, onClose }) {
     const dispatch = useDispatch();
+    const { sendTo } = useToolChain();
     const [query, setQuery] = useState("");
     const [activeIndex, setActiveIndex] = useState(0);
     const inputRef = useRef(null);
@@ -116,6 +118,7 @@ export default function CommandPalette({ open, onClose }) {
         (item) => {
             if (!item) return;
             if (item.kind === "smart") {
+                sendTo(query, item.detection.route);
                 navigateTo(item.detection.route);
             } else if (item.kind === "action") {
                 item.run();
@@ -123,7 +126,7 @@ export default function CommandPalette({ open, onClose }) {
                 navigateTo(item.route);
             }
         },
-        [navigateTo]
+        [navigateTo, sendTo, query]
     );
 
     const handleKeyDown = useCallback(
@@ -200,7 +203,7 @@ export default function CommandPalette({ open, onClose }) {
                             $active={activeIndex === 0}
                             data-active={activeIndex === 0}
                             onMouseEnter={() => setActiveIndex(0)}
-                            onMouseDown={() => navigateTo(smartDetection.route)}
+                            onMouseDown={() => executeItem({ kind: "smart", detection: smartDetection })}
                         >
                             <span style={{ fontSize: "1.1rem" }}>🧠</span>
                             <SmartBannerText>

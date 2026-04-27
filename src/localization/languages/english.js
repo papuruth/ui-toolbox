@@ -172,6 +172,7 @@ export default {
         fairLabel: "Fair",
         strongLabel: "Strong",
         veryStrongLabel: "Very Strong",
+        passwordLabel: "Password",
         copyBtn: "Copy",
         copiedLabel: "Copied",
         emptyStateMessage: "Press Generate to create a password"
@@ -194,8 +195,16 @@ export default {
         noMatchesMessage: "No matches found",
         noValidJsonMessage: "No valid JSON to display",
         loadDialogTitle: "Load JSON Data",
-        loadUrlPlaceholder: "Enter JSON URL",
-        loadDataBtn: "Load Data"
+        loadUrlPlaceholder: "https://api.example.com/data.json",
+        loadDataBtn: "Load Data",
+        loadTabUrl: "URL",
+        loadTabFile: "File",
+        loadRecentLabel: "Recent",
+        loadDropZoneText: "Drop a .json file here",
+        loadDropZoneHint: "or click to browse",
+        loadDropActiveText: "Drop it here",
+        loadInvalidFileError: "File does not contain valid JSON",
+        loadNotJsonFileError: "Please drop a .json file"
     },
     colorConverter: {
         pageTitle: "Color Converter",
@@ -397,6 +406,7 @@ export default {
         tipText: "Strong password uses different types of characters",
         showPasswordLabel: "Show password",
         passwordInputLabel: "Password Input",
+        tipLabel: "Tip:",
         tipFullText: "A strong password uses uppercase, lowercase, numbers, and symbols — at least 12 characters long.",
         analysisLabel: "Analysis",
         strengthLabel: "Strength",
