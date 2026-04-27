@@ -5,9 +5,9 @@ import { styledMedia } from "styles/global";
 export const StyledContainer = styled(Box)`
     display: flex;
     width: 100%;
-    border: 1px solid #000;
+    border: 1px solid var(--border-color);
     border-radius: 2px;
-    margin-top: 80px;
+    margin-top: 24px;
     ${styledMedia.lessThan("md")`
         flex-direction: column;
     `}

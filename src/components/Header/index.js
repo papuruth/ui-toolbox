@@ -1,74 +1,72 @@
-import { Clear, DarkMode, GitHub, LightMode } from "@mui/icons-material";
+import { DarkMode, GitHub, LightMode } from "@mui/icons-material";
 import SearchIcon from "@mui/icons-material/Search";
-import { Divider, IconButton, Tooltip } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import gearIcon from "assets/images/gear.svg";
-import { StyledBoxContainer, StyledImageRenderer } from "components/Shared/Styled-Components";
+import DevDeckLogo from "components/DevDeckLogo";
+import { StyledBoxContainer } from "components/Shared/Styled-Components";
 import localization from "localization";
 import { func } from "prop-types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { Link } from "react-router-dom";
 import colors from "styles/colors";
 import { GLOBAL_CONSTANTS } from "utils/globalConstants";
 import ColorModeContext, { useColorMode } from "../../context/ColorModeContext";
-import { handleSearchAction } from "./HeaderAction";
-import { ClearIconWrapper, Search, SearchIconWrapper, StyledContainer, StyledInputBase } from "./styles";
+import { toggleCommandPaletteAction } from "./HeaderAction";
+import { PaletteTrigger, StyledContainer, TriggerKbd, TriggerKbdGroup, TriggerPlaceholder } from "./styles";
+
+const isMac = /Mac|iPhone|iPod|iPad/i.test(navigator.userAgent);
 
 function Header({ dispatch }) {
-    const [searchText, setSearchText] = useState("");
     const { mode, toggleColorMode } = useColorMode(ColorModeContext);
+    const [scrolled, setScrolled] = useState(false);
 
-    const handleInputChange = (event) => {
-        setSearchText(event.target.value);
-        dispatch(handleSearchAction(event.target.value));
-    };
-
-    const handleSearchClear = () => {
-        setSearchText("");
-        dispatch(handleSearchAction(""));
-    };
+    useEffect(() => {
+        const onScroll = () => setScrolled(window.scrollY > 10);
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
 
     return (
         <StyledContainer sx={{ flexGrow: 1, minWidth: 320 }}>
-            <AppBar position="fixed">
-                <Toolbar sx={{ padding: { xs: "0 10px", sm: "0 16px" } }}>
+            <AppBar
+                position="fixed"
+                sx={{
+                    transition: "box-shadow 0.25s ease, background 0.25s ease",
+                    ...(scrolled && { boxShadow: mode === "dark" ? "0 4px 24px rgba(0,0,0,0.6)" : "0 4px 16px rgba(0,0,0,0.2)" })
+                }}
+            >
+                <Toolbar
+                    sx={{
+                        padding: { xs: "0 10px", sm: "0 16px" },
+                        minHeight: scrolled ? "52px !important" : "64px !important",
+                        transition: "min-height 0.25s ease"
+                    }}
+                >
+                    {/* Logo — full wordmark on sm+, icon-only on xs */}
                     <StyledBoxContainer sx={{ flexGrow: 1, width: { sm: "calc(50% - 24px)!important" } }}>
-                        <Typography variant="h6" noWrap component="div" sx={{ display: { sm: "flex" }, alignItems: "center", lineHeight: 1 }}>
-                            <Link to="/" style={{ color: colors.white }}>
-                                <StyledImageRenderer src={gearIcon} alt="web-logo" />
-                            </Link>
-                        </Typography>
-                        <Divider orientation="vertical" flexItem sx={{ ml: 2 }} />
-                        <Typography variant="h6" noWrap component="div" sx={{ display: { sm: "flex" }, alignItems: "center", ml: 2 }}>
-                            <Link to="/" style={{ color: colors.white }}>
-                                {localization.appTitle}
-                            </Link>
-                        </Typography>
+                        <DevDeckLogo compact={false} />
                     </StyledBoxContainer>
+
                     <StyledBoxContainer sx={{ width: { sm: "calc(50% - 24px)!important" }, justifyContent: "flex-end", alignItems: "center" }}>
-                        <Search>
-                            <SearchIconWrapper>
-                                <SearchIcon />
-                            </SearchIconWrapper>
-                            <StyledInputBase
-                                placeholder="Search…"
-                                inputProps={{ "aria-label": "search" }}
-                                onChange={handleInputChange}
-                                value={searchText}
-                            />
-                            {searchText ? (
-                                <ClearIconWrapper>
-                                    <IconButton onClick={handleSearchClear}>
-                                        <Clear htmlColor={colors.white} />
-                                    </IconButton>
-                                </ClearIconWrapper>
-                            ) : null}
-                        </Search>
+                        <PaletteTrigger onClick={() => dispatch(toggleCommandPaletteAction())} aria-label="Open command palette" tabIndex={0}>
+                            <SearchIcon sx={{ fontSize: "1rem", color: "rgba(255,255,255,0.45)", flexShrink: 0 }} />
+                            <TriggerPlaceholder>{localization.commandPalette.placeholder}</TriggerPlaceholder>
+                            <TriggerKbdGroup aria-hidden>
+                                <TriggerKbd>{isMac ? "⌘" : "Ctrl"}</TriggerKbd>
+                                <TriggerKbd>K</TriggerKbd>
+                            </TriggerKbdGroup>
+                        </PaletteTrigger>
                         <Tooltip title={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}>
-                            <IconButton onClick={toggleColorMode} sx={{ ml: 1, color: colors.white }}>
+                            <IconButton
+                                onClick={toggleColorMode}
+                                sx={{
+                                    ml: 1,
+                                    color: colors.white,
+                                    transition: "transform 0.15s ease, opacity 0.15s ease",
+                                    "&:hover": { transform: "scale(1.1)", opacity: 0.85 }
+                                }}
+                            >
                                 {mode === "dark" ? <LightMode /> : <DarkMode />}
                             </IconButton>
                         </Tooltip>
@@ -78,7 +76,12 @@ function Header({ dispatch }) {
                                 href={GLOBAL_CONSTANTS.GIT_REPO_URL}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                sx={{ ml: 0.5, color: colors.white }}
+                                sx={{
+                                    ml: 0.5,
+                                    color: colors.white,
+                                    transition: "transform 0.15s ease, opacity 0.15s ease",
+                                    "&:hover": { transform: "scale(1.1)", opacity: 0.85 }
+                                }}
                                 aria-label="View source on GitHub"
                             >
                                 <GitHub />

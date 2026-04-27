@@ -1,33 +1,29 @@
-import { ContentCopy, Delete, Settings } from "@mui/icons-material";
-import { Button, IconButton, Toolbar, Tooltip } from "@mui/material";
+import { ContentCopy, Delete } from "@mui/icons-material";
+import { Divider, IconButton, Toolbar, Tooltip, Typography } from "@mui/material";
 import { StyledBoxCenter, StyledTextField } from "components/Shared/Styled-Components";
-import React, { useCallback, useState } from "react";
+import React, { useMemo, useState } from "react";
 import colors from "styles/colors";
-import toast from "utils/toast";
 import { StyledContainer, StyledText } from "./styles";
 
 export default function DecodeBase64() {
     const [base64Data, setBase64Data] = useState("");
     const [copyTooltip, setCopyTooltip] = useState("Copy to clipboard");
-    const [decodedStrings, setDecodedStrings] = useState("");
 
-    const handleCopyToClipBoard = useCallback(() => {
+    const handleCopyToClipBoard = (data) => {
         if (window && window.navigator.clipboard) {
-            window.navigator.clipboard.writeText(base64Data).then(() => {
+            window.navigator.clipboard.writeText(data).then(() => {
                 setCopyTooltip("Copied!");
-                setTimeout(() => {
-                    setCopyTooltip("Copy to clipboard");
-                }, 1000);
+                setTimeout(() => setCopyTooltip("Copy to clipboard"), 1000);
             });
         }
-    }, [base64Data]);
+    };
 
-    const decodeStrings = useCallback(() => {
+    const { decodedStrings, decodeError } = useMemo(() => {
+        if (!base64Data.trim()) return { decodedStrings: "", decodeError: "" };
         try {
-            const plainText = window.atob(base64Data);
-            setDecodedStrings(plainText);
-        } catch (error) {
-            toast.error("The string to be encoded is invalid.");
+            return { decodedStrings: window.atob(base64Data), decodeError: "" };
+        } catch {
+            return { decodedStrings: "", decodeError: "Invalid Base64 string" };
         }
     }, [base64Data]);
 
@@ -75,6 +71,7 @@ export default function DecodeBase64() {
                         />
                     </StyledBoxCenter>
                 </StyledBoxCenter>
+                <Divider orientation="vertical" flexItem sx={{ display: { xs: "none", sm: "none", md: "block" } }} />
                 <StyledBoxCenter justifyContent="center" flexDirection="column">
                     <StyledBoxCenter justifyContent="center" width="90%" sx={{ minHeight: 64 }}>
                         <StyledText component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
@@ -85,15 +82,6 @@ export default function DecodeBase64() {
                         </StyledText>
                         {decodedStrings.length > 0 ? (
                             <Toolbar>
-                                <Tooltip title="Clear">
-                                    <IconButton
-                                        onClick={() => {
-                                            setDecodedStrings("");
-                                        }}
-                                    >
-                                        <Delete color="error" />
-                                    </IconButton>
-                                </Tooltip>
                                 <Tooltip title={copyTooltip}>
                                     <IconButton onClick={() => handleCopyToClipBoard(decodedStrings)}>
                                         <ContentCopy color="primary" />
@@ -102,6 +90,11 @@ export default function DecodeBase64() {
                             </Toolbar>
                         ) : null}
                     </StyledBoxCenter>
+                    {decodeError ? (
+                        <Typography variant="caption" color="error" sx={{ mb: 1, pl: "5%" }}>
+                            {decodeError}
+                        </Typography>
+                    ) : null}
                     <StyledBoxCenter justifyContent="center">
                         <StyledTextField
                             id="image-base64"
@@ -110,15 +103,10 @@ export default function DecodeBase64() {
                             rows={7}
                             sx={{ width: { xs: "100%", sm: "100%", md: "90%" }, mb: 3 }}
                             value={decodedStrings}
-                            disabled
+                            InputProps={{ readOnly: true }}
                         />
                     </StyledBoxCenter>
                 </StyledBoxCenter>
-            </StyledBoxCenter>
-            <StyledBoxCenter justifyContent="center">
-                <Button endIcon={<Settings />} onClick={decodeStrings} variant="outlined">
-                    Decode
-                </Button>
             </StyledBoxCenter>
         </StyledContainer>
     );

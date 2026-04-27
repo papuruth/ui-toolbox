@@ -1,5 +1,5 @@
 export default {
-    appTitle: "UI Toolbox",
+    appTitle: "DevDeck",
     newVersionMessage: "A new update is available.",
     appUpdateCTALabel: "Update",
     noSearchDataMessage: "No matching data found for [DATA]",
@@ -214,6 +214,14 @@ export default {
         veryStrong: "Very Strong",
         tipText: "Strong password uses different types of characters",
         showPasswordLabel: "Show password"
+    },
+    commandPalette: {
+        placeholder: "Search tools, actions, or paste data...",
+        noResults: `No results for "[QUERY]"`,
+        sectionRecent: "Recent",
+        sectionTools: "Tools",
+        sectionActions: "Actions",
+        smartDetectionOpen: "Open →"
     },
     common: {
         maxImageSizeText: "Maximum image size allowed is 5MB",

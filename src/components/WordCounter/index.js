@@ -20,6 +20,8 @@ function getStats(text) {
     return { words, chars, charsNoSpace, lines, sentences, paragraphs, readingTime };
 }
 
+const STAT_COLORS = ["#22cc99", "#2299ff", "#9c27b0", "#ff9800", "#e91e63", "#00bcd4", "#607d8b"];
+
 const STAT_LABELS = [
     { key: "words", label: () => L.wordsLabel },
     { key: "chars", label: () => L.charsLabel },
@@ -38,9 +40,17 @@ export default function WordCounter() {
         <StyledBoxContainer flexDirection="column" gap={3}>
             <StyledTextField multiline rows={8} placeholder={L.placeholder} value={text} onChange={(e) => setText(e.target.value)} />
             <Grid container spacing={2}>
-                {STAT_LABELS.map(({ key, label }) => (
+                {STAT_LABELS.map(({ key, label }, index) => (
                     <Grid item xs={6} sm={4} md={3} key={key}>
-                        <Paper variant="outlined" sx={{ p: 2, textAlign: "center", background: "var(--bg-card)" }}>
+                        <Paper
+                            variant="outlined"
+                            sx={{
+                                p: 2,
+                                textAlign: "center",
+                                background: "var(--bg-card)",
+                                borderLeft: `3px solid ${STAT_COLORS[index]}`
+                            }}
+                        >
                             <Typography variant="h5" fontWeight={700} color="primary.main">
                                 {stats[key]}
                             </Typography>

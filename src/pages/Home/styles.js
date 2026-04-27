@@ -1,7 +1,18 @@
 import { Chip, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { styledMedia } from "styles/global";
+
+// ── Animations ────────────────────────────────────────────────────────────────
+const fadeUp = keyframes`
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0);    }
+`;
+
+const slideDown = keyframes`
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0);    }
+`;
 
 export const StyledContainer = styled.div`
     background-color: var(--bg-page);
@@ -9,38 +20,313 @@ export const StyledContainer = styled.div`
     min-height: 100vh;
 `;
 
-export const StyledHero = styled.div`
-    background: var(--hero-gradient);
-    padding: 48px 24px 56px;
+// ── Hero ──────────────────────────────────────────────────────────────────────
+export const StyledHero = styled.section`
+    background: #0f172a;
+    padding: 80px 24px 88px;
     text-align: center;
     color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+
+    /* subtle radial glow */
+    &::before {
+        content: "";
+        position: absolute;
+        top: -40%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 700px;
+        height: 700px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(34, 197, 94, 0.08) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
     ${styledMedia.lessThan("sm")`
-      padding: 32px 16px 40px;
+        padding: 56px 16px 64px;
     `}
 `;
 
 export const StyledHeroTitle = styled(Typography)`
-    font-weight: 700 !important;
-    letter-spacing: -0.5px !important;
+    font-weight: 800 !important;
+    font-size: 3rem !important;
+    letter-spacing: -1px !important;
+    color: #f9fafb !important;
+    animation: ${fadeUp} 0.5s ease both;
     ${styledMedia.lessThan("sm")`
-      font-size: 2rem !important;
+        font-size: 2.2rem !important;
     `}
 `;
 
 export const StyledHeroSubtitle = styled(Typography)`
-    opacity: 0.85;
-    margin-top: 8px !important;
+    color: #94a3b8 !important;
+    margin-top: 12px !important;
+    max-width: 480px;
+    line-height: 1.6 !important;
+    animation: ${fadeUp} 0.5s ease 0.1s both;
     ${styledMedia.lessThan("sm")`
-      font-size: 1rem !important;
+        font-size: 1rem !important;
     `}
 `;
 
 export const StyledHeroBadge = styled(Chip)`
-    margin-top: 16px !important;
-    background-color: rgba(255, 255, 255, 0.15) !important;
-    color: #fff !important;
-    border: 1px solid rgba(255, 255, 255, 0.4) !important;
-    font-weight: 600 !important;
+    margin-top: 20px !important;
+    background-color: rgba(34, 197, 94, 0.12) !important;
+    color: #4ade80 !important;
+    border: 1px solid rgba(34, 197, 94, 0.3) !important;
+    font-weight: 700 !important;
+    font-size: 0.75rem !important;
+    animation: ${fadeUp} 0.5s ease 0.15s both;
+`;
+
+export const HeroMicroText = styled.p`
+    font-size: 0.78rem;
+    color: #475569;
+    margin-top: 8px;
+    animation: ${fadeUp} 0.5s ease 0.12s both;
+    letter-spacing: 0.02em;
+`;
+
+// ── Hero inline search ────────────────────────────────────────────────────────
+export const HeroSearchWrapper = styled.div`
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    margin-top: 28px;
+    animation: ${fadeUp} 0.5s ease 0.2s both;
+    z-index: 10;
+`;
+
+export const HeroSearchBox = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #111827;
+    border: 1.5px solid ${({ $focused }) => ($focused ? "rgba(34, 197, 94, 0.5)" : "rgba(255, 255, 255, 0.1)")};
+    border-radius: 14px;
+    padding: 14px 16px;
+    cursor: text;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    box-shadow: ${({ $focused }) => ($focused ? "0 0 0 4px rgba(34, 197, 94, 0.1), 0 8px 32px rgba(0,0,0,0.3)" : "0 4px 16px rgba(0,0,0,0.2)")};
+    transform: ${({ $focused }) => ($focused ? "scale(1.01)" : "scale(1)")};
+`;
+
+export const HeroSearchIcon = styled.span`
+    font-size: 1rem;
+    flex-shrink: 0;
+    line-height: 1;
+`;
+
+export const HeroInputField = styled.input`
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 0.92rem;
+    color: #e2e8f0;
+    font-family: "Ubuntu", sans-serif;
+    min-width: 0;
+
+    &::placeholder {
+        color: #475569;
+    }
+`;
+
+export const HeroInputHints = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+
+    ${styledMedia.lessThan("xs")`
+        display: none;
+    `}
+`;
+
+export const HeroInputKbd = styled.span`
+    font-size: 0.68rem;
+    color: #334155;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 5px;
+    padding: 2px 7px;
+    font-family: monospace;
+    white-space: nowrap;
+`;
+
+export const HeroEnterHint = styled.span`
+    font-size: 0.68rem;
+    color: #334155;
+`;
+
+export const HeroSuggestionsList = styled.div`
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: #111827;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+    animation: ${slideDown} 0.15s ease;
+    z-index: 100;
+`;
+
+export const HeroSuggestionItem = styled.div`
+    padding: 10px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    background: ${({ $active }) => ($active ? "rgba(34, 197, 94, 0.08)" : "transparent")};
+    transition: background 0.1s ease;
+
+    &:last-child {
+        border-bottom: none;
+    }
+`;
+
+export const HeroSuggestionLabel = styled.div`
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #e2e8f0;
+`;
+
+export const HeroHighlight = styled.mark`
+    background: transparent;
+    color: #4ade80;
+    font-weight: 700;
+`;
+
+export const HeroSuggestionDesc = styled.div`
+    font-size: 0.73rem;
+    color: #475569;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+`;
+
+export const HeroSmartBanner = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    background: ${({ $active }) => ($active ? "rgba(34, 197, 94, 0.1)" : "rgba(34, 197, 94, 0.05)")};
+    border-bottom: 1px solid rgba(34, 197, 94, 0.1);
+    font-size: 0.82rem;
+    color: #94a3b8;
+    transition: background 0.1s ease;
+
+    strong {
+        color: #4ade80;
+    }
+`;
+
+export const HeroSuggestionFooter = styled.div`
+    padding: 8px 16px;
+    font-size: 0.72rem;
+    color: #334155;
+    cursor: pointer;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    transition: color 0.1s ease;
+
+    &:hover {
+        color: #4ade80;
+    }
+`;
+
+/* CTA buttons row */
+export const HeroCTARow = styled.div`
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+    animation: ${fadeUp} 0.5s ease 0.3s both;
+`;
+
+export const HeroCTAPrimary = styled.button`
+    padding: 12px 28px;
+    border-radius: 12px;
+    border: none;
+    background: #22c55e;
+    color: #0f172a;
+    font-weight: 700;
+    font-size: 0.92rem;
+    font-family: "Ubuntu", sans-serif;
+    cursor: pointer;
+    transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+
+    &:hover {
+        background: #16a34a;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(34, 197, 94, 0.3);
+    }
+    &:active {
+        transform: translateY(0);
+    }
+`;
+
+export const HeroCTASecondary = styled.button`
+    padding: 12px 28px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: #cbd5e1;
+    font-weight: 600;
+    font-size: 0.92rem;
+    font-family: "Ubuntu", sans-serif;
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.09);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+`;
+
+/* Feature pills row */
+export const HeroFeatureRow = styled.div`
+    display: flex;
+    gap: 24px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: ${fadeUp} 0.5s ease 0.4s both;
+`;
+
+export const HeroFeature = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: #64748b;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    cursor: default;
+    transition: background 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+        background: rgba(34, 197, 94, 0.05);
+        border-color: rgba(34, 197, 94, 0.2);
+    }
+
+    span.icon {
+        font-size: 1.5rem;
+        transition: transform 0.2s ease;
+    }
+    &:hover span.icon {
+        transform: scale(1.2);
+    }
+    span.label {
+        color: #94a3b8;
+        font-weight: 600;
+    }
 `;
 
 export const StyledSectionWrapper = styled.div`

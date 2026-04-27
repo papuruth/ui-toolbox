@@ -118,7 +118,7 @@ export default function Base64ToImage() {
                 }}
             />
             <StyledImagePreviewContainer>
-                <Box sx={{ border: "1px solid #000", borderRadius: 2, p: 5, width: "100%" }}>{loadPreviewImage()} </Box>
+                <Box sx={{ border: "1px solid var(--border-color)", borderRadius: 2, p: 5, width: "100%" }}>{loadPreviewImage()} </Box>
             </StyledImagePreviewContainer>
             {imageBase64.length > 0 && !imageError ? (
                 <Toolbar>

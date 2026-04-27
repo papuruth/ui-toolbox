@@ -32,11 +32,11 @@ export const StyledImagePreviewContainer = styled.div`
     width: 50%;
     padding: ${(props) => (props?.isPadding ? "20px" : "0")};
     text-align: center;
-    border-right: ${(props) => (props.borderRight ? "1px solid #000" : "")};
+    border-right: ${(props) => (props.borderRight ? "1px solid var(--border-color)" : "")};
     ${styledMedia.lessThan("md")`
       width: 100%;
       border-right: 0;
-      border-bottom: ${(props) => (props.borderBottom ? "1px solid #000" : "")};
+      border-bottom: ${(props) => (props.borderBottom ? "1px solid var(--border-color)" : "")};
     `}
 `;
 
@@ -123,7 +123,7 @@ export const StyledTextField = muiStyled(TextField)({
         borderColor: "black",
         borderWidth: "1px"
     },
-    "&[readonly=\"read-only\"]": {
+    "&[readonly='read-only']": {
         pointerEvents: "none"
     },
     "#placeholder": {

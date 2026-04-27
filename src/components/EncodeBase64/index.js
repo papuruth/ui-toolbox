@@ -1,34 +1,30 @@
-import { ContentCopy, Delete, Settings } from "@mui/icons-material";
-import { Button, IconButton, Toolbar, Tooltip } from "@mui/material";
+import { ContentCopy, Delete } from "@mui/icons-material";
+import { Divider, IconButton, Toolbar, Tooltip, Typography } from "@mui/material";
 import { StyledBoxCenter, StyledTextField } from "components/Shared/Styled-Components";
-import React, { useCallback, useState } from "react";
+import React, { useMemo, useState } from "react";
 import colors from "styles/colors";
-import toast from "utils/toast";
 import { StyledText } from "components/DecodeBase64/styles";
 import { StyledContainer } from "./styles";
 
 export default function EncodeBase64() {
     const [plainText, setPlainText] = useState("");
     const [copyTooltip, setCopyTooltip] = useState("Copy to clipboard");
-    const [encodeStrings, setEncodedStrings] = useState("");
 
-    const handleCopyToClipBoard = useCallback((data) => {
+    const handleCopyToClipBoard = (data) => {
         if (window && window.navigator.clipboard) {
             window.navigator.clipboard.writeText(data).then(() => {
                 setCopyTooltip("Copied!");
-                setTimeout(() => {
-                    setCopyTooltip("Copy to clipboard");
-                }, 1000);
+                setTimeout(() => setCopyTooltip("Copy to clipboard"), 1000);
             });
         }
-    }, []);
+    };
 
-    const encodePlainText = useCallback(() => {
+    const { encodeStrings, encodeError } = useMemo(() => {
+        if (!plainText) return { encodeStrings: "", encodeError: "" };
         try {
-            const base64String = window.btoa(plainText);
-            setEncodedStrings(base64String);
-        } catch (error) {
-            toast.error("The string to be decoded is not correctly encoded.");
+            return { encodeStrings: window.btoa(plainText), encodeError: "" };
+        } catch {
+            return { encodeStrings: "", encodeError: "String contains characters outside Latin-1 range" };
         }
     }, [plainText]);
 
@@ -76,6 +72,7 @@ export default function EncodeBase64() {
                         />
                     </StyledBoxCenter>
                 </StyledBoxCenter>
+                <Divider orientation="vertical" flexItem sx={{ display: { xs: "none", sm: "none", md: "block" } }} />
                 <StyledBoxCenter justifyContent="center" flexDirection="column">
                     <StyledBoxCenter justifyContent="center" width="90%" sx={{ minHeight: 64 }}>
                         <StyledText component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
@@ -86,15 +83,6 @@ export default function EncodeBase64() {
                         </StyledText>
                         {encodeStrings.length > 0 ? (
                             <Toolbar>
-                                <Tooltip title="Clear">
-                                    <IconButton
-                                        onClick={() => {
-                                            setEncodedStrings("");
-                                        }}
-                                    >
-                                        <Delete color="error" />
-                                    </IconButton>
-                                </Tooltip>
                                 <Tooltip title={copyTooltip}>
                                     <IconButton onClick={() => handleCopyToClipBoard(encodeStrings)}>
                                         <ContentCopy color="primary" />
@@ -103,6 +91,11 @@ export default function EncodeBase64() {
                             </Toolbar>
                         ) : null}
                     </StyledBoxCenter>
+                    {encodeError ? (
+                        <Typography variant="caption" color="error" sx={{ mb: 1, pl: "5%" }}>
+                            {encodeError}
+                        </Typography>
+                    ) : null}
                     <StyledBoxCenter justifyContent="center">
                         <StyledTextField
                             id="image-base64"
@@ -111,15 +104,10 @@ export default function EncodeBase64() {
                             rows={7}
                             sx={{ width: { xs: "100%", sm: "100%", md: "90%" }, mb: 3 }}
                             value={encodeStrings}
-                            disabled
+                            InputProps={{ readOnly: true }}
                         />
                     </StyledBoxCenter>
                 </StyledBoxCenter>
-            </StyledBoxCenter>
-            <StyledBoxCenter justifyContent="center">
-                <Button endIcon={<Settings />} onClick={encodePlainText} variant="outlined">
-                    Encode
-                </Button>
             </StyledBoxCenter>
         </StyledContainer>
     );

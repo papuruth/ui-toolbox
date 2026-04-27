@@ -26,7 +26,11 @@ function shouldForwardProp(propName, target) {
 }
 
 function App() {
-    const [mode, setMode] = useState(() => localStorage.getItem("ui-toolbox-theme") || "light");
+    const [mode, setMode] = useState(() => {
+        const saved = localStorage.getItem("ui-toolbox-theme");
+        if (saved) return saved;
+        return window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark";
+    });
     const { isLatestVersion, emptyCacheStorage } = useClearCache();
 
     useEffect(() => {
@@ -73,6 +77,18 @@ function App() {
                         styleOverrides: {
                             root: {
                                 touchAction: "manipulation"
+                            }
+                        }
+                    },
+                    MuiAppBar: {
+                        styleOverrides: {
+                            root: {
+                                background: mode === "dark" ? "rgba(15, 23, 42, 0.85)" : "linear-gradient(90deg, #0d9a68 0%, #059669 100%)",
+                                backdropFilter: mode === "dark" ? "blur(12px)" : "none",
+                                WebkitBackdropFilter: mode === "dark" ? "blur(12px)" : "none",
+                                boxShadow:
+                                    mode === "dark" ? "0 2px 16px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.05)" : "0 2px 10px rgba(0,0,0,0.15)",
+                                borderBottom: mode === "dark" ? "1px solid rgba(255,255,255,0.07)" : "none"
                             }
                         }
                     }

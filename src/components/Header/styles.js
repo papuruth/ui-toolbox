@@ -58,3 +58,89 @@ export const StyledInputBase = muiStyled(InputBase)(({ theme }) => ({
         }
     }
 }));
+
+// ── Premium Command Palette Trigger ──────────────────────────────────────────
+export const PaletteTrigger = muiStyled("button")(({ theme }) => {
+    const isDark = theme.palette.mode === "dark";
+    return {
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        padding: "7px 14px 7px 12px",
+        background: isDark ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.18)",
+        border: `1px solid ${isDark ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.4)"}`,
+        borderRadius: "10px",
+        cursor: "pointer",
+        color: isDark ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.95)",
+        fontFamily: "'Ubuntu', sans-serif",
+        fontSize: "0.82rem",
+        transition: "background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease, width 0.2s ease",
+        outline: "none",
+        userSelect: "none",
+        width: 220,
+        minWidth: 40,
+        boxShadow: isDark ? "inset 0 1px 0 rgba(255,255,255,0.05)" : "inset 0 1px 0 rgba(255,255,255,0.3), 0 1px 3px rgba(0,0,0,0.1)",
+
+        "&:hover": {
+            background: isDark ? "rgba(255,255,255,0.11)" : "rgba(255,255,255,0.28)",
+            borderColor: isDark ? "rgba(34,204,153,0.5)" : "rgba(255,255,255,0.65)",
+            boxShadow: isDark ? "0 0 0 3px rgba(34,204,153,0.12), inset 0 1px 0 rgba(255,255,255,0.07)" : "0 0 0 3px rgba(255,255,255,0.18)",
+            color: isDark ? "rgba(255,255,255,0.88)" : "#fff",
+            width: 280
+        },
+
+        "&:focus-visible": {
+            borderColor: "rgba(34,204,153,0.65)",
+            boxShadow: "0 0 0 3px rgba(34,204,153,0.22)",
+            outline: "none",
+            width: 280
+        },
+
+        [theme.breakpoints.down("sm")]: {
+            minWidth: 40,
+            padding: "6px 8px"
+        }
+    };
+});
+
+export const TriggerPlaceholder = muiStyled("span")(({ theme }) => ({
+    flex: 1,
+    textAlign: "left",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+
+    [theme.breakpoints.down("sm")]: {
+        display: "none"
+    }
+}));
+
+export const TriggerKbdGroup = muiStyled("span")(({ theme }) => ({
+    display: "flex",
+    alignItems: "center",
+    gap: "3px",
+    marginLeft: "auto",
+    paddingLeft: "8px",
+    flexShrink: 0,
+
+    [theme.breakpoints.down("sm")]: {
+        display: "none"
+    }
+}));
+
+export const TriggerKbd = muiStyled("kbd")(({ theme }) => {
+    const isDark = theme.palette.mode === "dark";
+    return {
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "2px 6px",
+        background: isDark ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.25)",
+        border: `1px solid ${isDark ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.5)"}`,
+        borderRadius: "5px",
+        fontFamily: "monospace",
+        fontSize: "0.68rem",
+        color: isDark ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.9)",
+        lineHeight: 1.6
+    };
+});

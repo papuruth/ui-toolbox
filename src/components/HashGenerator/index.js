@@ -42,7 +42,7 @@ export default function HashGenerator() {
         <StyledBoxContainer flexDirection="column" gap={3}>
             <StyledTextField multiline rows={4} placeholder={L.inputPlaceholder} value={input} onChange={(e) => setInput(e.target.value)} />
             {ALGORITHMS.map(({ id, label }) => (
-                <Paper key={id} variant="outlined" sx={{ p: 2, background: "var(--bg-card)" }}>
+                <Paper key={id} variant="outlined" sx={{ p: 2, background: "var(--bg-card)", borderLeft: "3px solid #22cc99" }}>
                     <Typography variant="caption" color="text.secondary" fontWeight={600}>
                         {label}
                     </Typography>

@@ -12,7 +12,7 @@ function NoData(props) {
             <figure>
                 <StyledImageRenderer src={noDataImage} alt="no-data-found" />
             </figure>
-            <Typography variant="h6" fontWeight={500} color="black">
+            <Typography variant="h6" fontWeight={500} color="var(--text-primary)">
                 {title}
             </Typography>
         </StyledContainer>
