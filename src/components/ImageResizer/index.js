@@ -121,13 +121,13 @@ export default function ImageResizer() {
         [completedCrop, scale, rotate]
     );
 
-    const aspectLabel = aspect ? "Locked 16:9" : "Free";
+    const aspectLabel = aspect ? L.aspectLockedLabel : L.aspectFreeLabel;
 
     return (
         <ToolLayout>
             <Panel>
                 <PanelHeader>
-                    <PanelLabel>Controls</PanelLabel>
+                    <PanelLabel>{L.controlsLabel}</PanelLabel>
                     {imgDims && (
                         <MetaText>
                             {imgDims.w}×{imgDims.h}px

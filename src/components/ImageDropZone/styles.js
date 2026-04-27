@@ -1,11 +1,14 @@
 import styled from "styled-components";
-
+import { styledMedia } from "styles/global";
 import { Paper } from "@mui/material";
 
 export const StyledPaper = styled(Paper)`
     width: 100%;
     max-width: ${(props) => (props.$fullWidth ? "none" : "500px")};
     height: 160px;
+    ${styledMedia.lessThan("sm")`
+        max-width: 100%;
+    `}
     text-align: center;
     display: flex;
     align-items: center;

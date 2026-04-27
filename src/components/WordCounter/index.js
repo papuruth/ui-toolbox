@@ -1,7 +1,22 @@
-import { Grid, Paper, Typography } from "@mui/material";
-import { StyledBoxContainer, StyledTextField } from "components/Shared/Styled-Components";
+import { IosShare } from "@mui/icons-material";
 import localization from "localization";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import styled from "styled-components";
+import {
+    ActionBar,
+    ActionBtn,
+    ActionBtnGroup,
+    EmptyState,
+    InputArea,
+    MetaText,
+    Panel,
+    PanelHeader,
+    PanelLabel,
+    ToolLayout
+} from "components/Shared/ToolKit";
+import SendToButton from "components/Shared/SendToButton";
+import { useToolChain } from "context/ToolChainContext";
+import { useShareableURL } from "utils/hooks/useShareableURL.hooks";
 
 const { wordCounter: L } = localization;
 
@@ -87,16 +102,27 @@ const STOP_WORDS = new Set([
 ]);
 
 function getStats(text) {
-    if (!text) return { words: 0, chars: 0, charsNoSpace: 0, lines: 0, sentences: 0, paragraphs: 0, readingTime: "< 1 min" };
+    if (!text) {
+        return { words: 0, chars: 0, charsNoSpace: 0, lines: 0, sentences: 0, paragraphs: 0, readingTime: "< 1 min", speakingTime: "< 1 min" };
+    }
     const words = text.trim() ? text.trim().split(/\s+/).length : 0;
     const chars = text.length;
     const charsNoSpace = text.replace(/\s/g, "").length;
     const lines = text.split("\n").length;
     const sentences = (text.match(/[^.!?]*[.!?]/g) || []).length;
     const paragraphs = text.split(/\n\s*\n/).filter((p) => p.trim()).length;
-    const mins = Math.ceil(words / 200);
-    const readingTime = mins <= 1 ? "< 1 min" : `~${mins} min`;
-    return { words, chars, charsNoSpace, lines, sentences, paragraphs, readingTime };
+    const readMins = Math.ceil(words / 200);
+    const speakMins = Math.ceil(words / 130);
+    return {
+        words,
+        chars,
+        charsNoSpace,
+        lines,
+        sentences,
+        paragraphs,
+        readingTime: readMins <= 1 ? "< 1 min" : `~${readMins} min`,
+        speakingTime: speakMins <= 1 ? "< 1 min" : `~${speakMins} min`
+    };
 }
 
 function getKeywordDensity(text, topN = 10) {
@@ -113,79 +139,198 @@ function getKeywordDensity(text, topN = 10) {
         .map(([word, count]) => ({ word, count, pct: ((count / total) * 100).toFixed(1) }));
 }
 
-const STAT_COLORS = ["#22cc99", "#2299ff", "#9c27b0", "#ff9800", "#e91e63", "#00bcd4", "#607d8b"];
+function getStatsConfig() {
+    return [
+        { key: "words", label: L.wordsLabel },
+        { key: "chars", label: L.charsLabel },
+        { key: "charsNoSpace", label: L.charsNoSpaceLabel },
+        { key: "sentences", label: L.sentencesLabel },
+        { key: "paragraphs", label: L.paragraphsLabel },
+        { key: "lines", label: L.linesLabel },
+        { key: "readingTime", label: L.readingTimeLabel },
+        { key: "speakingTime", label: L.speakingTimeLabel }
+    ];
+}
 
-const STAT_LABELS = [
-    { key: "words", label: () => L.wordsLabel },
-    { key: "chars", label: () => L.charsLabel },
-    { key: "charsNoSpace", label: () => L.charsNoSpaceLabel },
-    { key: "lines", label: () => L.linesLabel },
-    { key: "sentences", label: () => L.sentencesLabel },
-    { key: "paragraphs", label: () => L.paragraphsLabel },
-    { key: "readingTime", label: () => L.readingTimeLabel }
-];
+const StatsGrid = styled.div`
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border-color);
+    border-top: 1px solid var(--border-color);
+`;
+
+const StatCard = styled.div`
+    background: var(--bg-surface);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+`;
+
+const StatValue = styled.span`
+    font-size: 18px;
+    font-weight: 600;
+    font-family: "JetBrains Mono", monospace;
+    color: var(--text-primary);
+    line-height: 1.2;
+`;
+
+const StatLabel = styled.span`
+    font-size: 10px;
+    font-weight: 600;
+    font-family: "Inter", sans-serif;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+`;
+
+const KeywordSection = styled.div`
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+`;
+
+const KeywordRow = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+`;
+
+const KeywordWord = styled.span`
+    font-size: 11px;
+    font-family: "JetBrains Mono", monospace;
+    color: var(--text-primary);
+    min-width: 80px;
+`;
+
+const KeywordBar = styled.div`
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border-color);
+    overflow: hidden;
+`;
+
+const KeywordFill = styled.div`
+    height: 100%;
+    border-radius: 2px;
+    background: #22cc99;
+    width: ${(p) => p.$pct}%;
+    transition: width 0.3s ease;
+`;
+
+const KeywordMeta = styled.span`
+    font-size: 10px;
+    font-family: "Inter", sans-serif;
+    color: var(--text-secondary);
+    min-width: 52px;
+    text-align: right;
+`;
+
+const KeywordHeader = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    border-top: 1px solid var(--border-color);
+    background: rgba(0, 0, 0, 0.04);
+    min-height: 36px;
+`;
 
 export default function WordCounter() {
     const [text, setText] = useState("");
     const stats = useMemo(() => getStats(text), [text]);
     const keywords = useMemo(() => getKeywordDensity(text), [text]);
+    const { consumeChain } = useToolChain();
+    const { initialValue, shareURL } = useShareableURL("q");
+
+    useEffect(() => {
+        const chained = consumeChain("/word-counter");
+        if (chained) setText(chained);
+        else if (initialValue) setText(initialValue);
+    }, [consumeChain, initialValue]);
+
+    const STATS_CONFIG = getStatsConfig();
 
     return (
-        <StyledBoxContainer flexDirection="column" gap={3}>
-            <StyledTextField multiline rows={8} placeholder={L.placeholder} value={text} onChange={(e) => setText(e.target.value)} />
-            <Grid container spacing={2}>
-                {STAT_LABELS.map(({ key, label }, index) => (
-                    <Grid item xs={6} sm={4} md={3} key={key}>
-                        <Paper
-                            variant="outlined"
-                            sx={{ p: 2, textAlign: "center", background: "var(--bg-card)", borderLeft: `3px solid ${STAT_COLORS[index]}` }}
-                        >
-                            <Typography variant="h5" fontWeight={700} color="primary.main">
-                                {stats[key]}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                                {label()}
-                            </Typography>
-                        </Paper>
-                    </Grid>
-                ))}
-            </Grid>
+        <ToolLayout>
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>{L.textLabel}</PanelLabel>
+                    {text && <MetaText>{stats.words.toLocaleString()} {L.wordsLabel}</MetaText>}
+                </PanelHeader>
+                <InputArea
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    placeholder={L.placeholder}
+                    spellCheck
+                    style={{ minHeight: 400 }}
+                />
+                {text && (
+                    <ActionBar>
+                        <ActionBtnGroup>
+                            <ActionBtn onClick={() => shareURL(text)}>
+                                <IosShare style={{ fontSize: 11 }} /> {L.shareBtn}
+                            </ActionBtn>
+                            <SendToButton
+                                value={text}
+                                targets={[
+                                    { label: "Hash Generator", route: "/hash-generator" },
+                                    { label: "Text Case Converter", route: "/text-case" },
+                                    { label: "Regex Tester", route: "/regex-tester" }
+                                ]}
+                            />
+                        </ActionBtnGroup>
+                    </ActionBar>
+                )}
+            </Panel>
 
-            {keywords.length > 0 && (
-                <>
-                    <Typography variant="subtitle2" fontWeight={700} color="text.primary">
-                        Keyword Density
-                    </Typography>
-                    <Grid container spacing={1}>
-                        {keywords.map(({ word, count, pct }, i) => (
-                            <Grid item xs={6} sm={4} md={3} key={word}>
-                                <Paper variant="outlined" sx={{ p: 1.5, background: "var(--bg-card)" }}>
-                                    <Typography
-                                        variant="body2"
-                                        fontWeight={600}
-                                        sx={{ fontFamily: "monospace", color: STAT_COLORS[i % STAT_COLORS.length] }}
-                                    >
-                                        {word}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                        {count}× · {pct}%
-                                    </Typography>
-                                    <div style={{ marginTop: 4, height: 4, borderRadius: 2, background: "var(--border-color)", overflow: "hidden" }}>
-                                        <div
-                                            style={{
-                                                height: "100%",
-                                                width: `${Math.min(100, pct * 5)}%`,
-                                                background: STAT_COLORS[i % STAT_COLORS.length],
-                                                transition: "width 0.3s"
-                                            }}
-                                        />
-                                    </div>
-                                </Paper>
-                            </Grid>
-                        ))}
-                    </Grid>
-                </>
-            )}
-        </StyledBoxContainer>
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>{L.statsLabel}</PanelLabel>
+                </PanelHeader>
+                {text ? (
+                    <>
+                        <StatsGrid>
+                            {STATS_CONFIG.map(({ key, label }) => (
+                                <StatCard key={key}>
+                                    <StatValue>{stats[key]}</StatValue>
+                                    <StatLabel>{label}</StatLabel>
+                                </StatCard>
+                            ))}
+                        </StatsGrid>
+                        {keywords.length > 0 && (
+                            <>
+                                <KeywordHeader>
+                                    <PanelLabel>{L.keywordDensityLabel}</PanelLabel>
+                                    <MetaText>top {keywords.length}</MetaText>
+                                </KeywordHeader>
+                                <KeywordSection>
+                                    {keywords.map(({ word, count, pct }) => (
+                                        <KeywordRow key={word}>
+                                            <KeywordWord>{word}</KeywordWord>
+                                            <KeywordBar>
+                                                <KeywordFill $pct={Math.min(100, pct * 5)} />
+                                            </KeywordBar>
+                                            <KeywordMeta>
+                                                {count}× {pct}%
+                                            </KeywordMeta>
+                                        </KeywordRow>
+                                    ))}
+                                </KeywordSection>
+                            </>
+                        )}
+                    </>
+                ) : (
+                    <EmptyState>
+                        <span style={{ fontSize: 26, fontFamily: "JetBrains Mono, monospace" }}>&#931;</span>
+                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>{L.emptyStateMessage}</span>
+                    </EmptyState>
+                )}
+            </Panel>
+        </ToolLayout>
     );
 }

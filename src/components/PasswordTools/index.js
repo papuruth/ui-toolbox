@@ -1,22 +1,24 @@
-import { Tabs } from "@mui/base/Tabs";
 import PasswordGenerator from "components/PasswordGenerator";
 import PasswordStrengthMeter from "components/PasswordStrengthMeter";
-import { StyledTab, StyledTabPanel, StyledTabsList } from "components/Shared/StyledTabs";
-import React from "react";
+import { TabBtn, TabStrip } from "components/Shared/ToolKit";
+import localization from "localization";
+import React, { useState } from "react";
+
+const { passwordTools: L } = localization;
 
 export default function PasswordTools() {
+    const [tab, setTab] = useState("generator");
     return (
-        <Tabs defaultValue={0}>
-            <StyledTabsList>
-                <StyledTab value={0}>Generator</StyledTab>
-                <StyledTab value={1}>Strength Meter</StyledTab>
-            </StyledTabsList>
-            <StyledTabPanel value={0}>
-                <PasswordGenerator />
-            </StyledTabPanel>
-            <StyledTabPanel value={1}>
-                <PasswordStrengthMeter />
-            </StyledTabPanel>
-        </Tabs>
+        <>
+            <TabStrip>
+                <TabBtn $active={tab === "generator"} onClick={() => setTab("generator")}>
+                    {L.generatorTab}
+                </TabBtn>
+                <TabBtn $active={tab === "strength"} onClick={() => setTab("strength")}>
+                    {L.strengthMeterTab}
+                </TabBtn>
+            </TabStrip>
+            {tab === "generator" ? <PasswordGenerator /> : <PasswordStrengthMeter />}
+        </>
     );
 }

@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import styled from "styled-components";
+import { styledMedia } from "styles/global";
 
 export {
     ActionBar,
@@ -80,7 +81,7 @@ export const SliderWrap = styled(Box)`
 
 export const ControlValue = styled.span`
     font-family: "JetBrains Mono", monospace;
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-secondary);
     min-width: 56px;
     text-align: right;
@@ -88,8 +89,8 @@ export const ControlValue = styled.span`
 `;
 
 export const ColorInput = styled.input`
-    width: 28px;
-    height: 28px;
+    width: 40px;
+    height: 40px;
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 2px;
@@ -105,6 +106,10 @@ export const QrPreviewArea = styled(Box)`
     min-height: 320px;
     background: var(--bg-input);
     padding: 24px;
+    ${styledMedia.lessThan("sm")`
+        min-height: 220px;
+        padding: 16px;
+    `}
 `;
 
 export const QrPreviewImg = styled.img`

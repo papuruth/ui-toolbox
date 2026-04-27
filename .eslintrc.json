@@ -48,7 +48,9 @@
                     ["routes", "./src/routes"],
                     ["localization", "./src/localization"],
                     ["assets", "./src/assets"],
-                    ["services", "./src/services"]
+                    ["services", "./src/services"],
+                    ["hooks", "./src/hooks"],
+                    ["context", "./src/context"]
                 ]
             }
         }

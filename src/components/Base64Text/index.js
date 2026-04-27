@@ -1,5 +1,6 @@
 import { Check, ContentCopy, DeleteOutline, IosShare } from "@mui/icons-material";
 import { Box, Typography } from "@mui/material";
+import localization from "localization";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useShareableURL } from "utils/hooks/useShareableURL.hooks";
 import styled from "styled-components";
@@ -16,6 +17,8 @@ import {
     ActionBtnGroup,
     ActionBtn
 } from "components/Shared/ToolKit";
+
+const { base64Text: L, common: C } = localization;
 
 /* ─── Tool-specific Styles ───────────────────────────── */
 
@@ -80,13 +83,13 @@ export default function Base64Text() {
             try {
                 return { output: window.btoa(input), error: "" };
             } catch {
-                return { output: "", error: "Contains characters outside Latin-1 range" };
+                return { output: "", error: L.latinRangeError };
             }
         }
         try {
             return { output: window.atob(input), error: "" };
         } catch {
-            return { output: "", error: "Invalid Base64 string" };
+            return { output: "", error: L.invalidBase64Error };
         }
     }, [input, mode]);
 
@@ -107,10 +110,10 @@ export default function Base64Text() {
         shareURL(input);
     }, [shareURL, input]);
 
-    const inputLabel = mode === "encode" ? "Plain Text" : "Base64 String";
-    const outputLabel = mode === "encode" ? "Base64 Output" : "Decoded Text";
-    const inputPlaceholder = mode === "encode" ? "Type or paste plain text here…" : "Paste your Base64 encoded string here…";
-    const outputPlaceholder = mode === "encode" ? "Base64 output will appear here…" : "Decoded plain text will appear here…";
+    const inputLabel = mode === "encode" ? L.plainTextLabel : L.base64StringLabel;
+    const outputLabel = mode === "encode" ? L.base64OutputLabel : L.decodedTextLabel;
+    const inputPlaceholder = mode === "encode" ? L.encodeInputPlaceholder : L.decodeInputPlaceholder;
+    const outputPlaceholder = mode === "encode" ? L.encodeOutputPlaceholder : L.decodedOutputPlaceholder;
 
     const inputMeta = input ? `${(input.length / 1024).toFixed(1)} KB · ${input.length.toLocaleString()} chars` : "";
     const outputMeta = output ? `${(output.length / 1024).toFixed(1)} KB · ${output.length.toLocaleString()} chars` : "";
@@ -119,10 +122,10 @@ export default function Base64Text() {
         <ToolWrap>
             <ModeToggle>
                 <ModeBtn $active={mode === "encode"} onClick={() => handleModeSwitch("encode")}>
-                    Encode
+                    {L.encodeMode}
                 </ModeBtn>
                 <ModeBtn $active={mode === "decode"} onClick={() => handleModeSwitch("decode")}>
-                    Decode
+                    {L.decodeMode}
                 </ModeBtn>
             </ModeToggle>
 
@@ -139,7 +142,7 @@ export default function Base64Text() {
                             <BtnGroup>
                                 <ActionBtn $danger onClick={() => setInput("")}>
                                     <DeleteOutline style={{ fontSize: 12 }} />
-                                    Clear
+                                    {C.clearBtn}
                                 </ActionBtn>
                             </BtnGroup>
                         </ActionBar>
@@ -159,12 +162,12 @@ export default function Base64Text() {
                                 {mode === "encode" && (
                                     <ActionBtn onClick={handleShare} disabled={!input}>
                                         <IosShare style={{ fontSize: 12 }} />
-                                        Share
+                                        {C.shareBtn}
                                     </ActionBtn>
                                 )}
                                 <ActionBtn $success={copied} onClick={handleCopy}>
                                     {copied ? <Check style={{ fontSize: 12 }} /> : <ContentCopy style={{ fontSize: 12 }} />}
-                                    {copied ? "Copied" : "Copy"}
+                                    {copied ? C.copiedLabel : C.copyBtn}
                                 </ActionBtn>
                             </BtnGroup>
                         </ActionBar>

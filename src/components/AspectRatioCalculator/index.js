@@ -133,7 +133,7 @@ export default function AspectRatioCalculator() {
 
     const hasInput = imageWidth || imageHeight;
     const copyIcon = copied ? <Done sx={{ fontSize: 13 }} /> : <ContentCopy sx={{ fontSize: 13 }} />;
-    const copyLabel = copied ? "Copied!" : "Copy";
+    const copyLabel = copied ? L.copiedLabel : L.copyBtn;
 
     return (
         <ToolLayout>
@@ -145,12 +145,12 @@ export default function AspectRatioCalculator() {
                     <ImageDropZone handleOnDrop={handleSelectedFiles} maxImageSize={4} />
                 </DropWrap>
                 <DimInputsRow>
-                    <DimInput type="number" placeholder="Width (px)" value={imageWidth} onChange={handleWidthChange} min={1} />
+                    <DimInput type="number" placeholder={L.widthPlaceholder} value={imageWidth} onChange={handleWidthChange} min={1} />
                     <DimSeparator>×</DimSeparator>
-                    <DimInput type="number" placeholder="Height (px)" value={imageHeight} onChange={handleHeightChange} min={1} />
+                    <DimInput type="number" placeholder={L.heightPlaceholder} value={imageHeight} onChange={handleHeightChange} min={1} />
                 </DimInputsRow>
                 <PresetsSection>
-                    <PresetLabel>Presets</PresetLabel>
+                    <PresetLabel>{L.presetsLabel}</PresetLabel>
                     <PresetsRow>
                         {PRESETS.map((p) => (
                             <PresetBtn key={p.label} onClick={() => applyPreset(p)}>
@@ -161,7 +161,7 @@ export default function AspectRatioCalculator() {
                 </PresetsSection>
                 <ActionBar>
                     <ActionBtn $danger onClick={handleReset} disabled={!hasInput}>
-                        Reset
+                        {L.resetBtn}
                     </ActionBtn>
                 </ActionBar>
             </Panel>
@@ -183,13 +183,13 @@ export default function AspectRatioCalculator() {
                                 variant="body2"
                                 sx={{ fontSize: "12px", color: "var(--text-secondary)", mt: 1, fontFamily: "Inter, sans-serif" }}
                             >
-                                Simplified ratio
+                                {L.simplifiedRatioLabel}
                             </Typography>
                         </>
                     ) : (
                         <EmptyState>
                             <Typography variant="body2" sx={{ fontSize: "13px" }}>
-                                Enter dimensions or upload an image
+                                {L.emptyStateMessage}
                             </Typography>
                         </EmptyState>
                     )}

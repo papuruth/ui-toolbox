@@ -1,192 +1,275 @@
-import { Checkbox, Chip, FormControlLabel, Paper } from "@mui/material";
-import { StyledBoxCenter, StyledBoxContainer, StyledText, StyledTextField } from "components/Shared/Styled-Components";
-import localization from "localization/index";
-import { capitalize, debounce } from "lodash";
-import moment from "moment";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import React, { useCallback, useEffect, useState } from "react";
-import colors from "styles/colors";
-import { formatNumberToUnits } from "utils/helperFunctions";
+import styled from "styled-components";
+import { EmptyState, Panel, PanelHeader, PanelLabel, ToolLayout } from "components/Shared/ToolKit";
 import zxcvbn from "zxcvbn";
-import { StyledPasswordInputContainer } from "./styles";
 
-const { passwordStrengthMeter } = localization;
+function formatCrackTime(seconds) {
+    const YEAR = 365.25 * 24 * 3600;
+    const MONTH = 30 * 24 * 3600;
+    const WEEK = 7 * 24 * 3600;
+    const DAY = 24 * 3600;
+    const HOUR = 3600;
+    if (seconds >= YEAR) {
+        const n = Math.round(seconds / YEAR);
+        return `${n} ${n === 1 ? "year" : "years"}`;
+    }
+    if (seconds >= MONTH) {
+        const n = Math.round(seconds / MONTH);
+        return `${n} ${n === 1 ? "month" : "months"}`;
+    }
+    if (seconds >= WEEK) {
+        const n = Math.round(seconds / WEEK);
+        return `${n} ${n === 1 ? "week" : "weeks"}`;
+    }
+    if (seconds >= DAY) {
+        const n = Math.round(seconds / DAY);
+        return `${n} ${n === 1 ? "day" : "days"}`;
+    }
+    if (seconds >= HOUR) {
+        const n = Math.round(seconds / HOUR);
+        return `${n} ${n === 1 ? "hour" : "hours"}`;
+    }
+    const n = Math.round(seconds);
+    return `${n} ${n === 1 ? "second" : "seconds"}`;
+}
+
+function getStrengthLabel(score) {
+    if (score <= 1) return "Weak";
+    if (score === 2) return "Fair";
+    if (score === 3) return "Strong";
+    return "Very Strong";
+}
+
+function getStrengthColor(score) {
+    if (score <= 1) return "#ef4444";
+    if (score === 2) return "#f97316";
+    if (score === 3) return "#fbbf24";
+    return "#22cc99";
+}
+
+const TipText = styled.p`
+    font-size: 13px;
+    font-family: "Inter", sans-serif;
+    color: var(--text-secondary);
+    padding: 12px 16px;
+    margin: 0;
+    border-bottom: 1px solid var(--border-color);
+    line-height: 1.5;
+`;
+
+const PasswordInputWrap = styled.div`
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    gap: 8px;
+`;
+
+const PasswordInput = styled.input`
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    &::placeholder {
+        color: var(--text-secondary);
+        opacity: 0.5;
+    }
+`;
+
+const ShowToggle = styled.button`
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.15s ease;
+    &:hover {
+        color: var(--text-primary);
+    }
+`;
+
+const ResultSection = styled.div`
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+`;
+
+const MetaRow = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 10px;
+`;
+
+const MetaLabel = styled.span`
+    font-size: 12px;
+    font-weight: 600;
+    font-family: "Inter", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    min-width: 80px;
+`;
+
+const MetaValue = styled.span`
+    font-size: 12px;
+    font-family: "JetBrains Mono", monospace;
+    color: ${(p) => p.$color || "var(--text-primary)"};
+`;
+
+const StrengthBar = styled.div`
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border-color);
+    overflow: hidden;
+    flex: 1;
+`;
+
+const StrengthFill = styled.div`
+    height: 100%;
+    border-radius: 2px;
+    width: ${(p) => (p.$score + 1) * 20}%;
+    background: ${(p) => getStrengthColor(p.$score)};
+    transition: width 0.3s ease, background 0.3s ease;
+`;
+
+const CharTypeSection = styled.div`
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+`;
+
+const CharTypeLabel = styled.span`
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+`;
+
+const CharTypePills = styled.div`
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+`;
+
+const CharPill = styled.span`
+    font-size: 13px;
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid ${(p) => (p.$active ? "rgba(34,204,153,0.4)" : "var(--border-color)")};
+    color: ${(p) => (p.$active ? "#22cc99" : "var(--text-secondary)")};
+    background: ${(p) => (p.$active ? "rgba(34,204,153,0.08)" : "transparent")};
+    opacity: ${(p) => (p.$active ? 1 : 0.4)};
+    transition: all 0.15s ease;
+`;
+
+const SYMBOLS_RE = /[!#$%&*+\-.@^_~%()=`[\]{}|\\/.,<>:;"'+=?]/;
 
 export default function PasswordStrengthMeter() {
     const [password, setPassword] = useState("");
-    const [passwordStrengthDetails, setPasswordStrengthDetails] = useState(null);
-    const [showPasword, setShowPassword] = useState(false);
+    const [analysis, setAnalysis] = useState(null);
+    const [showPassword, setShowPassword] = useState(false);
 
-    const handlePasswordMeter = useCallback(() => {
+    const analyze = useCallback(() => {
         if (!password) {
-            setPasswordStrengthDetails(null);
+            setAnalysis(null);
             return;
         }
-        const strengthDetails = zxcvbn(password);
-        const { crack_times_seconds } = strengthDetails || {};
-        const { online_no_throttling_10_per_second } = crack_times_seconds || {};
-        const hashingTime = online_no_throttling_10_per_second;
-        const secondsInYear = 365.5 * 24 * 60 * 60;
-        const secondsInMonth = 30 * 24 * 60 * 60;
-        const secondsInWeek = 7 * 24 * 60 * 60;
-        const secondsInDay = 24 * 60 * 60;
-        const secondsInHour = 60 * 60;
-        let cractTime = 0;
-        let unit = "";
-        if (hashingTime >= secondsInYear) {
-            cractTime = moment.duration(hashingTime, "seconds").asYears();
-            unit = cractTime > 1 ? "years" : "year";
-        } else if (hashingTime >= secondsInMonth) {
-            cractTime = moment.duration(hashingTime, "seconds").asMonths();
-            unit = cractTime > 1 ? "months" : "month";
-        } else if (hashingTime >= secondsInWeek) {
-            cractTime = moment.duration(hashingTime, "seconds").asWeeks();
-            unit = cractTime > 1 ? "weeks" : "week";
-        } else if (hashingTime >= secondsInDay) {
-            cractTime = moment.duration(hashingTime, "seconds").asDays();
-            unit = cractTime > 1 ? "days" : "day";
-        } else if (hashingTime >= secondsInHour) {
-            cractTime = moment.duration(hashingTime, "seconds").asHours();
-            unit = cractTime > 1 ? "hours" : "hour";
-        } else {
-            cractTime = moment.duration(hashingTime, "seconds").asSeconds();
-            unit = cractTime > 1 ? "seconds" : "second";
-        }
-        const Text_A_Z_REGEX = /[A-Z]/;
-        const Text_a_z_REGEX = /[a-z]/;
-        const NUMBERS_REGEX = /[0-9]/;
-        const SYMBOLS_REGEX = /[!#$%&*+-.@^_~%()=`[\]{}|\\/.>,<:;"'+=?]/;
-
-        const passwordStrength = {
-            score: strengthDetails.score,
-            crackTime: `${formatNumberToUnits(Math.round(cractTime), true)} ${capitalize(unit)}`,
-            hasUpperCase: Text_A_Z_REGEX.test(password),
-            hasLowerCase: Text_a_z_REGEX.test(password),
-            hasNumbers: NUMBERS_REGEX.test(password),
-            hasSymbols: SYMBOLS_REGEX.test(password)
-        };
-        setPasswordStrengthDetails(passwordStrength);
+        const result = zxcvbn(password);
+        const secs = result.crack_times_seconds?.online_no_throttling_10_per_second ?? 0;
+        setAnalysis({
+            score: result.score,
+            crackTime: formatCrackTime(secs),
+            hasUpperCase: /[A-Z]/.test(password),
+            hasLowerCase: /[a-z]/.test(password),
+            hasNumbers: /[0-9]/.test(password),
+            hasSymbols: SYMBOLS_RE.test(password)
+        });
     }, [password]);
 
     useEffect(() => {
-        const debobouncedFn = debounce(handlePasswordMeter, 500);
-        debobouncedFn();
-    }, [password, handlePasswordMeter]);
+        const timer = setTimeout(analyze, 300);
+        return () => clearTimeout(timer);
+    }, [analyze]);
 
-    const getPasswordStrength = () => {
-        switch (passwordStrengthDetails?.score) {
-            case 0:
-            case 1:
-                return passwordStrengthMeter.weak;
-            case 2:
-                return passwordStrengthMeter.medium;
-            case 3:
-                return passwordStrengthMeter.strong;
-            case 4:
-                return passwordStrengthMeter.veryStrong;
-            default:
-                return null;
-        }
-    };
-
-    const getPasswordBgColor = () => {
-        switch (passwordStrengthDetails?.score) {
-            case 0:
-            case 1:
-                return colors.error;
-            case 2:
-                return colors.warning;
-            case 3:
-            case 4:
-                return colors.success;
-            default:
-                return colors.grey;
-        }
-    };
-
-    const { crackTime, score, hasUpperCase, hasLowerCase, hasNumbers, hasSymbols } = passwordStrengthDetails || {};
     return (
-        <StyledBoxCenter flexDirection="column" justifyContent="center" marginTop={4} gap={3}>
-            <Paper sx={{ display: "flex", flexDirection: "column", width: { xs: "100%", sm: "100%", md: "50%" }, justifyContent: "center", p: 3 }}>
-                <StyledBoxCenter justifyContent="center" flexDirection="column" gap={1}>
-                    <StyledBoxCenter justifyContent="center" sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }} gap={1} marginTop={2}>
-                        <StyledText sx={{ mr: 3 }}>
-                            <b>Tip:</b>
-                            &nbsp; {passwordStrengthMeter.tipText}
-                        </StyledText>
-                        <FormControlLabel
-                            labelPlacement="start"
-                            label={passwordStrengthMeter.showPasswordLabel}
-                            control={<Checkbox sx={{ ml: 1 }} checked={showPasword} onChange={(e) => setShowPassword(e.target.checked)} />}
-                        />
-                    </StyledBoxCenter>
-                    <StyledBoxCenter justifyContent="center">
-                        <StyledPasswordInputContainer
-                            alignItems="center"
-                            justifyContent="center"
-                            flexDirection="column"
-                            gap={1}
-                            $marginLeft="5px"
-                            bgcolor={getPasswordBgColor()}
-                            width={600}
-                        >
-                            <StyledTextField
-                                fullWidth
-                                type={showPasword ? "text" : "password"}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder={passwordStrengthMeter.passwordFieldPlaceholderText}
-                                size="small"
-                                sx={{ background: colors.white, textAlign: "center" }}
-                                slotProps={{
-                                    htmlInput: {
-                                        style: { textAlign: "center", padding: 10 }
-                                    }
-                                }}
-                                variant="filled"
-                            />
-                            {score >= 0 ? (
-                                <StyledText>
-                                    <b>{getPasswordStrength()}</b>
-                                </StyledText>
-                            ) : (
-                                <StyledText>
-                                    <b>No Password</b>
-                                </StyledText>
-                            )}
-                        </StyledPasswordInputContainer>
-                    </StyledBoxCenter>
-                    <StyledBoxCenter
-                        justifyContent="space-between"
-                        width={600}
-                        sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }}
-                        gap={1}
-                    >
-                        <StyledText sx={{ minWidth: 220 }}>
-                            <b>{password?.length} characters containing:</b>
-                        </StyledText>
-                        <StyledBoxContainer justifyContent="space-between">
-                            <Chip label="Uppercase" disabled={!hasUpperCase} color={hasUpperCase ? "success" : "default"} />
-                            <Chip label="Lowercase" disabled={!hasLowerCase} color={hasLowerCase ? "success" : "default"} />
-                            <Chip label="Numbers" disabled={!hasNumbers} color={hasNumbers ? "success" : "default"} />
-                            <Chip label="Symbols" disabled={!hasSymbols} color={hasSymbols ? "success" : "default"} />
-                        </StyledBoxContainer>
-                    </StyledBoxCenter>
-                </StyledBoxCenter>
-                {score >= 0 ? (
-                    <StyledBoxCenter justifyContent="center" sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }} gap={1} marginTop={2}>
-                        <StyledBoxContainer width={520}>
-                            <StyledText sx={{ mr: 3, minWidth: 181 }}>Time to crack your password:</StyledText>
-                            <StyledText>{crackTime}</StyledText>
-                        </StyledBoxContainer>
-                    </StyledBoxCenter>
-                ) : null}
-                <StyledBoxCenter
-                    justifyContent="center"
-                    sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }}
-                    gap={1}
-                    marginTop={password ? 2 : 0}
-                />
-            </Paper>
-        </StyledBoxCenter>
+        <ToolLayout>
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>Password Input</PanelLabel>
+                </PanelHeader>
+                <TipText>
+                    <b>Tip:</b> A strong password uses uppercase, lowercase, numbers, and symbols — at least 12 characters long.
+                </TipText>
+                <PasswordInputWrap>
+                    <PasswordInput
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter a password to analyze…"
+                        autoComplete="new-password"
+                        spellCheck={false}
+                    />
+                    <ShowToggle onClick={() => setShowPassword((v) => !v)} title={showPassword ? "Hide" : "Show"}>
+                        {showPassword ? <VisibilityOff style={{ fontSize: 16 }} /> : <Visibility style={{ fontSize: 16 }} />}
+                    </ShowToggle>
+                </PasswordInputWrap>
+            </Panel>
+
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>Analysis</PanelLabel>
+                </PanelHeader>
+                {analysis ? (
+                    <>
+                        <ResultSection>
+                            <MetaRow>
+                                <MetaLabel>Strength</MetaLabel>
+                                <StrengthBar>
+                                    <StrengthFill $score={analysis.score} />
+                                </StrengthBar>
+                                <MetaValue $color={getStrengthColor(analysis.score)}>{getStrengthLabel(analysis.score)}</MetaValue>
+                            </MetaRow>
+                            <MetaRow>
+                                <MetaLabel>Crack Time</MetaLabel>
+                                <MetaValue>{analysis.crackTime}</MetaValue>
+                            </MetaRow>
+                            <MetaRow>
+                                <MetaLabel>Length</MetaLabel>
+                                <MetaValue>{password.length} characters</MetaValue>
+                            </MetaRow>
+                        </ResultSection>
+                        <CharTypeSection>
+                            <CharTypeLabel>Contains</CharTypeLabel>
+                            <CharTypePills>
+                                <CharPill $active={analysis.hasUpperCase}>Uppercase</CharPill>
+                                <CharPill $active={analysis.hasLowerCase}>Lowercase</CharPill>
+                                <CharPill $active={analysis.hasNumbers}>Numbers</CharPill>
+                                <CharPill $active={analysis.hasSymbols}>Symbols</CharPill>
+                            </CharTypePills>
+                        </CharTypeSection>
+                    </>
+                ) : (
+                    <EmptyState>
+                        <span style={{ fontSize: 22, fontFamily: "JetBrains Mono, monospace" }}>••••••••</span>
+                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>Enter a password to analyze its strength</span>
+                    </EmptyState>
+                )}
+            </Panel>
+        </ToolLayout>
     );
 }

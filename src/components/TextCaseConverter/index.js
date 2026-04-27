@@ -1,87 +1,152 @@
-import { CheckCircle, ContentCopy } from "@mui/icons-material";
-import { Box, Chip, IconButton, Stack, Tooltip, Typography } from "@mui/material";
-import { StyledBoxCenter, StyledBoxContainer, StyledTextField } from "components/Shared/Styled-Components";
-import HistoryDropdown from "components/Shared/HistoryDropdown";
-import ShareButton from "components/Shared/ShareButton";
+import { Check, ContentCopy, DeleteOutline, IosShare } from "@mui/icons-material";
 import { camelCase, kebabCase, snakeCase, startCase } from "lodash";
 import localization from "localization";
-import React, { useEffect, useState } from "react";
-import { useToolHistory } from "utils/hooks/useToolHistory.hooks";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import styled from "styled-components";
+import {
+    ActionBtn,
+    ActionBar,
+    ActionBtnGroup,
+    EmptyState,
+    InputArea,
+    MetaText,
+    Panel,
+    PanelHeader,
+    PanelLabel,
+    ToolLayout
+} from "components/Shared/ToolKit";
+import SendToButton from "components/Shared/SendToButton";
+import { useToolChain } from "context/ToolChainContext";
 import { useShareableURL } from "utils/hooks/useShareableURL.hooks";
 
-const { textCaseConverter: L, common: C } = localization;
+const { textCaseConverter: L } = localization;
 
 const CASES = [
-    { id: "upper", label: "UPPER CASE", fn: (s) => s.toUpperCase() },
-    { id: "lower", label: "lower case", fn: (s) => s.toLowerCase() },
+    { id: "upper", label: "UPPERCASE", fn: (s) => s.toUpperCase() },
+    { id: "lower", label: "lowercase", fn: (s) => s.toLowerCase() },
     { id: "title", label: "Title Case", fn: (s) => startCase(s.toLowerCase()) },
     { id: "camel", label: "camelCase", fn: (s) => camelCase(s) },
     { id: "pascal", label: "PascalCase", fn: (s) => startCase(camelCase(s)).replace(/\s/g, "") },
     { id: "snake", label: "snake_case", fn: (s) => snakeCase(s) },
-    { id: "kebab", label: "kebab-case", fn: (s) => kebabCase(s) }
+    { id: "kebab", label: "kebab-case", fn: (s) => kebabCase(s) },
+    { id: "constant", label: "CONSTANT_CASE", fn: (s) => snakeCase(s).toUpperCase() }
 ];
+
+const FormatRow = styled.div`
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    gap: 12px;
+    border-bottom: 1px solid var(--border-color);
+    &:last-child {
+        border-bottom: none;
+    }
+`;
+
+const FormatLabel = styled.span`
+    font-size: 10px;
+    font-weight: 600;
+    font-family: "Inter", sans-serif;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    min-width: 108px;
+    flex-shrink: 0;
+`;
+
+const FormatValue = styled.span`
+    font-size: 12px;
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    color: var(--text-primary);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+`;
+
+const BtnGroup = styled(ActionBtnGroup)`
+    margin-left: auto;
+`;
 
 export default function TextCaseConverter() {
     const [input, setInput] = useState("");
-    const [output, setOutput] = useState("");
-    const [activeCase, setActiveCase] = useState("");
-    const [copied, setCopied] = useState(false);
-    const { history: inputHistory, addHistory, clearHistory } = useToolHistory("text-case");
-    const { initialValue, shareURL } = useShareableURL("text");
+    const [copiedId, setCopiedId] = useState(null);
+    const { consumeChain } = useToolChain();
+    const { initialValue, shareURL } = useShareableURL("q");
 
     useEffect(() => {
-        if (initialValue) setInput(initialValue);
-    }, [initialValue]);
+        const chained = consumeChain("/text-case");
+        if (chained) setInput(chained);
+        else if (initialValue) setInput(initialValue);
+    }, [consumeChain, initialValue]);
 
-    const applyCase = (caseObj) => {
-        setActiveCase(caseObj.id);
-        setOutput(caseObj.fn(input));
-    };
+    const results = useMemo(() => {
+        if (!input.trim()) return [];
+        return CASES.map(({ id, label, fn }) => ({ id, label, value: fn(input) }));
+    }, [input]);
 
-    const handleInputChange = (value) => {
-        setInput(value);
-        if (value.trim()) addHistory(value.trim());
-        if (activeCase) {
-            const fn = CASES.find((c) => c.id === activeCase)?.fn;
-            if (fn) setOutput(fn(value));
-        }
-    };
-
-    const handleCopy = () => {
-        if (window?.navigator?.clipboard && output) {
-            window.navigator.clipboard.writeText(output);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1500);
-        }
-    };
+    const handleCopy = useCallback((id, value) => {
+        if (!window?.navigator?.clipboard) return;
+        window.navigator.clipboard.writeText(value).then(() => {
+            setCopiedId(id);
+            setTimeout(() => setCopiedId(null), 1500);
+        });
+    }, []);
 
     return (
-        <StyledBoxContainer flexDirection="column" gap={3}>
-            <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}>
-                <HistoryDropdown history={inputHistory} onSelect={(v) => handleInputChange(v)} onClear={clearHistory} />
-                <ShareButton onShare={() => shareURL(input)} disabled={!input} />
-            </Box>
-            <StyledTextField multiline rows={5} placeholder={L.inputPlaceholder} value={input} onChange={(e) => handleInputChange(e.target.value)} />
-            <Stack direction="row" flexWrap="wrap" gap={1}>
-                {CASES.map((c) => (
-                    <Chip key={c.id} label={c.label} onClick={() => applyCase(c)} color={activeCase === c.id ? "primary" : "default"} clickable />
-                ))}
-            </Stack>
-            {output && (
-                <Box>
-                    <StyledBoxCenter justifyContent="space-between" mb={1}>
-                        <Typography variant="subtitle2" fontWeight={600}>
-                            {L.outputLabel}
-                        </Typography>
-                        <Tooltip title={copied ? "Copied!" : C.copyToCP}>
-                            <IconButton size="small" onClick={handleCopy}>
-                                {copied ? <CheckCircle fontSize="small" color="success" /> : <ContentCopy fontSize="small" />}
-                            </IconButton>
-                        </Tooltip>
-                    </StyledBoxCenter>
-                    <StyledTextField multiline rows={5} value={output} onChange={() => {}} InputProps={{ readOnly: true }} />
-                </Box>
-            )}
-        </StyledBoxContainer>
+        <ToolLayout>
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>{L.inputTextLabel}</PanelLabel>
+                    {input && <MetaText>{input.length.toLocaleString()} chars</MetaText>}
+                </PanelHeader>
+                <InputArea value={input} onChange={(e) => setInput(e.target.value)} placeholder={L.inputPlaceholder} spellCheck={false} autoFocus />
+                {input && (
+                    <ActionBar>
+                        <BtnGroup>
+                            <ActionBtn onClick={() => shareURL(input)}>
+                                <IosShare style={{ fontSize: 11 }} /> {L.shareBtn}
+                            </ActionBtn>
+                            <SendToButton
+                                value={input}
+                                targets={[
+                                    { label: "Word Counter", route: "/word-counter" },
+                                    { label: "Hash Generator", route: "/hash-generator" }
+                                ]}
+                            />
+                            <ActionBtn $danger onClick={() => setInput("")}>
+                                <DeleteOutline style={{ fontSize: 12 }} />
+                                {L.clearBtn}
+                            </ActionBtn>
+                        </BtnGroup>
+                    </ActionBar>
+                )}
+            </Panel>
+
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>{L.allFormatsLabel}</PanelLabel>
+                    {results.length > 0 && <MetaText>{L.formatsCount}</MetaText>}
+                </PanelHeader>
+                {results.length > 0 ? (
+                    results.map(({ id, label, value }) => (
+                        <FormatRow key={id}>
+                            <FormatLabel>{label}</FormatLabel>
+                            <FormatValue title={value}>{value}</FormatValue>
+                            <ActionBtn $success={copiedId === id} onClick={() => handleCopy(id, value)}>
+                                {copiedId === id ? <Check style={{ fontSize: 11 }} /> : <ContentCopy style={{ fontSize: 11 }} />}
+                                {copiedId === id ? L.copiedLabel : L.copyBtn}
+                            </ActionBtn>
+                        </FormatRow>
+                    ))
+                ) : (
+                    <EmptyState>
+                        <span style={{ fontSize: 28, fontFamily: "JetBrains Mono, monospace" }}>Aa</span>
+                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>{L.emptyStateMessage}</span>
+                    </EmptyState>
+                )}
+            </Panel>
+        </ToolLayout>
     );
 }

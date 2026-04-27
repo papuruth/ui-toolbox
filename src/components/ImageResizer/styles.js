@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import styled from "styled-components";
+import { styledMedia } from "styles/global";
 
 export {
     ActionBar,
@@ -53,7 +54,7 @@ export const SliderWrap = styled(Box)`
 
 export const ControlValue = styled.span`
     font-family: "JetBrains Mono", monospace;
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-secondary);
     min-width: 48px;
     text-align: right;
@@ -65,8 +66,9 @@ export const AspectToggle = styled.button`
     color: ${(props) => (props.$active ? "#22cc99" : "var(--text-secondary)")};
     border: 1px solid ${(props) => (props.$active ? "rgba(34,204,153,0.4)" : "var(--border-color)")};
     border-radius: 6px;
-    padding: 5px 12px;
-    font-size: 11px;
+    padding: 8px 14px;
+    min-height: 36px;
+    font-size: 12px;
     font-weight: 500;
     font-family: "Inter", sans-serif;
     cursor: pointer;
@@ -85,6 +87,9 @@ export const CropWrap = styled(Box)`
     background: var(--bg-input);
     padding: 16px;
     overflow: auto;
+    ${styledMedia.lessThan("sm")`
+        min-height: 200px;
+    `}
 `;
 
 export const CanvasWrap = styled(Box)`

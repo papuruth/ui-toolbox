@@ -1,13 +1,18 @@
 import ReactJsonView from "@microlink/react-json-view";
-import { Tabs } from "@mui/base/Tabs";
-import { Box, Button, Dialog, DialogContent, DialogTitle, InputAdornment, TextField } from "@mui/material";
-import { StyledBoxContainer, StyledButton, StyledTextField } from "components/Shared/Styled-Components";
-import { StyledTab, StyledTabPanel, StyledTabsList } from "components/Shared/StyledTabs";
+import { Dialog, DialogContent, DialogTitle } from "@mui/material";
 import HistoryDropdown from "components/Shared/HistoryDropdown";
-import React, { useMemo, useState } from "react";
+import localization from "localization";
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import styled from "styled-components";
+import { ActionBtn, ActionBtnGroup, Panel, PanelHeader, PanelLabel, TabBtn, TabStrip } from "components/Shared/ToolKit";
+import ToolSkeleton from "components/Shared/ToolSkeleton";
 import api from "services/api";
 import toast from "utils/toast";
 import { useToolHistory } from "utils/hooks/useToolHistory.hooks";
+import { useToolChain } from "context/ToolChainContext";
+import ColorModeContext from "../../context/ColorModeContext";
+
+const { jsonViewer: L } = localization;
 import Editor from "./components/Editor";
 
 function filterJsonByQuery(obj, query) {
@@ -39,7 +44,84 @@ function filterJsonByQuery(obj, query) {
     return result !== undefined ? result : null;
 }
 
+const ToolWrap = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    flex: 1;
+`;
+
+const ViewerControls = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+`;
+
+const SearchInput = styled.input`
+    flex: 1;
+    min-width: 160px;
+    max-width: 280px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    padding: 5px 10px;
+    outline: none;
+    &:focus {
+        border-color: #22cc99;
+    }
+    &::placeholder {
+        color: var(--text-secondary);
+    }
+`;
+
+const ViewerArea = styled.div`
+    flex: 1;
+    overflow: auto;
+    padding: 16px;
+    background: var(--bg-input);
+    min-height: 320px;
+`;
+
+const NoMatch = styled.div`
+    color: var(--text-secondary);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    opacity: 0.6;
+`;
+
+const DialogInput = styled.input`
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    padding: 8px 12px;
+    outline: none;
+    box-sizing: border-box;
+    &:focus {
+        border-color: #22cc99;
+    }
+    &::placeholder {
+        color: var(--text-secondary);
+    }
+`;
+
+const ViewerBtnGroup = styled(ActionBtnGroup)`
+    flex-shrink: 0;
+`;
+
 export default function JSONViewer() {
+    const { mode } = useContext(ColorModeContext);
+    const [tab, setTab] = useState("editor");
     const [jsonInput, setJSONInput] = useState("");
     const [jsonLink, setJSONLink] = useState("");
     const [showLinkModal, setShowLinkModal] = useState(false);
@@ -47,6 +129,12 @@ export default function JSONViewer() {
     const [searchQuery, setSearchQuery] = useState("");
     const [collapsed, setCollapsed] = useState(1);
     const { history: jsonHistory, addHistory: addJsonHistory, clearHistory: clearJsonHistory } = useToolHistory("json-viewer");
+    const { consumeChain } = useToolChain();
+
+    useEffect(() => {
+        const chained = consumeChain("/json-viewer");
+        if (chained) setJSONInput(chained);
+    }, [consumeChain]);
 
     const handleJSONInput = ({ target: { value } }) => {
         setJSONInput(value);
@@ -121,70 +209,88 @@ export default function JSONViewer() {
 
     const filteredJson = useMemo(() => filterJsonByQuery(parsedJson, searchQuery), [parsedJson, searchQuery]);
 
+    const handleJsonMutation = ({ updated_src }) => {
+        const formatted = JSON.stringify(updated_src, null, 4);
+        setJSONInput(formatted);
+        addJsonHistory(formatted);
+    };
+
     return (
-        <StyledBoxContainer>
-            <Tabs defaultValue={2} style={{ width: "100%" }}>
-                <StyledTabsList sx={{ width: 140 }}>
-                    <StyledTab value={1} disabled={!jsonInput}>
-                        Viewer
-                    </StyledTab>
-                    <StyledTab value={2}>Editor</StyledTab>
-                </StyledTabsList>
-                <StyledTabPanel value={1} sx={{ maxHeight: "calc(100vh - 370px)", overflow: "hidden auto" }}>
-                    <Box sx={{ display: "flex", gap: 1, mb: 1.5, flexWrap: "wrap", alignItems: "center" }}>
-                        <TextField
-                            size="small"
-                            placeholder="Search keys / values..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            sx={{ flexGrow: 1, maxWidth: 320 }}
-                            InputProps={{ startAdornment: <InputAdornment position="start">🔍</InputAdornment> }}
-                        />
-                        <Button size="small" variant="outlined" onClick={() => setCollapsed(false)}>
-                            Expand All
-                        </Button>
-                        <Button size="small" variant="outlined" onClick={() => setCollapsed(1)}>
-                            Collapse All
-                        </Button>
-                    </Box>
-                    {filteredJson !== null && filteredJson !== undefined ? (
-                        <ReactJsonView key={`${collapsed}-${searchQuery}`} src={filteredJson} collapsed={collapsed} theme="monokai" />
-                    ) : (
-                        <Box sx={{ p: 2, color: "text.secondary", fontFamily: "monospace", fontSize: "0.85rem" }}>
-                            {searchQuery ? "No matches found" : "No valid JSON to display"}
-                        </Box>
-                    )}
-                </StyledTabPanel>
-                <StyledTabPanel value={2}>
-                    <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 0.5 }}>
-                        <HistoryDropdown history={jsonHistory} onSelect={(v) => setJSONInput(v)} onClear={clearJsonHistory} />
-                    </Box>
+        <ToolWrap>
+            <TabStrip>
+                <TabBtn $active={tab === "editor"} onClick={() => setTab("editor")}>
+                    Editor
+                </TabBtn>
+                <TabBtn $active={tab === "viewer"} onClick={() => setTab("viewer")} disabled={!jsonInput}>
+                    Viewer
+                </TabBtn>
+            </TabStrip>
+
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>{tab === "editor" ? "JSON Input" : "JSON Viewer"}</PanelLabel>
+                    {tab === "editor" && <HistoryDropdown history={jsonHistory} onSelect={(v) => setJSONInput(v)} onClear={clearJsonHistory} />}
+                </PanelHeader>
+
+                {tab === "editor" ? (
                     <Editor handleJSONInput={handleJSONInput} jsonInput={jsonInput} handleEditorOperations={handleEditorOperations} />
-                </StyledTabPanel>
-            </Tabs>
+                ) : (
+                    <>
+                        <ViewerControls>
+                            <SearchInput
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search keys / values..."
+                                spellCheck={false}
+                            />
+                            <ViewerBtnGroup>
+                                <ActionBtn onClick={() => setCollapsed(false)}>Expand All</ActionBtn>
+                                <ActionBtn onClick={() => setCollapsed(true)}>Collapse All</ActionBtn>
+                            </ViewerBtnGroup>
+                        </ViewerControls>
+                        <ViewerArea>
+                            {filteredJson !== null && filteredJson !== undefined ? (
+                                <ReactJsonView
+                                    key={collapsed}
+                                    src={filteredJson}
+                                    collapsed={collapsed}
+                                    theme={mode === "dark" ? "ocean" : "rjv-default"}
+                                    iconStyle="circle"
+                                    displayDataTypes={false}
+                                    quotesOnKeys={false}
+                                    showComma
+                                    onAdd={searchQuery ? undefined : handleJsonMutation}
+                                    onEdit={searchQuery ? undefined : handleJsonMutation}
+                                    onDelete={searchQuery ? undefined : handleJsonMutation}
+                                />
+                            ) : (
+                                <NoMatch>{searchQuery ? "No matches found" : "No valid JSON to display"}</NoMatch>
+                            )}
+                        </ViewerArea>
+                    </>
+                )}
+            </Panel>
+
             <Dialog onClose={() => setShowLinkModal(false)} open={showLinkModal} sx={{ width: "100%" }}>
                 <DialogTitle>Load JSON Data</DialogTitle>
                 <DialogContent sx={{ flexDirection: "column", display: "flex", width: 500, gap: 1, alignItems: "center" }}>
-                    <StyledTextField
-                        name="jsonLink"
-                        placeholder="Enter JSON URL"
-                        onChange={(e) => setJSONLink(e.target.value)}
-                        size="small"
-                        fullWidth
-                        autoComplete="off"
-                    />
-                    <StyledButton
-                        sx={{ width: 150 }}
-                        variant="outlined"
-                        disabled={!jsonLink}
-                        loading={jsonLoading}
-                        loadingPosition="end"
-                        onClick={fetchJSONData}
-                    >
-                        {jsonLoading ? "Loading" : "Load Data"}
-                    </StyledButton>
+                    {jsonLoading ? (
+                        <ToolSkeleton rows={2} />
+                    ) : (
+                        <>
+                            <DialogInput
+                                name="jsonLink"
+                                placeholder="Enter JSON URL"
+                                onChange={(e) => setJSONLink(e.target.value)}
+                                autoComplete="off"
+                            />
+                            <ActionBtn disabled={!jsonLink} onClick={fetchJSONData}>
+                                Load Data
+                            </ActionBtn>
+                        </>
+                    )}
                 </DialogContent>
             </Dialog>
-        </StyledBoxContainer>
+        </ToolWrap>
     );
 }

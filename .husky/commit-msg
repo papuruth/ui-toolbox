@@ -1,4 +1,10 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+# Ensure nvm-managed Node is available in PATH
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+# If .nvmrc exists, switch to the required Node version
+[ -f .nvmrc ] && nvm use > /dev/null 2>&1
+
 yarn commitlint --edit "$1"

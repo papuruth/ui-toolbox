@@ -1,7 +1,10 @@
 import PropTypes from "prop-types";
 import { Delete, History, RestoreOutlined } from "@mui/icons-material";
 import { Box, IconButton, List, ListItem, ListItemButton, ListItemText, Popover, Tooltip, Typography } from "@mui/material";
+import localization from "localization";
 import React, { useState } from "react";
+
+const { common: C } = localization;
 
 /**
  * M6 — Shared history panel.
@@ -23,8 +26,8 @@ export default function HistoryDropdown({ history, onSelect, onClear }) {
 
     return (
         <>
-            <Tooltip title="Recent inputs">
-                <IconButton size="small" onClick={handleOpen} sx={{ color: "rgba(255,255,255,0.5)", "&:hover": { color: "#22cc99" } }}>
+            <Tooltip title={C.recentInputsTooltip}>
+                <IconButton size="small" onClick={handleOpen} sx={{ color: "var(--text-secondary)", "&:hover": { color: "#22cc99" } }}>
                     <History fontSize="small" />
                 </IconButton>
             </Tooltip>
@@ -38,8 +41,8 @@ export default function HistoryDropdown({ history, onSelect, onClear }) {
                 PaperProps={{
                     sx: {
                         mt: 0.5,
-                        minWidth: 280,
-                        maxWidth: 400,
+                        minWidth: { xs: 240, sm: 280 },
+                        maxWidth: { xs: "calc(100vw - 24px)", sm: 400 },
                         background: "var(--bg-card)",
                         border: "1px solid var(--border-color)",
                         borderRadius: "10px",
@@ -51,12 +54,12 @@ export default function HistoryDropdown({ history, onSelect, onClear }) {
                     <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
                         <RestoreOutlined sx={{ fontSize: "0.95rem", color: "#22cc99" }} />
                         <Typography variant="caption" fontWeight={700} color="text.secondary">
-                            RECENT INPUTS
+                            {C.recentInputsHeader}
                         </Typography>
                     </Box>
                     {onClear && (
-                        <Tooltip title="Clear history">
-                            <IconButton size="small" onClick={onClear} sx={{ color: "rgba(255,255,255,0.3)", "&:hover": { color: "#f44336" } }}>
+                        <Tooltip title={C.clearHistoryLabel}>
+                            <IconButton size="small" onClick={onClear} sx={{ color: "var(--text-secondary)", "&:hover": { color: "#f44336" } }}>
                                 <Delete sx={{ fontSize: "0.85rem" }} />
                             </IconButton>
                         </Tooltip>

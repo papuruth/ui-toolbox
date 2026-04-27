@@ -30,6 +30,7 @@ export const StyledHero = styled.section`
     flex-direction: column;
     align-items: center;
     position: relative;
+    overflow: hidden;
 
     /* subtle radial glow */
     &::before {
@@ -245,6 +246,8 @@ export const HeroCTARow = styled.div`
     display: flex;
     gap: 12px;
     margin-top: 28px;
+    flex-wrap: wrap;
+    justify-content: center;
     animation: ${fadeUp} 0.5s ease 0.3s both;
 `;
 

@@ -1,80 +1,184 @@
-/* eslint-disable react/no-array-index-key */
-import { ContentCopy } from "@mui/icons-material";
-import {
-    Checkbox,
-    FormControl,
-    FormControlLabel,
-    FormGroup,
-    FormLabel,
-    IconButton,
-    InputLabel,
-    MenuItem,
-    Paper,
-    Select,
-    Tooltip
-} from "@mui/material";
-import { StyledBoxCenter, StyledBoxContainer, StyledButton, StyledText } from "components/Shared/Styled-Components";
-import StyledNumberInput from "components/Shared/StyledNumberInput";
-import localization from "localization/index";
+import { Check, ContentCopy } from "@mui/icons-material";
 import { filter, keys, reduce } from "lodash";
-import React, { useState } from "react";
-import colors from "styles/colors";
+import React, { useCallback, useState } from "react";
+import styled from "styled-components";
+import { ActionBar, ActionBtn, ActionBtnGroup, EmptyState, Panel, PanelHeader, PanelLabel, ToolLayout } from "components/Shared/ToolKit";
+import SendToButton from "components/Shared/SendToButton";
 import { GLOBAL_CONSTANTS } from "utils/globalConstants";
 import { getRandomNumbers, passwordGenerator } from "utils/helperFunctions";
 import zxcvbn from "zxcvbn";
 
 const { PASSWORD_GEN_LIST } = GLOBAL_CONSTANTS;
-const {
-    passwordGen,
-    passwordStrengthMeter: psm,
-    common: { copiedToCP, copyToCP }
-} = localization;
+
+const CHAR_TYPES = [
+    { key: "upperCase", label: "Uppercase" },
+    { key: "lowerCase", label: "Lowercase" },
+    { key: "numbers", label: "Numbers" },
+    { key: "symbols", label: "Symbols" }
+];
+
+const ControlRow = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-color);
+`;
+
+const ControlLabel = styled.span`
+    font-size: 11px;
+    font-weight: 600;
+    font-family: "Inter", sans-serif;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    min-width: 80px;
+`;
+
+const LengthInput = styled.input`
+    width: 64px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    padding: 4px 8px;
+    text-align: center;
+    outline: none;
+    &:focus {
+        border-color: #22cc99;
+    }
+`;
+
+const RuleRow = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border-color);
+`;
+
+const StyledCheckbox = styled.input.attrs({ type: "checkbox" })`
+    width: 15px;
+    height: 15px;
+    accent-color: #22cc99;
+    cursor: pointer;
+    flex-shrink: 0;
+`;
+
+const RuleLabel = styled.span`
+    font-size: 12px;
+    font-family: "Inter", sans-serif;
+    color: var(--text-primary);
+    flex: 1;
+`;
+
+const MinLabel = styled.span`
+    font-size: 10px;
+    font-family: "Inter", sans-serif;
+    color: var(--text-secondary);
+`;
+
+const MinSelect = styled.select`
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    padding: 3px 6px;
+    cursor: pointer;
+    outline: none;
+    &:focus {
+        border-color: #22cc99;
+    }
+`;
+
+const PasswordDisplay = styled.div`
+    padding: 20px 16px;
+    font-size: 18px;
+    font-family: "JetBrains Mono", monospace;
+    color: #22cc99;
+    word-break: break-all;
+    line-height: 1.6;
+    flex: 1;
+    background: var(--bg-input);
+    min-height: 80px;
+`;
+
+const MetaSection = styled.div`
+    padding: 10px 16px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+`;
+
+const MetaRow = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 10px;
+`;
+
+const MetaLabel = styled.span`
+    font-size: 10px;
+    font-weight: 600;
+    font-family: "Inter", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    min-width: 70px;
+`;
+
+const MetaValue = styled.span`
+    font-size: 12px;
+    font-family: "JetBrains Mono", monospace;
+    color: ${(p) => p.$color || "var(--text-primary)"};
+`;
+
+const StrengthBar = styled.div`
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border-color);
+    overflow: hidden;
+    flex: 1;
+`;
+
+const StrengthFill = styled.div`
+    height: 100%;
+    border-radius: 2px;
+    width: ${(p) => (p.$score + 1) * 20}%;
+    background: ${(p) => {
+        if (p.$score <= 1) return "#ef4444";
+        if (p.$score === 2) return "#f97316";
+        if (p.$score === 3) return "#fbbf24";
+        return "#22cc99";
+    }};
+    transition: width 0.3s ease, background 0.3s ease;
+`;
+
+const BtnGroup = styled(ActionBtnGroup)`
+    margin-left: auto;
+`;
+
+function getPasswordStrengthLabel(score) {
+    if (score <= 2) return "Weak";
+    if (score === 3) return "Strong";
+    return "Very Strong";
+}
 
 export default function PasswordGenerator() {
     const [password, setPassword] = useState("");
-    const [copyTooltip, setCopyTooltip] = useState(copyToCP);
     const [passwordLength, setPasswordLength] = useState(8);
     const [passwordScore, setPasswordScore] = useState(0);
+    const [copied, setCopied] = useState(false);
     const [compositionRule, setCompositionRule] = useState({
         upperCase: { min: 2, forbidden: false },
         lowerCase: { min: 2, forbidden: false },
         numbers: { min: 2, forbidden: false },
         symbols: { min: 2, forbidden: false }
     });
-
-    const handleCopyToClipBoard = () => {
-        if (window && window.navigator.clipboard) {
-            window.navigator.clipboard.writeText(password).then(() => {
-                setCopyTooltip(copiedToCP);
-            });
-        }
-    };
-
-    const handlePasswordGenerate = () => {
-        const pswdString = passwordGenerator(passwordLength, compositionRule, PASSWORD_GEN_LIST);
-        setPassword(pswdString);
-        const passwordStrength = zxcvbn(pswdString);
-        setPasswordScore(passwordStrength.score);
-    };
-
-    const resetState = () => {
-        setPassword("");
-    };
-
-    const handleCompositionChange = ({ target: { name, checked } }) => {
-        setCompositionRule((prevState) => {
-            prevState[name].forbidden = !checked;
-            const updatedCompositionRules = getUpdatedCompositionRules(passwordLength, prevState);
-            return { ...updatedCompositionRules };
-        });
-    };
-
-    const handleCompositionLength = ({ target: { name, value } }) => {
-        setCompositionRule((prevState) => {
-            prevState[name].min = Number(value);
-            return { ...prevState };
-        });
-    };
 
     const getUpdatedCompositionRules = (value, rules) => {
         const updatedCompositionRules = { ...rules };
@@ -102,257 +206,143 @@ export default function PasswordGenerator() {
         return updatedCompositionRules;
     };
 
-    const handlePasswordLength = (...args) => {
-        const value = args[1];
-        const updatedCompositionRules = getUpdatedCompositionRules(value, compositionRule);
-        setCompositionRule(updatedCompositionRules);
-        setPasswordLength(value);
-    };
+    const handlePasswordLength = useCallback(
+        (e) => {
+            const value = Math.max(8, Math.min(32, Number(e.target.value) || 8));
+            const updatedCompositionRules = getUpdatedCompositionRules(value, compositionRule);
+            setCompositionRule(updatedCompositionRules);
+            setPasswordLength(value);
+        },
+        [compositionRule]
+    );
 
-    const getPasswordStrength = () => {
-        switch (passwordScore) {
-            case 0:
-            case 1:
-            case 2:
-                return psm.weak;
-            case 3:
-                return psm.strong;
-            case 4:
-                return psm.veryStrong;
-            default:
-                return null;
-        }
-    };
+    const handleCompositionChange = useCallback(
+        ({ target: { name, checked } }) => {
+            setCompositionRule((prevState) => {
+                prevState[name].forbidden = !checked;
+                const updatedCompositionRules = getUpdatedCompositionRules(passwordLength, prevState);
+                return { ...updatedCompositionRules };
+            });
+        },
+        [passwordLength]
+    );
+
+    const handleCompositionLength = useCallback(({ target: { name, value } }) => {
+        setCompositionRule((prevState) => {
+            prevState[name].min = Number(value);
+            return { ...prevState };
+        });
+    }, []);
+
+    const handleGenerate = useCallback(() => {
+        const pswdString = passwordGenerator(passwordLength, compositionRule, PASSWORD_GEN_LIST);
+        setPassword(pswdString);
+        const { score } = zxcvbn(pswdString);
+        setPasswordScore(score);
+    }, [passwordLength, compositionRule]);
+
+    const handleCopy = useCallback(() => {
+        if (!password || !window?.navigator?.clipboard) return;
+        window.navigator.clipboard.writeText(password).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+        });
+    }, [password]);
+
+    let charsetSize = 0;
+    if (!compositionRule.upperCase.forbidden) charsetSize += 26;
+    if (!compositionRule.lowerCase.forbidden) charsetSize += 26;
+    if (!compositionRule.numbers.forbidden) charsetSize += 10;
+    if (!compositionRule.symbols.forbidden) charsetSize += 32;
+    const entropy = password && charsetSize > 0 ? Math.round(password.length * Math.log2(charsetSize)) : 0;
+    let entropyLabel = "Strong";
+    if (entropy < 40) entropyLabel = "Weak";
+    else if (entropy < 60) entropyLabel = "Fair";
+    else if (entropy < 80) entropyLabel = "Good";
+    let entropyColor = "#22cc99";
+    if (entropy < 60) entropyColor = "#ef4444";
+    else if (entropy < 80) entropyColor = "#f97316";
 
     return (
-        <StyledBoxCenter flexDirection="column" justifyContent="center" marginTop={4} gap={3}>
-            <Paper sx={{ display: "flex", flexDirection: "column", width: { xs: "100%", sm: "100%", md: "50%" }, justifyContent: "center", p: 3 }}>
-                <StyledBoxCenter justifyContent="center" sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }} gap={1}>
-                    <FormGroup sx={{ flexDirection: "row", alignItems: "center", minWidth: 520 }}>
-                        <FormLabel sx={{ mr: 3, minWidth: 181 }} color="info" required htmlFor="passwordLength">
-                            {passwordGen.passwordLengthLabel}
-                        </FormLabel>
-                        <FormGroup>
-                            <FormControl sx={{ minHeight: 40 }} size="small">
-                                <StyledNumberInput
-                                    aria-label="passwordLength"
-                                    placeholder={passwordGen.passwordFieldPlaceholderText}
-                                    max={32}
-                                    min={8}
-                                    id="passwordLength"
-                                    name="passwordLength"
-                                    value={passwordLength}
-                                    onChange={handlePasswordLength}
-                                />
-                            </FormControl>
-                        </FormGroup>
-                    </FormGroup>
-                </StyledBoxCenter>
-                <StyledBoxCenter justifyContent="center" sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }} gap={1}>
-                    <FormGroup sx={{ flexDirection: "row", alignItems: "center", minHeight: 250, minWidth: 520 }}>
-                        <FormLabel component="legend" sx={{ mr: 3 }} color="info" required>
-                            {passwordGen.passwordCompositionLabel}
-                        </FormLabel>
-                        <FormGroup sx={{ minHeight: 225 }}>
-                            <StyledBoxCenter>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            name="upperCase"
-                                            onChange={handleCompositionChange}
-                                            checked={!compositionRule.upperCase.forbidden}
-                                        />
-                                    }
-                                    label={passwordGen.uppercaseLabel}
-                                    sx={{ width: 120 }}
-                                />
-                                {!compositionRule.upperCase.forbidden ? (
-                                    <FormControl sx={{ m: 1, minWidth: 65, minHeight: 40 }} size="small">
-                                        <InputLabel id="upperCaseLength">Min</InputLabel>
-                                        <Select
-                                            name="upperCase"
-                                            labelId="upperCaseLength"
-                                            value={compositionRule.upperCase.min}
-                                            label="Length"
-                                            onChange={handleCompositionLength}
-                                            autoWidth
-                                        >
-                                            {new Array(10).fill(null).map((_, index) => (
-                                                <MenuItem value={index + 1} key={`upperCaseLength-${index}`}>
-                                                    {index + 1}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                ) : null}
-                            </StyledBoxCenter>
-                            <StyledBoxCenter>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            name="lowerCase"
-                                            onChange={handleCompositionChange}
-                                            checked={!compositionRule.lowerCase.forbidden}
-                                        />
-                                    }
-                                    label={passwordGen.lowercaseLabel}
-                                    sx={{ width: 120 }}
-                                />
-                                {!compositionRule.lowerCase.forbidden ? (
-                                    <FormControl sx={{ m: 1, minWidth: 65, minHeight: 40 }} size="small">
-                                        <InputLabel id="lowerCaseLength">Min</InputLabel>
-                                        <Select
-                                            name="lowerCase"
-                                            labelId="lowerCaseLength"
-                                            value={compositionRule.lowerCase.min}
-                                            label="Length"
-                                            onChange={handleCompositionLength}
-                                            autoWidth
-                                        >
-                                            {new Array(10).fill(null).map((_, index) => (
-                                                <MenuItem value={index + 1} key={`lowerCaseLength-${index}`}>
-                                                    {index + 1}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                ) : null}
-                            </StyledBoxCenter>
-                            <StyledBoxCenter>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox name="numbers" onChange={handleCompositionChange} checked={!compositionRule.numbers.forbidden} />
-                                    }
-                                    label={passwordGen.numbersLabel}
-                                    sx={{ width: 120 }}
-                                />
-                                {!compositionRule.numbers.forbidden ? (
-                                    <FormControl sx={{ m: 1, minWidth: 65, minHeight: 40 }} size="small">
-                                        <InputLabel id="numbersLength">Min</InputLabel>
-                                        <Select
-                                            name="numbers"
-                                            labelId="numbersLength"
-                                            value={compositionRule.numbers.min}
-                                            label="Length"
-                                            onChange={handleCompositionLength}
-                                            autoWidth
-                                        >
-                                            {new Array(10).fill(null).map((_, index) => (
-                                                <MenuItem value={index + 1} key={`numbersLength-${index}`}>
-                                                    {index + 1}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                ) : null}
-                            </StyledBoxCenter>
-                            <StyledBoxCenter>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox name="symbols" onChange={handleCompositionChange} checked={!compositionRule.symbols.forbidden} />
-                                    }
-                                    label={passwordGen.symbolsLabel}
-                                    sx={{ width: 120 }}
-                                />
-                                {!compositionRule.symbols.forbidden ? (
-                                    <FormControl sx={{ m: 1, minWidth: 65, minHeight: 40 }} size="small">
-                                        <InputLabel id="symbolsLength">Min</InputLabel>
-                                        <Select
-                                            name="symbols"
-                                            labelId="symbolsLength"
-                                            value={compositionRule.symbols.min}
-                                            label="Length"
-                                            onChange={handleCompositionLength}
-                                            autoWidth
-                                        >
-                                            {new Array(10).fill(null).map((_, index) => (
-                                                <MenuItem value={index + 1} key={`symbolsLength-${index}`}>
-                                                    {index + 1}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                ) : null}
-                            </StyledBoxCenter>
-                        </FormGroup>
-                    </FormGroup>
-                </StyledBoxCenter>
+        <ToolLayout>
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>Settings</PanelLabel>
+                </PanelHeader>
+                <ControlRow>
+                    <ControlLabel>Length</ControlLabel>
+                    <LengthInput type="number" min={8} max={32} value={passwordLength} onChange={handlePasswordLength} />
+                </ControlRow>
+                {CHAR_TYPES.map(({ key, label }) => (
+                    <RuleRow key={key}>
+                        <StyledCheckbox name={key} checked={!compositionRule[key].forbidden} onChange={handleCompositionChange} />
+                        <RuleLabel>{label}</RuleLabel>
+                        {!compositionRule[key].forbidden && (
+                            <>
+                                <MinLabel>Min</MinLabel>
+                                <MinSelect name={key} value={compositionRule[key].min} onChange={handleCompositionLength}>
+                                    {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+                                        <option key={n} value={n}>
+                                            {n}
+                                        </option>
+                                    ))}
+                                </MinSelect>
+                            </>
+                        )}
+                    </RuleRow>
+                ))}
+                <ActionBar>
+                    <BtnGroup>
+                        <ActionBtn onClick={handleGenerate}>Generate</ActionBtn>
+                    </BtnGroup>
+                </ActionBar>
+            </Panel>
+
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>Password</PanelLabel>
+                </PanelHeader>
                 {password ? (
-                    <StyledBoxCenter justifyContent="center" sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }} gap={1}>
-                        <StyledBoxContainer width={520} alignItems="center">
-                            <StyledText sx={{ mr: 3, minWidth: 181 }}>{passwordGen.generatedPasswordLabel}</StyledText>
-                            <StyledText sx={{ background: colors.black, color: colors.primary, borderRadius: 1, padding: 1 }}>{password}</StyledText>
-                            <Tooltip
-                                title={copyTooltip}
-                                onMouseLeave={() => {
-                                    setTimeout(() => setCopyTooltip(copyToCP), 1000);
-                                }}
-                            >
-                                <IconButton onClick={() => handleCopyToClipBoard()}>
-                                    <ContentCopy color="primary" />
-                                </IconButton>
-                            </Tooltip>
-                        </StyledBoxContainer>
-                    </StyledBoxCenter>
-                ) : null}
-                {password ? (
-                    <StyledBoxCenter justifyContent="center" sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }} gap={1} marginTop={2}>
-                        <StyledBoxContainer width={520}>
-                            <StyledText sx={{ mr: 3, minWidth: 181 }}>{passwordGen.passwordStrengthLabel}</StyledText>
-                            <StyledText>{getPasswordStrength()}</StyledText>
-                        </StyledBoxContainer>
-                    </StyledBoxCenter>
-                ) : null}
-                {password
-                    ? (() => {
-                          let charsetSize = 0;
-                          if (!compositionRule.upperCase.forbidden) charsetSize += 26;
-                          if (!compositionRule.lowerCase.forbidden) charsetSize += 26;
-                          if (!compositionRule.numbers.forbidden) charsetSize += 10;
-                          if (!compositionRule.symbols.forbidden) charsetSize += 32;
-                          const entropy = charsetSize > 0 ? Math.round(password.length * Math.log2(charsetSize)) : 0;
-                          let entropyLabel = "Strong";
-                          if (entropy < 40) entropyLabel = "Weak";
-                          else if (entropy < 60) entropyLabel = "Fair";
-                          else if (entropy < 80) entropyLabel = "Good";
-                          let entropyColor = "#22cc99";
-                          if (entropy < 60) entropyColor = "#f44336";
-                          else if (entropy < 80) entropyColor = "#ff9800";
-                          return (
-                              <StyledBoxCenter
-                                  justifyContent="center"
-                                  sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }}
-                                  gap={1}
-                                  marginTop={1}
-                              >
-                                  <StyledBoxContainer width={520}>
-                                      <StyledText sx={{ mr: 3, minWidth: 181 }}>Entropy:</StyledText>
-                                      <StyledText sx={{ color: entropyColor }}>
-                                          {entropy} bits ({entropyLabel})
-                                      </StyledText>
-                                  </StyledBoxContainer>
-                              </StyledBoxCenter>
-                          );
-                      })()
-                    : null}
-                <StyledBoxCenter
-                    justifyContent="center"
-                    sx={{ flexDirection: { xs: "column", sm: "column", md: "row" } }}
-                    gap={1}
-                    marginTop={password ? 2 : 0}
-                >
-                    <StyledText component="div">
-                        <StyledButton sx={{ width: 200 }} variant="outlined" onClick={handlePasswordGenerate}>
-                            {passwordGen.generateBtn}
-                        </StyledButton>
-                    </StyledText>
-                    <StyledText component="div">
-                        <StyledButton sx={{ width: 200 }} variant="outlined" onClick={resetState} disabled={!password}>
-                            {passwordGen.resetBtn}
-                        </StyledButton>
-                    </StyledText>
-                </StyledBoxCenter>
-            </Paper>
-        </StyledBoxCenter>
+                    <>
+                        <PasswordDisplay>{password}</PasswordDisplay>
+                        <MetaSection>
+                            <MetaRow>
+                                <MetaLabel>Strength</MetaLabel>
+                                <StrengthBar>
+                                    <StrengthFill $score={passwordScore} />
+                                </StrengthBar>
+                                <MetaValue>{getPasswordStrengthLabel(passwordScore)}</MetaValue>
+                            </MetaRow>
+                            <MetaRow>
+                                <MetaLabel>Entropy</MetaLabel>
+                                <MetaValue $color={entropyColor}>
+                                    {entropy} bits ({entropyLabel})
+                                </MetaValue>
+                            </MetaRow>
+                        </MetaSection>
+                        <ActionBar>
+                            <BtnGroup>
+                                <ActionBtn $success={copied} onClick={handleCopy}>
+                                    {copied ? <Check style={{ fontSize: 11 }} /> : <ContentCopy style={{ fontSize: 11 }} />}
+                                    {copied ? "Copied" : "Copy"}
+                                </ActionBtn>
+                                <SendToButton
+                                    value={password}
+                                    targets={[
+                                        { label: "Hash Generator", route: "/hash-generator" },
+                                        { label: "Base64 Text", route: "/base64-text" }
+                                    ]}
+                                />
+                            </BtnGroup>
+                        </ActionBar>
+                    </>
+                ) : (
+                    <EmptyState>
+                        <span style={{ fontSize: 22, fontFamily: "JetBrains Mono, monospace" }}>••••••••</span>
+                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>Click Generate to create a password</span>
+                    </EmptyState>
+                )}
+            </Panel>
+        </ToolLayout>
     );
 }

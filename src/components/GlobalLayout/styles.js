@@ -4,7 +4,7 @@ import { styledMedia } from "styles/global";
 
 export const StyledContainer = styled.div`
     width: 100%;
-    min-width: 320px !important;
+    min-width: 0;
 `;
 
 export const StyledMainViewContainer = styled(Box)`

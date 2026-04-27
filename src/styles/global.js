@@ -47,6 +47,9 @@ const GlobalStyle = createGlobalStyle`
     outline: 0;
     padding: 0;
   }
+  html {
+    overflow-x: hidden;
+  }
   body {
     background-color: var(--bg-page);
     text-rendering: optimizeLegibility !important;
@@ -61,6 +64,12 @@ const GlobalStyle = createGlobalStyle`
     outline: none;
     text-decoration: none;
     color: ${colors.black};
+  }
+  /* Prevent iOS auto-zoom on input focus (triggered when font-size < 16px) */
+  @media (max-width: 576px) {
+    input, textarea, select {
+      font-size: 16px !important;
+    }
   }
   a:active,a:focus {
     color: ${colors.black};

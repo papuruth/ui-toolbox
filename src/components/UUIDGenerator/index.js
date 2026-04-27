@@ -1,12 +1,21 @@
-import { ContentCopy } from "@mui/icons-material";
-import { Box, Button, Chip, IconButton, List, ListItem, ListItemText, MenuItem, Select, Tooltip, Typography } from "@mui/material";
-import { StyledBoxCenter, StyledBoxContainer } from "components/Shared/Styled-Components";
-import StyledNumberInput from "components/Shared/StyledNumberInput";
+import { Check, ContentCopy } from "@mui/icons-material";
 import localization from "localization";
-import React, { useState } from "react";
-import toast from "utils/toast";
+import React, { useCallback, useState } from "react";
+import styled from "styled-components";
+import {
+    ActionBar,
+    ActionBtn,
+    ActionBtnGroup,
+    EmptyState,
+    ModeBtn,
+    ModeToggle,
+    Panel,
+    PanelHeader,
+    PanelLabel,
+    ToolLayout
+} from "components/Shared/ToolKit";
 
-const { uuidGenerator: L, common: C } = localization;
+const { uuidGenerator: L } = localization;
 
 function generateV4() {
     if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") return crypto.randomUUID();
@@ -60,9 +69,9 @@ function generateV7() {
 }
 
 const VERSIONS = [
-    { value: "v1", label: "v1 (Time-based)", fn: generateV1 },
-    { value: "v4", label: "v4 (Random)", fn: generateV4 },
-    { value: "v7", label: "v7 (Unix-time ordered)", fn: generateV7 }
+    { value: "v1", label: "v1", fn: generateV1 },
+    { value: "v4", label: "v4", fn: generateV4 },
+    { value: "v7", label: "v7", fn: generateV7 }
 ];
 
 const VERSION_DESCRIPTIONS = {
@@ -71,92 +80,182 @@ const VERSION_DESCRIPTIONS = {
     v7: "Unix-time ordered: ms-precision timestamp prefix + random"
 };
 
+const ControlRow = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-color);
+`;
+
+const CountLabel = styled.span`
+    font-size: 11px;
+    font-weight: 600;
+    font-family: "Inter", sans-serif;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+`;
+
+const CountInput = styled.input`
+    width: 60px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    padding: 4px 8px;
+    text-align: center;
+    outline: none;
+    &:focus {
+        border-color: #22cc99;
+    }
+`;
+
+const DescBadge = styled.div`
+    padding: 8px 16px;
+    font-size: 11px;
+    font-family: "Inter", sans-serif;
+    color: #22cc99;
+    background: rgba(34, 204, 153, 0.08);
+    border-bottom: 1px solid var(--border-color);
+`;
+
+const UUIDList = styled.div`
+    flex: 1;
+    overflow: auto;
+`;
+
+const UUIDRow = styled.div`
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-color);
+    gap: 12px;
+`;
+
+const UUIDText = styled.span`
+    font-size: 12px;
+    font-family: "JetBrains Mono", monospace;
+    color: var(--text-primary);
+    flex: 1;
+    letter-spacing: 0.02em;
+`;
+
+const RowCopyBtn = styled.button`
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    padding: 2px 4px;
+    border-radius: 3px;
+    &:hover {
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.05);
+    }
+`;
+
+const BtnGroup = styled(ActionBtnGroup)`
+    margin-left: auto;
+`;
+
 export default function UUIDGenerator() {
     const [count, setCount] = useState(5);
     const [uuids, setUuids] = useState([]);
     const [version, setVersion] = useState("v4");
+    const [copiedAll, setCopiedAll] = useState(false);
+    const [copiedUuid, setCopiedUuid] = useState(null);
 
-    const generate = () => {
-        const fn = VERSIONS.find((v) => v.value === version)?.fn || generateV4;
+    const generate = useCallback(() => {
+        const { fn } = VERSIONS.find((v) => v.value === version) || VERSIONS[1];
         setUuids(Array.from({ length: count }, fn));
-    };
+    }, [count, version]);
 
-    const copyAll = () => {
-        if (window?.navigator?.clipboard && uuids.length) {
-            window.navigator.clipboard.writeText(uuids.join("\n"));
-            toast.success(L.copiedAll);
-        }
-    };
+    const copyAll = useCallback(() => {
+        if (!uuids.length || !window?.navigator?.clipboard) return;
+        window.navigator.clipboard.writeText(uuids.join("\n")).then(() => {
+            setCopiedAll(true);
+            setTimeout(() => setCopiedAll(false), 1500);
+        });
+    }, [uuids]);
 
-    const copyOne = (uuid) => {
-        if (window?.navigator?.clipboard) {
-            window.navigator.clipboard.writeText(uuid);
-            toast.success("Copied!");
-        }
-    };
+    const copyOne = useCallback((uuid) => {
+        if (!window?.navigator?.clipboard) return;
+        window.navigator.clipboard.writeText(uuid).then(() => {
+            setCopiedUuid(uuid);
+            setTimeout(() => setCopiedUuid(null), 1500);
+        });
+    }, []);
 
     return (
-        <StyledBoxContainer flexDirection="column" gap={3}>
-            <StyledBoxCenter gap={2} flexWrap="wrap" alignItems="center">
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography variant="body2" color="text.secondary">
-                        Version:
-                    </Typography>
-                    <Select value={version} onChange={(e) => setVersion(e.target.value)} size="small" sx={{ minWidth: 200 }}>
-                        {VERSIONS.map((v) => (
-                            <MenuItem key={v.value} value={v.value}>
-                                {v.label}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography variant="body2" color="text.secondary">
-                        {L.countLabel}
-                    </Typography>
-                    <StyledNumberInput min={1} max={100} value={count} onChange={(_, val) => setCount(val ?? 1)} />
-                </Box>
-                <Button variant="contained" onClick={generate}>
-                    {L.generateBtn}
-                </Button>
-                {uuids.length > 0 && (
-                    <Button variant="outlined" onClick={copyAll} startIcon={<ContentCopy />}>
-                        {L.copyAllBtn}
-                    </Button>
-                )}
-            </StyledBoxCenter>
-
-            <Chip
-                label={VERSION_DESCRIPTIONS[version]}
-                size="small"
-                sx={{ alignSelf: "flex-start", background: "rgba(34,204,153,0.1)", color: "#22cc99" }}
-            />
-
-            {uuids.length > 0 && (
-                <List dense disablePadding>
-                    {uuids.map((uuid) => (
-                        <ListItem
-                            key={uuid}
-                            secondaryAction={
-                                <Tooltip title={C.copyToCP}>
-                                    <IconButton edge="end" size="small" onClick={() => copyOne(uuid)}>
-                                        <ContentCopy fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
-                            }
-                            sx={{ borderBottom: "1px solid var(--border-color)" }}
-                        >
-                            <ListItemText
-                                primary={
-                                    <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
-                                        {uuid}
-                                    </Typography>
-                                }
-                            />
-                        </ListItem>
+        <ToolLayout>
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>{L.settingsLabel}</PanelLabel>
+                </PanelHeader>
+                <ModeToggle>
+                    {VERSIONS.map(({ value, label }) => (
+                        <ModeBtn key={value} $active={version === value} onClick={() => setVersion(value)}>
+                            {label}
+                        </ModeBtn>
                     ))}
-                </List>
-            )}
-        </StyledBoxContainer>
+                </ModeToggle>
+                <DescBadge>{VERSION_DESCRIPTIONS[version]}</DescBadge>
+                <ControlRow>
+                    <CountLabel>{L.countInputLabel}</CountLabel>
+                    <CountInput
+                        type="number"
+                        min={1}
+                        max={100}
+                        value={count}
+                        onChange={(e) => setCount(Math.max(1, Math.min(100, Number(e.target.value) || 1)))}
+                    />
+                </ControlRow>
+                <ActionBar>
+                    <BtnGroup>
+                        <ActionBtn onClick={generate}>{L.generateBtnLabel}</ActionBtn>
+                    </BtnGroup>
+                </ActionBar>
+            </Panel>
+
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>{L.uuidsLabel}</PanelLabel>
+                </PanelHeader>
+                {uuids.length > 0 ? (
+                    <>
+                        <UUIDList>
+                            {uuids.map((uuid, i) => (
+                                // eslint-disable-next-line react/no-array-index-key
+                                <UUIDRow key={i}>
+                                    <UUIDText>{uuid}</UUIDText>
+                                    <RowCopyBtn onClick={() => copyOne(uuid)} title="Copy">
+                                        {copiedUuid === uuid ? <Check style={{ fontSize: 13 }} /> : <ContentCopy style={{ fontSize: 13 }} />}
+                                    </RowCopyBtn>
+                                </UUIDRow>
+                            ))}
+                        </UUIDList>
+                        <ActionBar>
+                            <BtnGroup>
+                                <ActionBtn $success={copiedAll} onClick={copyAll}>
+                                    {copiedAll ? <Check style={{ fontSize: 11 }} /> : <ContentCopy style={{ fontSize: 11 }} />}
+                                    {copiedAll ? L.copiedAll : L.copyAllBtn}
+                                </ActionBtn>
+                            </BtnGroup>
+                        </ActionBar>
+                    </>
+                ) : (
+                    <EmptyState>
+                        <span style={{ fontSize: 15, fontFamily: "JetBrains Mono, monospace", color: "var(--text-secondary)" }}>
+                            xxxxxxxx-xxxx-xxxx
+                        </span>
+                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>{L.emptyStateMessage}</span>
+                    </EmptyState>
+                )}
+            </Panel>
+        </ToolLayout>
     );
 }

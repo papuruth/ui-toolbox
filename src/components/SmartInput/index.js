@@ -1,11 +1,14 @@
 import { AutoFixHigh, OpenInNew } from "@mui/icons-material";
 import { Box, Button, Chip, Typography } from "@mui/material";
+import localization from "localization";
 import React, { useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { push } from "connected-react-router";
 import { detectInputType } from "utils/inputDetector";
 import storage from "utils/storage";
 import styled, { keyframes } from "styled-components";
+
+const { smartInput: L } = localization;
 
 const fadeIn = keyframes`
     from { opacity: 0; transform: translateY(-4px); }
@@ -35,7 +38,7 @@ const TextArea = styled.textarea`
     box-sizing: border-box;
     &:focus {
         border-color: #22cc99;
-        box-shadow: 0 0 0 2px rgba(34, 204, 153, 0.15);
+        box-shadow: inset 0 0 0 2px rgba(34, 204, 153, 0.25);
     }
     &::placeholder {
         color: var(--text-secondary);
@@ -74,21 +77,21 @@ export default function SmartInput() {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
                 <AutoFixHigh sx={{ color: "#22cc99", fontSize: "1.1rem" }} />
                 <Typography variant="subtitle2" fontWeight={700} color="text.primary">
-                    Smart Paste
+                    {L.smartPasteLabel}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                    — paste anything and we'll detect what it is
+                    {L.smartPasteDescription}
                 </Typography>
             </Box>
 
-            <TextArea placeholder="Paste JSON, JWT, Base64, URL, UUID, hash…" value={value} onChange={(e) => setValue(e.target.value)} />
+            <TextArea placeholder={L.inputPlaceholder} value={value} onChange={(e) => setValue(e.target.value)} />
 
             {detected && (
                 <DetectedBanner>
                     <span>🧠</span>
                     <Chip label={detected.label} size="small" sx={{ background: "rgba(34,204,153,0.2)", color: "#22cc99", fontWeight: 700 }} />
                     <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
-                        detected
+                        {L.detectedLabel}
                     </Typography>
                     <Button
                         variant="contained"
@@ -97,7 +100,7 @@ export default function SmartInput() {
                         onClick={openInTool}
                         sx={{ background: "#22cc99", color: "#000", "&:hover": { background: "#1ab585" }, fontWeight: 700, fontSize: "0.78rem" }}
                     >
-                        Open in Tool →
+                        {L.openInToolBtn}
                     </Button>
                 </DetectedBanner>
             )}

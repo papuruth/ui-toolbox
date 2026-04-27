@@ -3,6 +3,12 @@ export default {
     newVersionMessage: "A new update is available.",
     appUpdateCTALabel: "Update",
     noSearchDataMessage: "No matching data found for [DATA]",
+    updateBanner: {
+        title: "DevDeck just got better",
+        subtitle: "A new version is ready — refresh for the latest improvements.",
+        laterBtn: "Later",
+        updateNowBtn: "Update Now"
+    },
     base64ToImage: {
         pageTitle: "Base64 to Image",
         brokenImageLabel: "Broken Image",
@@ -17,10 +23,24 @@ export default {
         cssBGSourceLabel: "CSS Source"
     },
     base64Image: {
-        pageTitle: "Base64 Image"
+        pageTitle: "Base64 Image",
+        imageToBase64Tab: "Image to Base64",
+        base64ToImageTab: "Base64 to Image"
     },
     base64Text: {
-        pageTitle: "Base64 Text"
+        pageTitle: "Base64 Text",
+        encodeMode: "Encode",
+        decodeMode: "Decode",
+        plainTextLabel: "Plain Text",
+        base64StringLabel: "Base64 String",
+        base64OutputLabel: "Base64 Output",
+        decodedTextLabel: "Decoded Text",
+        encodeInputPlaceholder: "Type or paste text to encode…",
+        decodeInputPlaceholder: "Paste Base64 string to decode…",
+        encodeOutputPlaceholder: "Base64 output will appear here…",
+        decodedOutputPlaceholder: "Decoded text will appear here…",
+        latinRangeError: "Input contains characters outside the Latin1 range (use the File tab for binary data)",
+        invalidBase64Error: "Invalid Base64 string"
     },
     qrGenerator: {
         pageTitle: "QR Code Generator",
@@ -28,7 +48,19 @@ export default {
         maxLogoSizeLabel: "Maximum image size allowed is 512 KB",
         maxLogoSizePXLabel: "Maximum logo width and height should not exceed 512px",
         enterQRDataLabel: "Enter QR Data",
-        qrWidthLabel: "QR Width"
+        qrWidthLabel: "QR Width",
+        qrDataLabel: "QR Data",
+        sizeLabel: "Size",
+        foregroundLabel: "Foreground",
+        backgroundLabel: "Background",
+        logoLabel: "Logo",
+        logoOffLabel: "Off",
+        logoOnLabel: "On",
+        inputPlaceholder: "URL, text, contact info…",
+        emptyStateMessage: "Enter data to generate QR",
+        pngBtn: "PNG",
+        svgBtn: "SVG",
+        clearBtn: "Clear"
     },
     aspectRatioCalculator: {
         pageTitle: "Aspect Ratio Calculator",
@@ -37,7 +69,15 @@ export default {
         imageHeightLabel: "Image Height",
         calculateBtn: "Calculate",
         aspectRatioLabel: "Image Aspect Ratio:",
-        resetTooltip: "Reset"
+        resetTooltip: "Reset",
+        presetsLabel: "Presets",
+        simplifiedRatioLabel: "Simplified ratio",
+        resetBtn: "Reset",
+        copyBtn: "Copy",
+        copiedLabel: "Copied!",
+        emptyStateMessage: "Enter dimensions or upload an image",
+        widthPlaceholder: "Width (px)",
+        heightPlaceholder: "Height (px)"
     },
     imageResizer: {
         pageTitle: "Image Resizer",
@@ -45,7 +85,15 @@ export default {
         rotateLabel: "Rotate Image",
         toggleAspectLabel: "Toggle Aspect",
         cropPreviewLabel: "Crop Preview",
-        downloadImageBtn: "Download Image"
+        downloadImageBtn: "Download Image",
+        controlsLabel: "Controls",
+        aspectRatioLabel: "Aspect Ratio",
+        aspectLockedLabel: "Locked 16:9",
+        aspectFreeLabel: "Free",
+        cropOutputLabel: "Crop Output",
+        previewLabel: "Preview",
+        croppedResultLabel: "Cropped Result",
+        emptyStateMessage: "Upload an image to start cropping"
     },
     base64Encoder: {
         pageTitle: "Base64 Encoder"
@@ -63,15 +111,44 @@ export default {
         unshortUrlBtn: "Unshort URL",
         replaceProtocolBtn: "Replace Protocol",
         replaceProtocolTooltip: "http link, consider using https",
-        restoreBtn: "Restore Original URL"
+        restoreBtn: "Restore Original URL",
+        urlLabel: "URL",
+        pasteBtn: "Paste",
+        shareBtn: "Share",
+        inputPlaceholder: "https://example.com/path?with=params",
+        breakdownLabel: "Breakdown",
+        actionsLabel: "Actions",
+        emptyBreakdownMessage: "Enter a URL above to see its breakdown",
+        cleanRefTitle: "Clean Referral Params",
+        cleanRefDesc: "Remove common tracking params (utm_*, ref, fbclid…)",
+        removeQueriesTitle: "Remove All Query Params",
+        removeQueriesDesc: "Strip everything after the ? in the URL",
+        stripToOriginTitle: "Strip to Origin",
+        stripToOriginDesc: "Keep only the protocol and host",
+        upgradeHttpsTitle: "Upgrade to HTTPS",
+        upgradeHttpsDesc: "Replace http:// with https://",
+        restoreOriginalTitle: "Restore Original",
+        restoreOriginalDesc: "Undo all modifications"
     },
     urlShortner: {
         pageTitle: "URL Shortner",
         urlTextPlaceholder: "Enter URL to shorten",
         creditText: "Powered by TinyURL",
         shortLinkLabel: "Short Link:",
-        shortenBtn: "Shorten URL",
-        resetBtn: "Reset"
+        shortenBtn: "Shorten",
+        shorteningLabel: "Shortening...",
+        resetBtn: "Reset",
+        longUrlLabel: "Long URL",
+        pasteBtn: "Paste",
+        shortUrlLabel: "Short URL",
+        copyBtn: "Copy",
+        copiedLabel: "Copied",
+        openBtn: "Open",
+        shortenAnotherBtn: "Shorten Another",
+        qrCodeLabel: "QR Code",
+        scanToOpenLabel: "Scan to open",
+        downloadBtn: "Download",
+        emptyStateMessage: "Paste a long URL above and press Shorten"
     },
     passwordGen: {
         pageTitle: "Password Generator",
@@ -85,14 +162,40 @@ export default {
         generatedPasswordLabel: "Generated password:",
         passwordStrengthLabel: "Password strength:",
         generateBtn: "Generate",
-        resetBtn: "Reset"
+        resetBtn: "Reset",
+        settingsLabel: "Settings",
+        lengthLabel: "Length",
+        minLabel: "Min",
+        strengthLabel: "Strength",
+        entropyLabel: "Entropy",
+        weakLabel: "Weak",
+        fairLabel: "Fair",
+        strongLabel: "Strong",
+        veryStrongLabel: "Very Strong",
+        copyBtn: "Copy",
+        copiedLabel: "Copied",
+        emptyStateMessage: "Press Generate to create a password"
     },
     passwordTools: {
-        pageTitle: "Password Tools"
+        pageTitle: "Password Tools",
+        generatorTab: "Generator",
+        strengthMeterTab: "Strength Meter"
     },
     jsonViewer: {
         pageTitle: "JSON Viewer",
-        urlTextPlaceholder: "Enter JSON"
+        urlTextPlaceholder: "Enter JSON",
+        editorTab: "Editor",
+        viewerTab: "Viewer",
+        jsonInputLabel: "JSON Input",
+        jsonViewerLabel: "JSON Viewer",
+        searchPlaceholder: "Search keys or values…",
+        expandAllBtn: "Expand All",
+        collapseAllBtn: "Collapse All",
+        noMatchesMessage: "No matches found",
+        noValidJsonMessage: "No valid JSON to display",
+        loadDialogTitle: "Load JSON Data",
+        loadUrlPlaceholder: "Enter JSON URL",
+        loadDataBtn: "Load Data"
     },
     colorConverter: {
         pageTitle: "Color Converter",
@@ -102,16 +205,38 @@ export default {
         copyHex: "Copy HEX",
         copyRgb: "Copy RGB",
         copyHsl: "Copy HSL",
-        invalidHexError: "Invalid HEX color — expected #RRGGBB"
+        invalidHexError: "Invalid HEX color — expected #RRGGBB",
+        colorLabel: "Color",
+        wcagContrastLabel: "WCAG Contrast",
+        vsWhiteLabel: "vs White",
+        vsBlackLabel: "vs Black",
+        invalidHexColorError: "Invalid hex color"
     },
     textCaseConverter: {
         pageTitle: "Text Case Converter",
         inputPlaceholder: "Enter text to convert...",
-        outputLabel: "Output"
+        outputLabel: "Output",
+        inputTextLabel: "Input Text",
+        allFormatsLabel: "All Formats",
+        formatsCount: "8 formats",
+        shareBtn: "Share",
+        clearBtn: "Clear",
+        copyBtn: "Copy",
+        copiedLabel: "Copied",
+        emptyStateMessage: "Enter text above to see all case formats"
     },
     hashGenerator: {
         pageTitle: "Hash Generator",
-        inputPlaceholder: "Enter text to hash..."
+        inputPlaceholder: "Enter text to hash...",
+        inputLabel: "Input",
+        hashesLabel: "Hashes",
+        dropzoneHint: "Drag & drop a file to hash…",
+        dropActiveHint: "Drop file here…",
+        algorithmsCount: "4 algorithms",
+        copyBtn: "Copy",
+        copiedLabel: "Copied",
+        shareBtn: "Share",
+        emptyStateMessage: "Enter text or drop a file to generate hashes"
     },
     regexTester: {
         pageTitle: "Regex Tester",
@@ -121,7 +246,13 @@ export default {
         noMatches: "No matches",
         enterPattern: "Enter a pattern above",
         matchAt: "Match [N] at index [I]:",
-        groupLabel: "Group [N]:"
+        groupLabel: "Group [N]:",
+        patternInputLabel: "Pattern",
+        invalidRegexError: "Invalid regex",
+        flagsLabel: "Flags",
+        matchesLabel: "Matches",
+        shareBtn: "Share",
+        emptyStateMessage: "Enter a pattern and test string to find matches"
     },
     jwtDecoder: {
         pageTitle: "JWT Decoder",
@@ -129,14 +260,27 @@ export default {
         invalidJwtError: "Invalid JWT: expected 3 parts separated by '.'",
         decodeError: "Failed to decode JWT segments — ensure it is a valid JWT",
         headerLabel: "HEADER",
-        payloadLabel: "PAYLOAD"
+        payloadLabel: "PAYLOAD",
+        jwtTokenLabel: "JWT Token",
+        copyBtn: "Copy",
+        copiedLabel: "Copied",
+        emptyStateMessage: "Paste a JWT token above to decode it"
     },
     uuidGenerator: {
         pageTitle: "UUID Generator",
         countLabel: "Count:",
         generateBtn: "Generate UUIDs",
         copyAllBtn: "Copy All",
-        copiedAll: "Copied all!"
+        copiedAll: "Copied all!",
+        settingsLabel: "Settings",
+        uuidsLabel: "UUIDs",
+        copyBtn: "Copy",
+        copiedLabel: "Copied",
+        v1Description: "Time-based",
+        v4Description: "Random",
+        countInputLabel: "Count",
+        generateBtnLabel: "Generate",
+        emptyStateMessage: "Press Generate to create UUIDs"
     },
     timestampConverter: {
         pageTitle: "Timestamp Converter",
@@ -150,11 +294,24 @@ export default {
         invalidTimestampError: "Invalid timestamp",
         invalidDateError: "Enter a valid date/time string",
         unixSecondsLabel: "Unix (seconds)",
-        millisecondsLabel: "Milliseconds"
+        millisecondsLabel: "Milliseconds",
+        unixToDateMode: "Unix → Date",
+        dateToUnixMode: "Date → Unix",
+        unixTimestampLabel: "Unix Timestamp",
+        dateStringLabel: "Date String",
+        pickDateLabel: "Pick Date",
+        timezoneLabel: "Timezone",
+        resultLabel: "Result",
+        unixEmptyMessage: "Enter a Unix timestamp to convert",
+        dateEmptyMessage: "Enter a date string to convert",
+        invalidUnixTimestampError: "Invalid Unix timestamp"
     },
     numberBaseConverter: {
         pageTitle: "Number Base Converter",
-        inputLabel: "Input Number",
+        inputLabel: "Input",
+        conversionsLabel: "Conversions",
+        numberInputPlaceholder: "Enter a number…",
+        emptyStateMessage: "Enter a number above to convert",
         sourceBaseLabel: "Source Base",
         invalidInputError: `"[INPUT]" is not a valid base-[BASE] number`
     },
@@ -162,12 +319,17 @@ export default {
         pageTitle: "YAML ↔ JSON",
         yamlToJsonTab: "YAML → JSON",
         jsonToYamlTab: "JSON → YAML",
-        yamlInputPlaceholder: "Paste YAML here...",
+        yamlInputPlaceholder: "Paste YAML here…",
         convertToJsonBtn: "Convert to JSON",
         jsonOutputLabel: "JSON Output",
-        jsonInputPlaceholder: "Paste JSON here...",
+        jsonInputPlaceholder: "Paste JSON here…",
         convertToYamlBtn: "Convert to YAML",
-        yamlOutputLabel: "YAML Output"
+        yamlOutputLabel: "YAML Output",
+        yamlInputLabel: "YAML Input",
+        jsonInputLabel: "JSON Input",
+        copyBtn: "Copy",
+        copiedLabel: "Copied",
+        fixErrorMessage: "Fix the error to see output"
     },
     textDiff: {
         pageTitle: "Text Diff",
@@ -175,7 +337,11 @@ export default {
         modifiedLabel: "Modified",
         originalPlaceholder: "Original text...",
         modifiedPlaceholder: "Modified text...",
-        compareBtn: "Compare"
+        compareBtn: "Compare",
+        diffLabel: "Diff",
+        wordsLabel: "words",
+        clearAllBtn: "Clear All",
+        emptyStateMessage: "Enter text in both panels to see differences"
     },
     loremIpsum: {
         pageTitle: "Lorem Ipsum",
@@ -184,18 +350,28 @@ export default {
         sentencesOption: "Sentences",
         wordsOption: "Words",
         generateBtn: "Generate",
-        outputLabel: "Output"
+        outputLabel: "Output",
+        settingsLabel: "Settings",
+        copyBtn: "Copy",
+        copiedLabel: "Copied",
+        emptyStateMessage: "Set count and press Generate"
     },
     wordCounter: {
         pageTitle: "Word Counter",
-        placeholder: "Paste or type your text here...",
+        placeholder: "Paste or type text here…",
         wordsLabel: "Words",
         charsLabel: "Characters",
-        charsNoSpaceLabel: "Chars (no spaces)",
+        charsNoSpaceLabel: "No Spaces",
         linesLabel: "Lines",
         sentencesLabel: "Sentences",
         paragraphsLabel: "Paragraphs",
-        readingTimeLabel: "Reading Time"
+        readingTimeLabel: "Reading Time",
+        speakingTimeLabel: "Speaking Time",
+        textLabel: "Text",
+        statsLabel: "Stats",
+        keywordDensityLabel: "Keyword Density",
+        shareBtn: "Share",
+        emptyStateMessage: "Type or paste text to see statistics"
     },
     csvToJson: {
         pageTitle: "CSV to JSON",
@@ -203,7 +379,13 @@ export default {
         firstRowHeaderLabel: "First row is header",
         convertBtn: "Convert to JSON",
         jsonOutputLabel: "JSON Output",
-        emptyInputError: "Please enter CSV data"
+        emptyInputError: "Please enter CSV data",
+        csvInputLabel: "CSV Input",
+        tableTabLabel: "Table",
+        jsonTabLabel: "JSON",
+        copyJsonBtn: "Copy JSON",
+        downloadBtn: "Download",
+        emptyStateMessage: "Paste CSV to convert to JSON"
     },
     passwordStrengthMeter: {
         pageTitle: "Password Strength Meter",
@@ -213,7 +395,21 @@ export default {
         strong: "Strong",
         veryStrong: "Very Strong",
         tipText: "Strong password uses different types of characters",
-        showPasswordLabel: "Show password"
+        showPasswordLabel: "Show password",
+        passwordInputLabel: "Password Input",
+        tipFullText: "A strong password uses uppercase, lowercase, numbers, and symbols — at least 12 characters long.",
+        analysisLabel: "Analysis",
+        strengthLabel: "Strength",
+        crackTimeLabel: "Crack Time",
+        lengthLabel: "Length",
+        containsLabel: "Contains",
+        uppercaseLabel: "Uppercase",
+        lowercaseLabel: "Lowercase",
+        numbersLabel: "Numbers",
+        symbolsLabel: "Symbols",
+        showLabel: "Show",
+        hideLabel: "Hide",
+        emptyStateMessage: "Enter a password to analyze its strength"
     },
     commandPalette: {
         placeholder: "Search tools, actions, or paste data...",
@@ -223,6 +419,13 @@ export default {
         sectionActions: "Actions",
         smartDetectionOpen: "Open →"
     },
+    smartInput: {
+        smartPasteLabel: "Smart Paste",
+        smartPasteDescription: "Paste any data and we'll detect what tool to use",
+        inputPlaceholder: "Paste anything — JSON, JWT, URL, timestamp…",
+        detectedLabel: "detected",
+        openInToolBtn: "Open in Tool →"
+    },
     common: {
         maxImageSizeText: "Maximum image size allowed is 5MB",
         imageLoadError: "Image Load Error",
@@ -230,6 +433,16 @@ export default {
         copyToCP: "Copy to clipboard",
         downloadLabel: "Download",
         downloadImageLabel: "Download Image",
-        downloadQRLabel: "Download QR"
+        downloadQRLabel: "Download QR",
+        copyBtn: "Copy",
+        copiedLabel: "Copied",
+        shareBtn: "Share",
+        clearBtn: "Clear",
+        resetBtn: "Reset",
+        pasteBtn: "Paste",
+        downloadBtn: "Download",
+        recentInputsTooltip: "Recent inputs",
+        recentInputsHeader: "RECENT INPUTS",
+        clearHistoryLabel: "Clear history"
     }
 };

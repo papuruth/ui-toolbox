@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import styled from "styled-components";
+import { styledMedia } from "styles/global";
 
 export {
     ActionBar,
@@ -34,8 +35,8 @@ export const DimInput = styled.input`
     outline: none;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
     &:focus {
-        border-color: rgba(34, 204, 153, 0.5);
-        box-shadow: 0 0 0 2px rgba(34, 204, 153, 0.12);
+        border-color: #22cc99;
+        box-shadow: inset 0 0 0 2px rgba(34, 204, 153, 0.25);
     }
     &::placeholder {
         color: var(--text-secondary);
@@ -57,7 +58,7 @@ export const PresetsSection = styled(Box)`
 
 export const PresetLabel = styled.span`
     font-family: "Inter", sans-serif;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text-secondary);
     text-transform: uppercase;
@@ -76,7 +77,8 @@ export const PresetBtn = styled.button`
     color: var(--text-secondary);
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    padding: 4px 14px;
+    padding: 8px 14px;
+    min-height: 36px;
     font-size: 12px;
     font-weight: 500;
     font-family: "Inter", sans-serif;
@@ -109,6 +111,9 @@ export const AspectRatioLabel = styled.span`
     letter-spacing: 0.05em;
     line-height: 1.2;
     text-align: center;
+    ${styledMedia.lessThan("sm")`
+        font-size: 32px;
+    `}
 `;
 
 export const DimSeparator = styled.span`

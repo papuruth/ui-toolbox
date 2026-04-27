@@ -1,22 +1,25 @@
-import { Tabs } from "@mui/base/Tabs";
 import Base64ToImage from "components/Base64ToImage";
 import ImageToBase64 from "components/ImageToBase64";
-import { StyledTab, StyledTabPanel, StyledTabsList } from "components/Shared/StyledTabs";
-import React from "react";
+import { TabBtn, TabStrip } from "components/Shared/ToolKit";
+import localization from "localization";
+import React, { useState } from "react";
+
+const { base64Image: L } = localization;
 
 export default function Base64Image() {
+    const [tab, setTab] = useState(0);
+
     return (
-        <Tabs defaultValue={0}>
-            <StyledTabsList>
-                <StyledTab value={0}>Image to Base64</StyledTab>
-                <StyledTab value={1}>Base64 to Image</StyledTab>
-            </StyledTabsList>
-            <StyledTabPanel value={0}>
-                <ImageToBase64 />
-            </StyledTabPanel>
-            <StyledTabPanel value={1}>
-                <Base64ToImage />
-            </StyledTabPanel>
-        </Tabs>
+        <>
+            <TabStrip>
+                <TabBtn $active={tab === 0} onClick={() => setTab(0)}>
+                    {L.imageToBase64Tab}
+                </TabBtn>
+                <TabBtn $active={tab === 1} onClick={() => setTab(1)}>
+                    {L.base64ToImageTab}
+                </TabBtn>
+            </TabStrip>
+            {tab === 0 ? <ImageToBase64 /> : <Base64ToImage />}
+        </>
     );
 }

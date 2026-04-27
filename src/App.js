@@ -1,10 +1,8 @@
 import { createTheme, CssBaseline, StyledEngineProvider, ThemeProvider } from "@mui/material";
 import GlobalLayout from "components/GlobalLayout";
-import AppUpdateUI from "components/Shared/AppUpdateUI";
-import { assign } from "lodash";
+import UpdateBanner from "components/Shared/UpdateBanner";
 import React, { useEffect, useMemo, useState } from "react";
 import { useClearCache } from "react-clear-cache";
-import { confirmAlert } from "react-confirm-alert";
 import { Provider } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,7 +12,6 @@ import { StyleSheetManager } from "styled-components";
 import ColorModeContext from "./context/ColorModeContext";
 import { ToolChainProvider } from "./context/ToolChainContext";
 import store from "./store";
-import localization from "./localization";
 
 // This implements the default behavior from styled-components v5
 function shouldForwardProp(propName, target) {
@@ -98,42 +95,12 @@ function App() {
         [mode]
     );
 
-    useEffect(() => {
-        const updateVersion = () => {
-            const { appTitle, newVersionMessage, appUpdateCTALabel } = localization;
-            const alertProps = {
-                title: appTitle,
-                description: newVersionMessage,
-                yesLabel: appUpdateCTALabel,
-                onClickYes: (e) => {
-                    e?.preventDefault();
-                    emptyCacheStorage();
-                },
-                showCancel: false
-            };
-            confirmAlert({
-                customUI: ({ onClose }) => AppUpdateUI(assign(alertProps, { onClose })),
-                closeOnClickOutside: false,
-                closeOnEscape: false
-            });
-        };
-
-        if (!isLatestVersion) {
-            setTimeout(() => {
-                if (process.env.NODE_ENV === "production") {
-                    updateVersion();
-                }
-            }, 1000);
-        }
-    }, [isLatestVersion, emptyCacheStorage]);
-
     return (
         <ColorModeContext.Provider value={colorMode}>
             <Provider store={store}>
                 <StyleSheetManager shouldForwardProp={shouldForwardProp}>
                     <CssBaseline />
                     <GlobalStyled />
-
                     <StyledEngineProvider injectFirst>
                         <ThemeProvider theme={theme}>
                             <ToolChainProvider>
@@ -154,6 +121,7 @@ function App() {
                         theme="colored"
                         closeButton={false}
                     />
+                    {!isLatestVersion && process.env.NODE_ENV === "production" && <UpdateBanner onUpdate={emptyCacheStorage} />}
                 </StyleSheetManager>
             </Provider>
         </ColorModeContext.Provider>

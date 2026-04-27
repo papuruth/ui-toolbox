@@ -1,92 +1,133 @@
-import { Box, Button, Typography } from "@mui/material";
-import { StyledBoxCenter, StyledBoxContainer, StyledTextField } from "components/Shared/Styled-Components";
 import { diffWords } from "diff";
 import localization from "localization";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
+import styled from "styled-components";
+import { ActionBtn, EmptyState, InputArea, MetaText, Panel, PanelHeader, PanelLabel, ToolLayout } from "components/Shared/ToolKit";
 
 const { textDiff: L } = localization;
 
-function getDiffStyle(part) {
-    if (part.added) return { background: "rgba(34,204,100,0.25)", color: "success.main", textDecoration: "none" };
-    if (part.removed) return { background: "rgba(255,80,80,0.2)", color: "error.main", textDecoration: "line-through" };
-    return { background: "transparent", color: "text.primary", textDecoration: "none" };
-}
+const ToolWrap = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    margin-top: 4px;
+`;
+
+const DiffArea = styled.div`
+    flex: 1;
+    min-height: 180px;
+    background: var(--bg-input);
+    padding: 16px;
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    font-size: 12px;
+    line-height: 1.75;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow: auto;
+`;
+
+const Added = styled.mark`
+    background: rgba(34, 204, 153, 0.25);
+    color: var(--text-primary);
+    border-radius: 2px;
+`;
+
+const Removed = styled.mark`
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    text-decoration: line-through;
+    border-radius: 2px;
+`;
 
 export default function TextDiff() {
     const [original, setOriginal] = useState("");
     const [modified, setModified] = useState("");
-    const [diffResult, setDiffResult] = useState(null);
 
-    const computeDiff = () => {
-        setDiffResult(diffWords(original, modified));
-    };
+    const { parts, stats } = useMemo(() => {
+        if (!original && !modified) return { parts: [], stats: null };
+        const result = diffWords(original, modified);
+        const added = result.filter((p) => p.added).reduce((n, p) => n + (p.count || 0), 0);
+        const removed = result.filter((p) => p.removed).reduce((n, p) => n + (p.count || 0), 0);
+        return { parts: result, stats: { added, removed } };
+    }, [original, modified]);
 
     return (
-        <StyledBoxContainer flexDirection="column" gap={3}>
-            <StyledBoxCenter gap={2} flexWrap="wrap" alignItems="flex-start">
-                <Box sx={{ flexGrow: 1, minWidth: 240 }}>
-                    <Typography variant="subtitle2" fontWeight={600} mb={1}>
-                        {L.originalLabel}
-                    </Typography>
-                    <StyledTextField
-                        multiline
-                        rows={8}
+        <ToolWrap>
+            <ToolLayout style={{ marginTop: 0 }}>
+                <Panel>
+                    <PanelHeader>
+                        <PanelLabel>{L.originalLabel}</PanelLabel>
+                        {original && <MetaText>{original.length.toLocaleString()} chars</MetaText>}
+                    </PanelHeader>
+                    <InputArea
                         value={original}
                         onChange={(e) => setOriginal(e.target.value)}
                         placeholder={L.originalPlaceholder}
+                        spellCheck={false}
+                        autoFocus
                     />
-                </Box>
-                <Box sx={{ flexGrow: 1, minWidth: 240 }}>
-                    <Typography variant="subtitle2" fontWeight={600} mb={1}>
-                        {L.modifiedLabel}
-                    </Typography>
-                    <StyledTextField
-                        multiline
-                        rows={8}
+                </Panel>
+
+                <Panel>
+                    <PanelHeader>
+                        <PanelLabel>{L.modifiedLabel}</PanelLabel>
+                        {modified && <MetaText>{modified.length.toLocaleString()} chars</MetaText>}
+                    </PanelHeader>
+                    <InputArea
                         value={modified}
                         onChange={(e) => setModified(e.target.value)}
                         placeholder={L.modifiedPlaceholder}
+                        spellCheck={false}
                     />
-                </Box>
-            </StyledBoxCenter>
-            <Button variant="contained" onClick={computeDiff} sx={{ alignSelf: "flex-start" }}>
-                {L.compareBtn}
-            </Button>
-            {diffResult && (
-                <Box
-                    sx={{
-                        p: 2,
-                        border: "1px solid var(--border-color)",
-                        borderRadius: 1,
-                        fontFamily: "monospace",
-                        fontSize: 14,
-                        lineHeight: 1.8,
-                        whiteSpace: "pre-wrap",
-                        wordBreak: "break-word",
-                        background: "var(--bg-card)"
-                    }}
-                >
-                    {diffResult.map((part, i) => {
-                        const style = getDiffStyle(part);
-                        return (
-                            <Typography
-                                // eslint-disable-next-line react/no-array-index-key
-                                key={i}
-                                component="span"
-                                sx={{
-                                    background: style.background,
-                                    color: style.color,
-                                    textDecoration: style.textDecoration,
-                                    fontFamily: "monospace",
-                                    fontSize: 14
+                </Panel>
+            </ToolLayout>
+
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>{L.diffLabel}</PanelLabel>
+                    {(original || modified) && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                            {stats && (
+                                <MetaText>
+                                    <span style={{ color: "#22cc99" }}>+{stats.added}</span>
+                                    {" / "}
+                                    <span style={{ color: "#ef4444" }}>-{stats.removed}</span> {L.wordsLabel}
+                                </MetaText>
+                            )}
+                            <ActionBtn
+                                $danger
+                                onClick={() => {
+                                    setOriginal("");
+                                    setModified("");
                                 }}
                             >
-                                {part.value}
-                            </Typography>
-                        );
-                    })}
-                </Box>
-            )}
-        </StyledBoxContainer>
+                                {L.clearAllBtn}
+                            </ActionBtn>
+                        </div>
+                    )}
+                </PanelHeader>
+                {parts.length > 0 ? (
+                    <DiffArea>
+                        {parts.map((part, i) => {
+                            if (part.added) {
+                                // eslint-disable-next-line react/no-array-index-key
+                                return <Added key={i}>{part.value}</Added>;
+                            }
+                            if (part.removed) {
+                                // eslint-disable-next-line react/no-array-index-key
+                                return <Removed key={i}>{part.value}</Removed>;
+                            }
+                            // eslint-disable-next-line react/no-array-index-key
+                            return <span key={i}>{part.value}</span>;
+                        })}
+                    </DiffArea>
+                ) : (
+                    <EmptyState>
+                        <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>{L.emptyStateMessage}</span>
+                    </EmptyState>
+                )}
+            </Panel>
+        </ToolWrap>
     );
 }

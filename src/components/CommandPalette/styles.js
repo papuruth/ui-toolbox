@@ -56,7 +56,8 @@ export const PaletteBox = styled.div`
     animation: ${slideDown} 0.2s cubic-bezier(0.22, 1, 0.36, 1);
     ${styledMedia.lessThan("sm")`
         border-radius: 12px;
-        margin: 0 12px;
+        width: calc(100% - 24px);
+        margin: 0 auto;
     `}
 `;
 

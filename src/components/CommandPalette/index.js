@@ -207,7 +207,7 @@ export default function CommandPalette({ open, onClose }) {
                                 <strong>{smartDetection.label}</strong> detected — open in{" "}
                                 <strong>{ENRICHED_TOOLS.find((t) => t.route === smartDetection.route)?.label}</strong>
                             </SmartBannerText>
-                            <SmartBannerArrow>Open →</SmartBannerArrow>
+                            <SmartBannerArrow>{L.smartDetectionOpen}</SmartBannerArrow>
                         </SmartBanner>
                     )}
 

@@ -28,7 +28,8 @@ const Textarea = styled(BaseTextareaAutosize)(
     ({ theme }) => `
     resize: none;
 box-sizing: border-box;
-width: 320px;
+width: 100%;
+max-width: 320px;
 font-family: 'IBM Plex Sans', sans-serif;
 font-size: 0.875rem;
 font-weight: 400;

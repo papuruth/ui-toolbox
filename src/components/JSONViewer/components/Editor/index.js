@@ -1,29 +1,42 @@
-import { StyledBoxContainer, StyledButton } from "components/Shared/Styled-Components";
-import StyledTextArea from "components/Shared/StyledTextArea";
 import { func, string } from "prop-types";
 import React from "react";
-import { GLOBAL_CONSTANTS } from "utils/globalConstants";
+import { ActionBar, ActionBtn, ActionBtnGroup, CodeArea } from "components/Shared/ToolKit";
 
-const { JSON_EDITOR_CTA } = GLOBAL_CONSTANTS;
+const EMPTY_CTAS = ["paste", "loadJSONData"];
+const CONTENT_CTAS = ["copy", "clear", "format", "removeWhitespace"];
+
+const CTA_LABELS = {
+    paste: "Paste",
+    loadJSONData: "Load JSON Data",
+    copy: "Copy",
+    clear: "Clear",
+    format: "Format",
+    removeWhitespace: "Remove Whitespace"
+};
+
 export default function Editor({ handleJSONInput, jsonInput, handleEditorOperations }) {
+    const hasContent = !!jsonInput;
+    const visibleIds = hasContent ? [...EMPTY_CTAS, ...CONTENT_CTAS] : EMPTY_CTAS;
+
     return (
-        <StyledBoxContainer flexDirection="column">
-            <StyledBoxContainer gap={1}>
-                {JSON_EDITOR_CTA.map((cta) => (
-                    <StyledButton variant="outlined" key={cta.id} onClick={() => handleEditorOperations(cta.id)}>
-                        {cta.label}
-                    </StyledButton>
-                ))}
-            </StyledBoxContainer>
-            <StyledBoxContainer flexDirection="column" height="calc(100vh - 410px)">
-                <StyledTextArea
-                    sx={{ height: "100% !important", width: "100%", mt: 1 }}
-                    placeholder="Paste JSON code here..."
-                    value={jsonInput}
-                    onChange={handleJSONInput}
-                />
-            </StyledBoxContainer>
-        </StyledBoxContainer>
+        <>
+            <ActionBar>
+                <ActionBtnGroup>
+                    {visibleIds.map((id) => (
+                        <ActionBtn key={id} onClick={() => handleEditorOperations(id)}>
+                            {CTA_LABELS[id]}
+                        </ActionBtn>
+                    ))}
+                </ActionBtnGroup>
+            </ActionBar>
+            <CodeArea
+                value={jsonInput}
+                onChange={handleJSONInput}
+                placeholder="Paste JSON code here..."
+                spellCheck={false}
+                style={{ flex: 1, minHeight: 400 }}
+            />
+        </>
     );
 }
 

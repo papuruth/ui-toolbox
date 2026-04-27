@@ -44,6 +44,14 @@ export const Panel = styled(Box)`
     box-shadow: var(--shadow-panel);
     display: flex;
     flex-direction: column;
+    > *:first-child {
+        border-top-left-radius: calc(var(--radius-panel) - 1px);
+        border-top-right-radius: calc(var(--radius-panel) - 1px);
+    }
+    > *:last-child {
+        border-bottom-left-radius: calc(var(--radius-panel) - 1px);
+        border-bottom-right-radius: calc(var(--radius-panel) - 1px);
+    }
 `;
 
 export const PanelHeader = styled(Box)`
@@ -74,6 +82,9 @@ export const PanelLabel = styled(Typography)`
     letter-spacing: 0.1em;
     color: var(--text-secondary) !important;
     line-height: 1.5 !important;
+    ${styledMedia.lessThan("sm")`
+        font-size: 13px !important;
+    `}
 `;
 
 /* Mono metadata — file size, char count, etc. */
@@ -83,6 +94,9 @@ export const MetaText = styled(Typography)`
     color: var(--text-secondary) !important;
     opacity: 0.7;
     line-height: 1.5 !important;
+    ${styledMedia.lessThan("sm")`
+        font-size: 13px !important;
+    `}
 `;
 
 /* ─── Code / Input Areas ──────────────────────────────── */
@@ -154,6 +168,10 @@ export const PreviewArea = styled(Box)`
     min-height: 280px;
     background: var(--bg-input);
     padding: 24px;
+    ${styledMedia.lessThan("sm")`
+        min-height: 200px;
+        padding: 16px;
+    `}
 `;
 
 export const PreviewImg = styled.img`
@@ -213,6 +231,15 @@ export const TabBtn = styled.button`
     &:hover {
         color: #22cc99;
     }
+    &:disabled {
+        opacity: 0.35;
+        cursor: default;
+        pointer-events: none;
+    }
+    ${styledMedia.lessThan("sm")`
+        padding: 12px 16px;
+        min-height: 44px;
+    `}
 `;
 
 /* ─── Actions ─────────────────────────────────────────── */
@@ -265,7 +292,8 @@ export const ActionBtn = styled.button`
     border: 1px solid ${getActionBtnBorder};
     background: ${getActionBtnBg};
     border-radius: var(--radius-btn);
-    padding: 5px 11px;
+    padding: 8px 14px;
+    min-height: 36px;
     font-size: 11px;
     font-weight: 500;
     font-family: "Inter", sans-serif;
@@ -284,6 +312,10 @@ export const ActionBtn = styled.button`
         cursor: default;
         pointer-events: none;
     }
+    ${styledMedia.lessThan("sm")`
+        padding: 10px 16px;
+        min-height: 44px;
+    `}
 `;
 
 /* ─── Mode Toggle (Pill) ──────────────────────────────── */
@@ -320,4 +352,8 @@ export const ModeBtn = styled.button`
     &:hover {
         color: ${getModeBtnHoverColor};
     }
+    ${styledMedia.lessThan("sm")`
+        padding: 8px 16px;
+        min-height: 36px;
+    `}
 `;

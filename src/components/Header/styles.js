@@ -98,7 +98,14 @@ export const PaletteTrigger = muiStyled("button")(({ theme }) => {
 
         [theme.breakpoints.down("sm")]: {
             minWidth: 40,
-            padding: "6px 8px"
+            width: "auto",
+            padding: "6px 8px",
+            "&:hover": {
+                width: "auto"
+            },
+            "&:focus-visible": {
+                width: "auto"
+            }
         }
     };
 });
