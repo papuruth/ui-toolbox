@@ -121,7 +121,7 @@ function App() {
                         theme="colored"
                         closeButton={false}
                     />
-                    {!isLatestVersion && process.env.NODE_ENV === "production" && <UpdateBanner onUpdate={emptyCacheStorage} />}
+                    {!isLatestVersion && process.env.NODE_ENV === "production" && <UpdateBanner onUpdate={() => emptyCacheStorage()} />}
                 </StyleSheetManager>
             </Provider>
         </ColorModeContext.Provider>
