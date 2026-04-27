@@ -17,19 +17,27 @@ const GlobalStyle = createGlobalStyle`
     --bg-page: #f5f5f5;
     --bg-surface: #ffffff;
     --bg-card: #ffffff;
+    --bg-input: #f0f2f5;
     --text-primary: rgba(0, 0, 0, 0.87);
     --text-secondary: rgba(0, 0, 0, 0.54);
     --border-color: rgba(0, 0, 0, 0.12);
     --hero-gradient: linear-gradient(135deg, #1f1e29 0%, #22cc99 100%);
+    --radius-panel: 12px;
+    --radius-btn: 6px;
+    --shadow-panel: 0 8px 32px rgba(0, 0, 0, 0.08);
   }
   [data-theme="dark"] {
     --bg-page: #121212;
     --bg-surface: #1e1e2e;
     --bg-card: #252535;
+    --bg-input: #121212;
     --text-primary: rgba(255, 255, 255, 0.87);
     --text-secondary: rgba(255, 255, 255, 0.6);
     --border-color: rgba(255, 255, 255, 0.12);
     --hero-gradient: linear-gradient(135deg, #0d0c14 0%, #1a9970 100%);
+    --radius-panel: 12px;
+    --radius-btn: 6px;
+    --shadow-panel: 0 8px 32px rgba(0, 0, 0, 0.18);
   }
 
   /* Default */
@@ -46,7 +54,8 @@ const GlobalStyle = createGlobalStyle`
     overflow-x: hidden;
   }
   body, input, textarea {
-    font-family: 'Ubuntu', sans-serif !important;
+    font-family: 'Inter', sans-serif !important;
+    line-height: 1.5;
   }
   a, button {
     outline: none;

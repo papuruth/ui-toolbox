@@ -72,7 +72,7 @@ export const PaletteTrigger = muiStyled("button")(({ theme }) => {
         borderRadius: "10px",
         cursor: "pointer",
         color: isDark ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.95)",
-        fontFamily: "'Ubuntu', sans-serif",
+        fontFamily: "'Inter', sans-serif",
         fontSize: "0.82rem",
         transition: "background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease, width 0.2s ease",
         outline: "none",

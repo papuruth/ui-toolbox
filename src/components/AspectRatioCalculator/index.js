@@ -1,50 +1,75 @@
-import { ContentCopy, Delete, Settings } from "@mui/icons-material";
-import { Button, IconButton, TextField, Tooltip, Typography } from "@mui/material";
+import { ContentCopy, Done } from "@mui/icons-material";
+import { Typography } from "@mui/material";
 import ImageDropZone from "components/ImageDropZone";
-import { StyledBoxCenter, StyledDivider } from "components/Shared/Styled-Components";
 import localization from "localization";
 import React, { useCallback, useState } from "react";
 import { getDataUrl, getImageAspectRatio } from "utils/helperFunctions";
 import toast from "utils/toast";
 import topLoader from "utils/topLoader";
-import { StyledContainer } from "./styles";
+import {
+    ActionBar,
+    ActionBtn,
+    ActionBtnGroup,
+    AspectDisplay,
+    AspectRatioLabel,
+    DimInput,
+    DimInputsRow,
+    DimSeparator,
+    DropWrap,
+    EmptyState,
+    MetaText,
+    Panel,
+    PanelHeader,
+    PanelLabel,
+    PresetBtn,
+    PresetLabel,
+    PresetsRow,
+    PresetsSection,
+    ToolLayout
+} from "./styles";
 
 const {
     aspectRatioCalculator: L,
-    common: { copyToCP, copiedToCP, maxImageSizeText }
+    common: { maxImageSizeText }
 } = localization;
 
-export default function AspectRatioCalculator() {
-    const [imageWidth, setImageWidth] = useState(0);
-    const [imageHeight, setImageHeight] = useState(0);
-    const [aspectRatio, setAspectRatio] = useState(null);
-    const [copyTooltip, setCopyTooltip] = useState(copyToCP);
+const PRESETS = [
+    { label: "16:9", w: 1920, h: 1080 },
+    { label: "4:3", w: 1600, h: 1200 },
+    { label: "1:1", w: 1000, h: 1000 },
+    { label: "21:9", w: 2560, h: 1080 }
+];
 
-    const handleSelectedFiles = useCallback((acceptedFiles) => {
-        const loaderId = Date.now();
-        try {
-            acceptedFiles.forEach(async (file) => {
-                if (Math.floor(file.size / 1024 / 1024) > 5) {
-                    toast.error(maxImageSizeText);
-                    return;
-                }
-                topLoader.show(true, loaderId);
-                const result = await getDataUrl(file);
-                if (result) {
-                    const imageMeta = await getImageMeta(result);
-                    if (imageMeta) {
-                        const [ratioInWidth, ratioInHeight] = getImageAspectRatio(imageMeta.width, imageMeta.height);
-                        setAspectRatio(`${ratioInWidth}:${ratioInHeight}`);
-                        setImageWidth(imageMeta.width);
-                        setImageHeight(imageMeta.height);
-                    }
-                }
-                topLoader.hide(true, loaderId);
-            });
-        } catch (error) {
-            console.log("Image Load Error", error);
-            topLoader.hide(true, loaderId);
-        }
+function computeRatio(w, h) {
+    const nw = Number(w);
+    const nh = Number(h);
+    if (!nw || !nh) return null;
+    const [rw, rh] = getImageAspectRatio(nw, nh);
+    return `${rw}:${rh}`;
+}
+
+export default function AspectRatioCalculator() {
+    const [imageWidth, setImageWidth] = useState("");
+    const [imageHeight, setImageHeight] = useState("");
+    const [aspectRatio, setAspectRatio] = useState(null);
+    const [copied, setCopied] = useState(false);
+
+    const handleWidthChange = (e) => {
+        const val = e.target.value;
+        setImageWidth(val);
+        setAspectRatio(computeRatio(val, imageHeight));
+    };
+
+    const handleHeightChange = (e) => {
+        const val = e.target.value;
+        setImageHeight(val);
+        setAspectRatio(computeRatio(imageWidth, val));
+    };
+
+    const applyPreset = useCallback((preset) => {
+        setImageWidth(String(preset.w));
+        setImageHeight(String(preset.h));
+        setAspectRatio(computeRatio(preset.w, preset.h));
     }, []);
 
     const getImageMeta = async (dataUrl) => {
@@ -52,100 +77,131 @@ export default function AspectRatioCalculator() {
             const image = new Image();
             image.src = dataUrl;
             await image.decode();
-            const { width, height } = image;
-            return { width, height };
+            return { width: image.width, height: image.height };
         } catch (error) {
             toast.error("Error decoding image.");
             return null;
         }
     };
 
-    const handleCopyToClipBoard = useCallback(() => {
-        if (window && window.navigator.clipboard) {
+    const handleSelectedFiles = useCallback(
+        (acceptedFiles) => {
+            const loaderId = Date.now();
+            try {
+                acceptedFiles.forEach(async (file) => {
+                    if (Math.floor(file.size / 1024 / 1024) > 5) {
+                        toast.error(maxImageSizeText);
+                        return;
+                    }
+                    topLoader.show(true, loaderId);
+                    const result = await getDataUrl(file);
+                    if (result) {
+                        const imageMeta = await getImageMeta(result);
+                        if (imageMeta) {
+                            setImageWidth(String(imageMeta.width));
+                            setImageHeight(String(imageMeta.height));
+                            setAspectRatio(computeRatio(imageMeta.width, imageMeta.height));
+                        }
+                    }
+                    topLoader.hide(true, loaderId);
+                });
+            } catch (error) {
+                console.log("Image Load Error", error);
+                topLoader.hide(true, loaderId);
+            }
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        []
+    );
+
+    const handleCopy = useCallback(() => {
+        if (!aspectRatio) return;
+        if (window?.navigator?.clipboard) {
             window.navigator.clipboard.writeText(aspectRatio).then(() => {
-                setCopyTooltip(copiedToCP);
-                setTimeout(() => {
-                    setCopyTooltip("Copy to clipboard");
-                }, 1000);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 1500);
             });
         }
     }, [aspectRatio]);
 
-    const calculateRatio = useCallback(() => {
-        if (imageWidth && imageHeight) {
-            const [ratioInWidth, ratioInHeight] = getImageAspectRatio(imageWidth, imageHeight);
-            setAspectRatio(`${ratioInWidth}:${ratioInHeight}`);
-        }
-    }, [imageWidth, imageHeight]);
+    const handleReset = useCallback(() => {
+        setImageWidth("");
+        setImageHeight("");
+        setAspectRatio(null);
+        setCopied(false);
+    }, []);
+
+    const hasInput = imageWidth || imageHeight;
+    const copyIcon = copied ? <Done sx={{ fontSize: 13 }} /> : <ContentCopy sx={{ fontSize: 13 }} />;
+    const copyLabel = copied ? "Copied!" : "Copy";
 
     return (
-        <StyledContainer>
-            <StyledBoxCenter flexDirection="column" justifyContent="center">
-                <ImageDropZone handleOnDrop={handleSelectedFiles} maxImageSize={4} />
-            </StyledBoxCenter>
-            <StyledBoxCenter flexDirection="column" justifyContent="center" marginTop={4}>
-                <StyledDivider variant="middle" width={300}>
-                    or
-                </StyledDivider>
-            </StyledBoxCenter>
-            <StyledBoxCenter flexDirection="column" justifyContent="center" marginTop={4}>
-                <Typography variant="h6" fontWeight={500}>
-                    {L.imageDimensionsLabel}
-                </Typography>
-                <StyledBoxCenter
-                    justifyContent="center"
-                    marginTop={2}
-                    sx={{
-                        "& .MuiTextField-root": { m: 1, width: "15ch" }
-                    }}
-                >
-                    <TextField
-                        label={L.imageWidthLabel}
-                        type="number"
-                        id="image-width"
-                        value={imageWidth}
-                        onChange={(e) => setImageWidth(Number(e.currentTarget.value))}
-                        variant="outlined"
-                    />
-                    <TextField
-                        label={L.imageHeightLabel}
-                        type="number"
-                        id="image-width"
-                        value={imageHeight}
-                        onChange={(e) => setImageHeight(Number(e.currentTarget.value))}
-                        variant="outlined"
-                    />
-                    <Button variant="outlined" endIcon={<Settings />} onClick={calculateRatio} disabled={!imageWidth || !imageHeight}>
-                        {L.calculateBtn}
-                    </Button>
-                </StyledBoxCenter>
-            </StyledBoxCenter>
-            {aspectRatio ? (
-                <StyledBoxCenter justifyContent="center" marginTop={4}>
-                    <Typography variant="h6" fontWeight={500}>
-                        {L.aspectRatioLabel}
-                    </Typography>
-                    <Typography variant="h6" fontWeight={500} marginLeft={2} color="blueviolet">
-                        {aspectRatio}
-                    </Typography>
-                    <Tooltip title={copyTooltip}>
-                        <IconButton sx={{ ml: 2 }} onClick={handleCopyToClipBoard}>
-                            <ContentCopy color="primary" />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title={L.resetTooltip}>
-                        <IconButton
-                            onClick={() => {
-                                setImageWidth(0);
-                                setImageHeight(0);
-                                setAspectRatio(null);
-                            }}
-                        >
-                            <Delete color="error" />
-                        </IconButton>
-                    </Tooltip>
-                </StyledBoxCenter>
-            ) : null}
-        </StyledContainer>
+        <ToolLayout>
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>{L.imageDimensionsLabel}</PanelLabel>
+                </PanelHeader>
+                <DropWrap>
+                    <ImageDropZone handleOnDrop={handleSelectedFiles} maxImageSize={4} />
+                </DropWrap>
+                <DimInputsRow>
+                    <DimInput type="number" placeholder="Width (px)" value={imageWidth} onChange={handleWidthChange} min={1} />
+                    <DimSeparator>×</DimSeparator>
+                    <DimInput type="number" placeholder="Height (px)" value={imageHeight} onChange={handleHeightChange} min={1} />
+                </DimInputsRow>
+                <PresetsSection>
+                    <PresetLabel>Presets</PresetLabel>
+                    <PresetsRow>
+                        {PRESETS.map((p) => (
+                            <PresetBtn key={p.label} onClick={() => applyPreset(p)}>
+                                {p.label}
+                            </PresetBtn>
+                        ))}
+                    </PresetsRow>
+                </PresetsSection>
+                <ActionBar>
+                    <ActionBtn $danger onClick={handleReset} disabled={!hasInput}>
+                        Reset
+                    </ActionBtn>
+                </ActionBar>
+            </Panel>
+
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>{L.aspectRatioLabel}</PanelLabel>
+                    {imageWidth && imageHeight && (
+                        <MetaText>
+                            {imageWidth}×{imageHeight}px
+                        </MetaText>
+                    )}
+                </PanelHeader>
+                <AspectDisplay>
+                    {aspectRatio ? (
+                        <>
+                            <AspectRatioLabel>{aspectRatio}</AspectRatioLabel>
+                            <Typography
+                                variant="body2"
+                                sx={{ fontSize: "12px", color: "var(--text-secondary)", mt: 1, fontFamily: "Inter, sans-serif" }}
+                            >
+                                Simplified ratio
+                            </Typography>
+                        </>
+                    ) : (
+                        <EmptyState>
+                            <Typography variant="body2" sx={{ fontSize: "13px" }}>
+                                Enter dimensions or upload an image
+                            </Typography>
+                        </EmptyState>
+                    )}
+                </AspectDisplay>
+                <ActionBar>
+                    <ActionBtnGroup>
+                        <ActionBtn $success={copied} onClick={handleCopy} disabled={!aspectRatio}>
+                            {copyIcon} {copyLabel}
+                        </ActionBtn>
+                    </ActionBtnGroup>
+                </ActionBar>
+            </Panel>
+        </ToolLayout>
     );
 }

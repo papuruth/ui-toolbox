@@ -127,7 +127,7 @@ export const HeroInputField = styled.input`
     outline: none;
     font-size: 0.92rem;
     color: #e2e8f0;
-    font-family: "Ubuntu", sans-serif;
+    font-family: "Inter", sans-serif;
     min-width: 0;
 
     &::placeholder {
@@ -256,7 +256,7 @@ export const HeroCTAPrimary = styled.button`
     color: #0f172a;
     font-weight: 700;
     font-size: 0.92rem;
-    font-family: "Ubuntu", sans-serif;
+    font-family: "Inter", sans-serif;
     cursor: pointer;
     transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
 
@@ -278,7 +278,7 @@ export const HeroCTASecondary = styled.button`
     color: #cbd5e1;
     font-weight: 600;
     font-size: 0.92rem;
-    font-family: "Ubuntu", sans-serif;
+    font-family: "Inter", sans-serif;
     cursor: pointer;
     transition: background 0.18s ease, border-color 0.18s ease;
 

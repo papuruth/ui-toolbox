@@ -79,7 +79,7 @@ export const SearchInput = styled.input`
     flex: 1;
     padding: 18px 0;
     font-size: 1rem;
-    font-family: "Ubuntu", sans-serif;
+    font-family: "Inter", sans-serif;
     background: transparent;
     border: none;
     color: ${P.text};

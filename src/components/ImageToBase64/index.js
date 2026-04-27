@@ -1,25 +1,47 @@
-import { CloudDownload, ContentCopy, Image } from "@mui/icons-material";
-import { Box, IconButton, TextField, Toolbar, Tooltip } from "@mui/material";
+import { Check, CloudDownload, ContentCopy, Image as ImageIcon } from "@mui/icons-material";
+import { Typography } from "@mui/material";
 import ImageDropZone from "components/ImageDropZone";
 import React, { useCallback, useState } from "react";
-import colors from "styles/colors";
+import localization from "localization";
 import toast from "utils/toast";
-import { StyledBoxCenter, StyledBoxContainer, StyledImagePreviewContainer, StyledImageRenderer } from "components/Shared/Styled-Components";
 import { downloadFile, getDataUrl } from "utils/helperFunctions";
 import topLoader from "utils/topLoader";
-import localization from "localization";
-import { StyledContainer, StyledText } from "./styles";
+import {
+    ActionBar,
+    ActionBtn,
+    ActionBtnGroup,
+    CodeArea,
+    DropWrap,
+    EmptyState,
+    ImagePreviewArea,
+    MetaText,
+    Panel,
+    PanelHeader,
+    PanelLabel,
+    PreviewImg,
+    TabBtn,
+    TabStrip,
+    ToolLayout
+} from "./styles";
+
+const TABS = [
+    { key: "base64", label: "Base64" },
+    { key: "html", label: "HTML" },
+    { key: "css", label: "CSS" }
+];
 
 export default function ImageToBase64() {
     const {
-        common: { maxImageSizeText, imageLoadError, copiedToCP, copyToCP, downloadLabel },
+        common: { maxImageSizeText, imageLoadError, downloadLabel },
         imageToBase64: { imagePreviewText, htmlImgLabel, cssBGSourceLabel, base64StringsLabel }
     } = localization;
+
     const [imageBase64, setImageBase64] = useState("");
     const [htmlImageCode, setHTMLImageCode] = useState("");
     const [cssBgImage, setCSSBGImage] = useState("");
-    const [copyTooltip, setCopyTooltip] = useState(copyToCP);
     const [filename, setFilename] = useState("");
+    const [activeTab, setActiveTab] = useState("base64");
+    const [copiedTab, setCopiedTab] = useState(null);
 
     const handleSelectedFiles = useCallback(
         (acceptedFiles) => {
@@ -31,16 +53,13 @@ export default function ImageToBase64() {
                         return;
                     }
                     topLoader.show(true, loaderId);
-                    let truncateName = file.name.split(".");
-                    truncateName.pop();
-                    truncateName = truncateName.join(".");
-                    setFilename(truncateName);
-                    const imageDataUrl = await getDataUrl(file);
-                    setImageBase64(imageDataUrl);
-                    const htmlIMG = `<img src='${imageDataUrl}' />`;
-                    setHTMLImageCode(htmlIMG);
-                    const cssBGCode = `background-image: url(${imageDataUrl})`;
-                    setCSSBGImage(cssBGCode);
+                    const name = file.name.split(".");
+                    name.pop();
+                    setFilename(name.join("."));
+                    const dataUrl = await getDataUrl(file);
+                    setImageBase64(dataUrl);
+                    setHTMLImageCode(`<img src='${dataUrl}' />`);
+                    setCSSBGImage(`background-image: url(${dataUrl})`);
                     topLoader.hide(true, loaderId);
                 });
             } catch (error) {
@@ -51,152 +70,122 @@ export default function ImageToBase64() {
         [maxImageSizeText, imageLoadError]
     );
 
-    const handleDownload = useCallback(
-        (type) => {
-            let downloadUrl = `data:text/plain;charset=utf-8,${encodeURIComponent(imageBase64)}`;
-            let downloadFilename = `${filename}.txt`;
-            if (type === "html") {
-                downloadUrl = `data:text/html;charset=utf-8,${encodeURIComponent(htmlImageCode)}`;
-                downloadFilename = `${filename}.html`;
-            } else if (type === "css") {
-                downloadUrl = `data:text/css;charset=utf-8,${encodeURIComponent(cssBgImage)}`;
-                downloadFilename = `${filename}.css`;
-            }
-            downloadFile(downloadUrl, downloadFilename);
-        },
-        [filename, htmlImageCode, imageBase64, cssBgImage]
-    );
+    const getActiveValue = useCallback(() => {
+        if (activeTab === "html") return htmlImageCode;
+        if (activeTab === "css") return cssBgImage;
+        return imageBase64;
+    }, [activeTab, imageBase64, htmlImageCode, cssBgImage]);
 
-    const handleCopyToClipBoard = useCallback(
-        (type) => {
+    const handleCopy = useCallback(
+        (tab) => {
             let data = imageBase64;
-            if (type === "html") {
-                data = htmlImageCode;
-            } else if (type === "css") {
-                data = cssBgImage;
-            }
-            if (window && window.navigator.clipboard) {
+            if (tab === "html") data = htmlImageCode;
+            else if (tab === "css") data = cssBgImage;
+            if (window?.navigator?.clipboard) {
                 window.navigator.clipboard.writeText(data).then(() => {
-                    setCopyTooltip(copiedToCP);
-                    setTimeout(() => {
-                        setCopyTooltip(copyToCP);
-                    }, 1000);
+                    setCopiedTab(tab);
+                    setTimeout(() => setCopiedTab(null), 1500);
                 });
             }
         },
-        [imageBase64, htmlImageCode, cssBgImage, copiedToCP, copyToCP]
+        [imageBase64, htmlImageCode, cssBgImage]
     );
 
+    const handleDownload = useCallback(
+        (tab) => {
+            let value = imageBase64;
+            let ext = "txt";
+            let mime = "text/plain";
+            if (tab === "html") {
+                value = htmlImageCode;
+                ext = "html";
+                mime = "text/html";
+            } else if (tab === "css") {
+                value = cssBgImage;
+                ext = "css";
+                mime = "text/css";
+            }
+            downloadFile(`data:${mime};charset=utf-8,${encodeURIComponent(value)}`, `${filename || "output"}.${ext}`);
+        },
+        [imageBase64, htmlImageCode, cssBgImage, filename]
+    );
+
+    const activeValue = getActiveValue();
+    const getTabLabel = () => {
+        if (activeTab === "html") return htmlImgLabel;
+        if (activeTab === "css") return cssBGSourceLabel;
+        return base64StringsLabel;
+    };
+    const tabLabel = getTabLabel();
+
     return (
-        <>
-            <ImageDropZone handleOnDrop={handleSelectedFiles} />
-            <StyledContainer>
-                <StyledImagePreviewContainer borderRight borderBottom isPadding>
+        <ToolLayout>
+            {/* Left — Source + Preview */}
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>Source Image</PanelLabel>
+                    {filename && <MetaText>{filename}</MetaText>}
+                </PanelHeader>
+
+                <DropWrap>
+                    <ImageDropZone handleOnDrop={handleSelectedFiles} fullWidth />
+                </DropWrap>
+
+                <ImagePreviewArea>
                     {imageBase64 ? (
-                        <StyledImageRenderer src={imageBase64} alt="image-preview" />
+                        <PreviewImg src={imageBase64} alt="preview" />
                     ) : (
-                        <StyledBoxCenter justifyContent="center" flexDirection="column">
-                            <Image fontSize="large" />
-                            <StyledText variant="h6">{imagePreviewText}</StyledText>
-                        </StyledBoxCenter>
+                        <EmptyState>
+                            <ImageIcon sx={{ fontSize: 40 }} />
+                            <Typography variant="body2" sx={{ fontSize: "13px" }}>
+                                {imagePreviewText}
+                            </Typography>
+                        </EmptyState>
                     )}
-                </StyledImagePreviewContainer>
-                <StyledBoxContainer width="50%" padding="20px" display="block !important">
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <StyledText component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
-                            {base64StringsLabel}
-                        </StyledText>
-                        <StyledText component="p" color={colors.secondary} fontWeight={400}>
-                            Size: {imageBase64 ? (imageBase64.length / 1024).toFixed(2) : 0} KB, {imageBase64.length} chars
-                        </StyledText>
-                        {imageBase64.length > 0 ? (
-                            <Toolbar>
-                                <Tooltip title={downloadLabel}>
-                                    <IconButton onClick={() => handleDownload("base64")}>
-                                        <CloudDownload color="primary" />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={copyTooltip}>
-                                    <IconButton onClick={() => handleCopyToClipBoard("base64")}>
-                                        <ContentCopy color="primary" />
-                                    </IconButton>
-                                </Tooltip>
-                            </Toolbar>
-                        ) : null}
-                    </Box>
-                    <TextField
-                        id="image-base64"
-                        placeholder={base64StringsLabel}
-                        multiline
-                        rows={7}
-                        sx={{ width: "100%", mb: 3 }}
-                        value={imageBase64}
-                        inputProps={{ readOnly: true }}
-                    />
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <StyledText component="h5" color={colors.primary} fontWeight={700} flexGrow={1}>
-                            {htmlImgLabel}
-                        </StyledText>
-                        <StyledText component="p" color={colors.secondary} fontWeight={400}>
-                            Size: {imageBase64 ? (imageBase64.length / 1024).toFixed(2) : 0} KB, {htmlImageCode.length} chars
-                        </StyledText>
-                        {imageBase64.length > 0 ? (
-                            <Toolbar>
-                                <Tooltip title={downloadLabel}>
-                                    <IconButton onClick={() => handleDownload("html")}>
-                                        <CloudDownload color="primary" />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={copyTooltip}>
-                                    <IconButton onClick={() => handleCopyToClipBoard("html")}>
-                                        <ContentCopy color="primary" />
-                                    </IconButton>
-                                </Tooltip>
-                            </Toolbar>
-                        ) : null}
-                    </Box>
-                    <TextField
-                        id="html-img"
-                        placeholder={htmlImgLabel}
-                        multiline
-                        rows={7}
-                        sx={{ width: "100%", mb: 3 }}
-                        value={htmlImageCode}
-                        inputProps={{ readOnly: true }}
-                    />
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <StyledText component="h5" color={colors.primary} fontWeight={700} flexGrow={1}>
-                            {cssBGSourceLabel}
-                        </StyledText>
-                        <StyledText component="p" color={colors.secondary} fontWeight={400}>
-                            Size: {imageBase64 ? (imageBase64.length / 1024).toFixed(2) : 0} KB, {cssBgImage.length} chars
-                        </StyledText>
-                        {imageBase64.length > 0 ? (
-                            <Toolbar>
-                                <Tooltip title={downloadLabel}>
-                                    <IconButton onClick={() => handleDownload("css")}>
-                                        <CloudDownload color="primary" />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={copyTooltip}>
-                                    <IconButton onClick={() => handleCopyToClipBoard("css")}>
-                                        <ContentCopy color="primary" />
-                                    </IconButton>
-                                </Tooltip>
-                            </Toolbar>
-                        ) : null}
-                    </Box>
-                    <TextField
-                        id="image-css"
-                        placeholder={cssBGSourceLabel}
-                        multiline
-                        rows={7}
-                        sx={{ width: "100%" }}
-                        value={cssBgImage}
-                        inputProps={{ readOnly: true }}
-                    />
-                </StyledBoxContainer>
-            </StyledContainer>
-        </>
+                </ImagePreviewArea>
+            </Panel>
+
+            {/* Right — Output */}
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>Output</PanelLabel>
+                    {activeValue && (
+                        <MetaText>
+                            {(activeValue.length / 1024).toFixed(1)} KB · {activeValue.length.toLocaleString()} chars
+                        </MetaText>
+                    )}
+                </PanelHeader>
+
+                <TabStrip>
+                    {TABS.map((tab) => (
+                        <TabBtn key={tab.key} $active={activeTab === tab.key} onClick={() => setActiveTab(tab.key)}>
+                            {tab.label}
+                        </TabBtn>
+                    ))}
+                </TabStrip>
+
+                <CodeArea
+                    value={activeValue}
+                    readOnly
+                    placeholder={activeTab === "html" ? "HTML <img /> tag will appear here…" : "Base64 / CSS will appear here…"}
+                />
+
+                {activeValue && (
+                    <ActionBar>
+                        <MetaText sx={{ opacity: "0.6 !important" }}>{tabLabel}</MetaText>
+                        <ActionBtnGroup>
+                            <ActionBtn $success={copiedTab === activeTab} onClick={() => handleCopy(activeTab)}>
+                                {copiedTab === activeTab ? <Check style={{ fontSize: 12 }} /> : <ContentCopy style={{ fontSize: 12 }} />}
+                                {copiedTab === activeTab ? "Copied" : "Copy"}
+                            </ActionBtn>
+                            <ActionBtn onClick={() => handleDownload(activeTab)}>
+                                <CloudDownload style={{ fontSize: 12 }} />
+                                {downloadLabel}
+                            </ActionBtn>
+                        </ActionBtnGroup>
+                    </ActionBar>
+                )}
+            </Panel>
+        </ToolLayout>
     );
 }

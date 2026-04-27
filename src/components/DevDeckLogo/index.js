@@ -87,7 +87,7 @@ export default function DevDeckLogo({ compact = false }) {
 
                 {/* Wordmark — hidden in compact mode */}
                 {!compact && (
-                    <text x="52" y="32" fill="#f9fafb" fontSize="22" fontWeight="700" fontFamily="Ubuntu, Inter, sans-serif" letterSpacing="-0.3">
+                    <text x="52" y="32" fill="#f9fafb" fontSize="22" fontWeight="700" fontFamily="Inter, sans-serif" letterSpacing="-0.3">
                         DevDeck
                     </text>
                 )}

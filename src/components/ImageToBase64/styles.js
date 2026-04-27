@@ -1,24 +1,24 @@
-import { Box, Typography } from "@mui/material";
 import styled from "styled-components";
-import { styledMedia } from "styles/global";
+import { PreviewArea } from "components/Shared/ToolKit";
 
-export const StyledContainer = styled(Box)`
-    display: flex;
-    width: 100%;
-    border: 1px solid var(--border-color);
-    border-radius: 2px;
-    margin-top: 24px;
-    ${styledMedia.lessThan("md")`
-        flex-direction: column;
-    `}
-`;
+export {
+    ToolLayout,
+    Panel,
+    PanelHeader,
+    PanelLabel,
+    MetaText,
+    DropWrap,
+    EmptyState,
+    TabStrip,
+    TabBtn,
+    CodeArea,
+    ActionBar,
+    ActionBtnGroup,
+    ActionBtn,
+    PreviewImg
+} from "components/Shared/ToolKit";
 
-export const StyledText = styled(Typography)`
-    font-size: ${(props) => (props.fontSize ? `${props.fontSize}px` : "")};
-    ${styledMedia.lessThan("sm")`
-      font-size: 1rem;
-    `}
-    ${styledMedia.lessThan("xs")`
-      font-size: 14px;
-    `}
+export const ImagePreviewArea = styled(PreviewArea)`
+    min-height: 220px;
+    padding: 20px;
 `;

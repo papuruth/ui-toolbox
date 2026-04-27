@@ -1,21 +1,64 @@
-import { BrokenImage, CloudDownload, ContentCopy, Delete, Image as ImageIcon } from "@mui/icons-material";
-import { Box, Button, IconButton, TextField, Toolbar, Tooltip, Typography } from "@mui/material";
-import { StyledImagePreviewContainer, StyledImageRenderer } from "components/Shared/Styled-Components";
+import { BrokenImage, Check, CloudDownload, ContentCopy, DeleteOutline, Image as ImageIcon } from "@mui/icons-material";
+import { Typography } from "@mui/material";
 import localization from "localization";
 import React, { useCallback, useState } from "react";
-import colors from "styles/colors";
 import { downloadFile } from "utils/helperFunctions";
 import toast from "utils/toast";
+import {
+    ActionBar,
+    ActionBtn,
+    ActionBtnGroup,
+    EmptyState,
+    ErrorState,
+    InputArea,
+    MetaText,
+    Panel,
+    PanelHeader,
+    PanelLabel,
+    PreviewArea,
+    PreviewImg,
+    ToolLayout
+} from "./styles";
 
 export default function Base64ToImage() {
     const {
-        common: { imageLoadError, copiedToCP, copyToCP, downloadImageLabel },
+        common: { imageLoadError, downloadImageLabel },
         imageToBase64: { imagePreviewText },
         base64ToImage: { brokenImageLabel, enterBase64Label, base64StringLengthError }
     } = localization;
+
     const [imageBase64, setImageBase64] = useState("");
     const [imageError, setImageError] = useState(false);
-    const [copyTooltip, setCopyTooltip] = useState(copyToCP);
+    const [copied, setCopied] = useState(false);
+
+    const handleChange = useCallback(
+        (e) => {
+            const val = e?.target?.value || "";
+            if (val.length > 2097152) {
+                toast.error(base64StringLengthError);
+                setImageBase64("");
+                setImageError(false);
+            } else {
+                setImageBase64(val);
+                setImageError(false);
+            }
+        },
+        [base64StringLengthError]
+    );
+
+    const handleClear = useCallback(() => {
+        setImageBase64("");
+        setImageError(false);
+    }, []);
+
+    const handleCopy = useCallback(() => {
+        if (window?.navigator?.clipboard) {
+            window.navigator.clipboard.writeText(imageBase64).then(() => {
+                setCopied(true);
+                setTimeout(() => setCopied(false), 1500);
+            });
+        }
+    }, [imageBase64]);
 
     const handleDownload = useCallback(async () => {
         try {
@@ -39,94 +82,91 @@ export default function Base64ToImage() {
         }
     }, [imageBase64, imageLoadError]);
 
-    const loadPreviewImage = () => {
+    const sizeKB = imageBase64 ? (imageBase64.length / 1024).toFixed(1) : "0";
+
+    const renderPreview = () => {
         if (imageBase64 && !imageError) {
-            return <StyledImageRenderer src={imageBase64} onError={() => setImageError(true)} onLoad={() => setImageError(false)} />;
+            return <PreviewImg src={imageBase64} alt="preview" onError={() => setImageError(true)} onLoad={() => setImageError(false)} />;
         }
         if (imageError) {
             return (
-                <>
-                    <BrokenImage fontSize="large" />
-                    <Typography component="div">{brokenImageLabel}</Typography>
-                </>
+                <ErrorState>
+                    <BrokenImage sx={{ fontSize: 40 }} />
+                    <Typography variant="body2" sx={{ fontSize: "13px" }}>
+                        {brokenImageLabel}
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontSize: "11px", opacity: 0.7 }}>
+                        Check that the Base64 string is valid
+                    </Typography>
+                </ErrorState>
             );
         }
         return (
-            <>
-                <ImageIcon fontSize="large" />
-                <Typography variant="h6">{imagePreviewText}</Typography>
-            </>
+            <EmptyState>
+                <ImageIcon sx={{ fontSize: 40 }} />
+                <Typography variant="body2" sx={{ fontSize: "13px" }}>
+                    {imagePreviewText}
+                </Typography>
+            </EmptyState>
         );
     };
 
-    const handleCopyToClipBoard = useCallback(() => {
-        if (window && window.navigator.clipboard) {
-            window.navigator.clipboard.writeText(imageBase64).then(() => {
-                setCopyTooltip(copiedToCP);
-                setTimeout(() => {
-                    setCopyTooltip(copyToCP);
-                }, 1000);
-            });
-        }
-    }, [imageBase64, copiedToCP, copyToCP]);
-
     return (
-        <>
-            <Box sx={{ display: "flex", alignItems: "center", width: { xs: "100%", sm: "100%", md: "50%" }, minHeight: 64 }}>
-                <Typography component="p" color={colors.primary} fontWeight={700} flexGrow={1}>
-                    {enterBase64Label}
-                </Typography>
-                <Typography component="p" color={colors.secondary} fontWeight={400}>
-                    Size: {imageBase64 ? (imageBase64.length / 1024).toFixed(2) : 0} KB, {imageBase64.length} chars
-                </Typography>
-                {imageBase64.length > 0 ? (
-                    <Toolbar>
-                        <Tooltip title="Clear">
-                            <IconButton
-                                onClick={() => {
-                                    setImageBase64("");
-                                    setImageError(false);
-                                }}
-                            >
-                                <Delete color="error" />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title={copyTooltip}>
-                            <IconButton onClick={handleCopyToClipBoard}>
-                                <ContentCopy color="primary" />
-                            </IconButton>
-                        </Tooltip>
-                    </Toolbar>
-                ) : null}
-            </Box>
-            <TextField
-                id="image-base64"
-                placeholder="Base64 String"
-                multiline
-                rows={10}
-                sx={{ width: { xs: "100%", sm: "100%", md: "50%" }, mb: 3 }}
-                value={imageBase64}
-                onChange={(event) => {
-                    if (event?.target?.value?.length > 2097152) {
-                        toast.error(base64StringLengthError);
-                        setImageBase64("");
-                        setImageError(false);
-                    } else {
-                        setImageBase64(event.target.value);
-                        setImageError(false);
-                    }
-                }}
-            />
-            <StyledImagePreviewContainer>
-                <Box sx={{ border: "1px solid var(--border-color)", borderRadius: 2, p: 5, width: "100%" }}>{loadPreviewImage()} </Box>
-            </StyledImagePreviewContainer>
-            {imageBase64.length > 0 && !imageError ? (
-                <Toolbar>
-                    <Button onClick={handleDownload} variant="outlined" endIcon={<CloudDownload color="primary" />}>
-                        {downloadImageLabel}
-                    </Button>
-                </Toolbar>
-            ) : null}
-        </>
+        <ToolLayout>
+            {/* Left — Input */}
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>{enterBase64Label}</PanelLabel>
+                    {imageBase64 && (
+                        <MetaText>
+                            {sizeKB} KB · {imageBase64.length.toLocaleString()} chars
+                        </MetaText>
+                    )}
+                </PanelHeader>
+
+                <InputArea
+                    value={imageBase64}
+                    onChange={handleChange}
+                    placeholder="Paste your Base64 string here…&#10;&#10;Example: data:image/png;base64,iVBOR..."
+                    spellCheck={false}
+                />
+
+                {imageBase64 && (
+                    <ActionBar>
+                        <MetaText sx={{ opacity: "0.5 !important" }}>Base64 Input</MetaText>
+                        <ActionBtnGroup>
+                            <ActionBtn $success={copied} onClick={handleCopy}>
+                                {copied ? <Check style={{ fontSize: 12 }} /> : <ContentCopy style={{ fontSize: 12 }} />}
+                                {copied ? "Copied" : "Copy"}
+                            </ActionBtn>
+                            <ActionBtn $danger onClick={handleClear}>
+                                <DeleteOutline style={{ fontSize: 12 }} />
+                                Clear
+                            </ActionBtn>
+                        </ActionBtnGroup>
+                    </ActionBar>
+                )}
+            </Panel>
+
+            {/* Right — Preview */}
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>Preview</PanelLabel>
+                    {imageBase64 && !imageError && <MetaText>{imageBase64.split(";")[0]?.split(":")[1] || "image"}</MetaText>}
+                </PanelHeader>
+
+                <PreviewArea>{renderPreview()}</PreviewArea>
+
+                {imageBase64 && !imageError && (
+                    <ActionBar>
+                        <MetaText sx={{ opacity: "0.5 !important" }}>Decoded Image</MetaText>
+                        <ActionBtn onClick={handleDownload}>
+                            <CloudDownload style={{ fontSize: 12 }} />
+                            {downloadImageLabel}
+                        </ActionBtn>
+                    </ActionBar>
+                )}
+            </Panel>
+        </ToolLayout>
     );
 }

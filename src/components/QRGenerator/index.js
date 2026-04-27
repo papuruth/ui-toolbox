@@ -1,103 +1,118 @@
-import { CloudDownload, Delete, QrCode } from "@mui/icons-material";
-import { Box, Button, IconButton, Slider, TextField, Toolbar, Tooltip, Typography } from "@mui/material";
+import { CloudDownload, QrCode } from "@mui/icons-material";
+import { Typography } from "@mui/material";
 import ImageDropZone from "components/ImageDropZone";
-import { StyledBoxCenter, StyledImagePreviewContainer, StyledImageRenderer, StyledPaperCenter } from "components/Shared/Styled-Components";
-import StyledSwitch from "components/Shared/StyledSwitch";
 import localization from "localization";
 import QRCode from "qrcode";
 import React, { useCallback, useEffect, useState } from "react";
-import colors from "styles/colors";
 import { applyShadowToQRImage, downloadFile, getDataUrl } from "utils/helperFunctions";
 import toast from "utils/toast";
 import topLoader from "utils/topLoader";
+import {
+    ActionBar,
+    ActionBtn,
+    ActionBtnGroup,
+    ColorInput,
+    ControlLabel,
+    ControlRow,
+    ControlValue,
+    ControlsSection,
+    EmptyState,
+    MetaText,
+    ModeBtn,
+    ModeToggle,
+    Panel,
+    PanelHeader,
+    PanelLabel,
+    QrInput,
+    QrInputWrap,
+    QrPreviewArea,
+    QrPreviewImg,
+    SliderWrap,
+    ToolLayout
+} from "./styles";
+
+const DEFAULT_SIZE = 300;
+const DEFAULT_FG = "#000000";
+const DEFAULT_BG = "#ffffff";
 
 export default function QRGenerator() {
-    const [qrImage, setQRImage] = useState("");
-    const [qrData, setQRData] = useState("");
-    const [width, setWidth] = useState(0);
-    const [addLogoSwitch, setAddLogoSwitch] = useState(false);
-    const [qrImageWithLogo, setQRImageWithLogo] = useState("");
+    const [qrImage, setQrImage] = useState("");
+    const [qrData, setQrData] = useState("");
+    const [size, setSize] = useState(DEFAULT_SIZE);
+    const [fgColor, setFgColor] = useState(DEFAULT_FG);
+    const [bgColor, setBgColor] = useState(DEFAULT_BG);
+    const [addLogo, setAddLogo] = useState(false);
     const [logoSrc, setLogoSrc] = useState("");
+    const [logoQr, setLogoQr] = useState("");
 
     const {
         appTitle,
-        qrGenerator: { qrPreviewLabel, maxLogoSizeLabel, maxLogoSizePXLabel, enterQRDataLabel, qrWidthLabel },
-        common: { downloadQRLabel }
+        qrGenerator: { qrPreviewLabel, maxLogoSizeLabel, maxLogoSizePXLabel }
     } = localization;
 
-    const generateQRCode = useCallback(
-        (data, logo) => {
-            QRCode.toDataURL(data, { errorCorrectionLevel: "H", width: width > 0 ? width : 300, margin: 0 }).then(async (data) => {
-                const qrImageWithShadow = await applyShadowToQRImage(data, logo);
-                if (logo) {
-                    setQRImageWithLogo(qrImageWithShadow);
-                    setLogoSrc(logo);
-                } else {
-                    setQRImage(qrImageWithShadow);
-                }
+    const generateQR = useCallback(async (data, logo, currentSize, fg, bg) => {
+        if (!data) {
+            setQrImage("");
+            setLogoQr("");
+            return;
+        }
+        try {
+            const dataUrl = await QRCode.toDataURL(data, {
+                errorCorrectionLevel: "H",
+                width: currentSize,
+                margin: 1,
+                color: { dark: fg, light: bg }
             });
-        },
-        [width]
-    );
-
-    const handleDownload = useCallback(() => {
-        const fileName = `${appTitle}-QR_code-${Date.now()}.png`;
-        if (qrImage && !qrImageWithLogo) {
-            downloadFile(qrImage, fileName);
-        } else if (qrImageWithLogo) {
-            downloadFile(qrImageWithLogo, fileName);
-        }
-    }, [qrImage, qrImageWithLogo, appTitle]);
-
-    const loadQRPreview = useCallback(() => {
-        if (qrImage && (!addLogoSwitch || !qrImageWithLogo)) {
-            return <StyledImageRenderer src={qrImage} alt="qr-preview" width={width} sameDimensions />;
-        }
-        if (addLogoSwitch && qrImageWithLogo) {
-            return <StyledImageRenderer src={qrImageWithLogo} alt="qr-preview" width={width} sameDimensions />;
-        }
-        return (
-            <StyledPaperCenter $isAspectRatio height={350} width={350}>
-                <QrCode fontSize="large" />
-                <Typography variant="h6">{qrPreviewLabel}</Typography>
-            </StyledPaperCenter>
-        );
-    }, [qrImage, addLogoSwitch, qrImageWithLogo, width, qrPreviewLabel]);
-
-    const handleQRInputChange = useCallback(
-        (event) => {
-            setQRData(event.target.value);
-            if (!event.target.value) {
-                setWidth(0);
+            const withShadow = await applyShadowToQRImage(dataUrl, logo);
+            if (logo) {
+                setLogoQr(withShadow);
+            } else {
+                setQrImage(withShadow);
+                setLogoQr("");
             }
-            if (event.target.value) {
-                if (!qrData) {
-                    setWidth(300);
-                }
-                generateQRCode(event.target.value, logoSrc);
-            }
-        },
-        [generateQRCode, logoSrc, qrData]
-    );
+        } catch (err) {
+            console.error("QR generation error", err.message);
+        }
+    }, []);
 
     useEffect(() => {
-        if ((qrImage || (qrImageWithLogo && logoSrc)) && width > 0 && qrData) {
-            generateQRCode(qrData, logoSrc);
+        generateQR(qrData, logoSrc, size, fgColor, bgColor);
+    }, [qrData, logoSrc, size, fgColor, bgColor, generateQR]);
+
+    const handleDownloadPNG = useCallback(() => {
+        const src = logoQr || qrImage;
+        if (src) {
+            downloadFile(src, `${appTitle}-QR-${Date.now()}.png`);
         }
-    }, [qrImage, width, generateQRCode, qrData, logoSrc, qrImageWithLogo]);
+    }, [qrImage, logoQr, appTitle]);
 
-    const handleQRWidthChange = ({ target: { value } }) => {
-        const qrWidth = Number(value);
-        if (qrWidth) {
-            setWidth(qrWidth);
-        } else {
-            setWidth(0);
-        }
-    };
+    const handleDownloadSVG = useCallback(() => {
+        if (!qrData) return;
+        QRCode.toString(qrData, {
+            type: "svg",
+            width: size,
+            margin: 1,
+            color: { dark: fgColor, light: bgColor }
+        })
+            .then((svgString) => {
+                const blob = new Blob([svgString], { type: "image/svg+xml" });
+                downloadFile(URL.createObjectURL(blob), `${appTitle}-QR-${Date.now()}.svg`);
+            })
+            .catch((err) => console.error("SVG generation error", err.message));
+    }, [qrData, size, fgColor, bgColor, appTitle]);
 
-    const valuetext = (value) => `QR idth ${value}`;
+    const handleClear = useCallback(() => {
+        setQrData("");
+        setQrImage("");
+        setSize(DEFAULT_SIZE);
+        setFgColor(DEFAULT_FG);
+        setBgColor(DEFAULT_BG);
+        setAddLogo(false);
+        setLogoSrc("");
+        setLogoQr("");
+    }, []);
 
-    const loadImage = async (imgData) => {
+    const loadLogoImage = async (imgData) => {
         try {
             const image = new Image();
             image.src = imgData;
@@ -105,17 +120,15 @@ export default function QRGenerator() {
             return image;
         } catch (error) {
             toast.error("Logo image decode error!");
-            console.log("Logo image decode error", error.message);
             return {};
         }
     };
 
-    const handleSelectedFiles = useCallback(
+    const handleLogoFiles = useCallback(
         (acceptedFiles) => {
             const loaderId = Date.now();
             try {
                 acceptedFiles.forEach(async (file) => {
-                    console.log(file);
                     if (Math.floor(file.size / 1024) > 512) {
                         toast.error(maxLogoSizeLabel);
                         return;
@@ -123,101 +136,119 @@ export default function QRGenerator() {
                     topLoader.show(true, loaderId);
                     const result = await getDataUrl(file);
                     if (result) {
-                        const { width, height } = await loadImage(result);
+                        const { width, height } = await loadLogoImage(result);
                         if (width > 512 && height > 512) {
                             toast.error(maxLogoSizePXLabel);
                         } else if (width > 0 && height > 0) {
-                            generateQRCode(qrData, result);
+                            setLogoSrc(result);
                         }
                     }
                     topLoader.hide(true, loaderId);
                 });
             } catch (error) {
-                console.log("Image Load Error", error);
+                console.log("Logo Load Error", error);
                 topLoader.hide(true, loaderId);
             }
         },
-        [generateQRCode, qrData, maxLogoSizeLabel, maxLogoSizePXLabel]
+        [maxLogoSizeLabel, maxLogoSizePXLabel]
     );
 
+    const disableLogo = useCallback(() => {
+        setAddLogo(false);
+        setLogoSrc("");
+        setLogoQr("");
+    }, []);
+
+    const enableLogo = useCallback(() => {
+        setAddLogo(true);
+    }, []);
+
+    const activeQr = logoQr || qrImage;
+    const hasData = qrData.length > 0;
+
     return (
-        <>
-            <Box sx={{ display: "flex", alignItems: "center", width: "50%", minHeight: 64 }}>
-                <Typography component="p" color={colors.black} fontWeight={700} flexGrow={1}>
-                    {enterQRDataLabel}
-                </Typography>
-                {qrData.length > 0 ? (
-                    <Toolbar>
-                        <Tooltip title="Clear">
-                            <IconButton
-                                onClick={() => {
-                                    setQRData("");
-                                    setQRImage("");
-                                    setWidth(0);
-                                    setAddLogoSwitch(false);
-                                    setQRImageWithLogo("");
-                                    setLogoSrc("");
-                                }}
-                            >
-                                <Delete color="error" />
-                            </IconButton>
-                        </Tooltip>
-                    </Toolbar>
-                ) : null}
-            </Box>
-            <TextField
-                id="qr-data"
-                placeholder="QR data"
-                sx={{ width: "50%", mb: 3 }}
-                value={qrData}
-                onChange={handleQRInputChange}
-                inputProps={{ maxLength: 200 }}
-            />
-            <Toolbar sx={{ width: { xs: "100%", sm: "100%", md: 400 } }}>
-                <Typography id="qr-width-slider" marginRight={2} width={100} fontWeight={500}>
-                    {qrWidthLabel}
-                </Typography>
-                <Slider
-                    aria-label="Width"
-                    value={width}
-                    getAriaValueText={valuetext}
-                    valueLabelDisplay="auto"
-                    step={100}
-                    marks
-                    min={100}
-                    max={1000}
-                    color="secondary"
-                    size="large"
-                    sx={{ width: "100%" }}
-                    onChange={handleQRWidthChange}
-                    disabled={!qrData}
-                />
-            </Toolbar>
-            <StyledBoxCenter width={350} marginTop={2} justifyContent="flex-start" $isLeftRightPadding>
-                <StyledSwitch
-                    label="Add Logo"
-                    checked={!!addLogoSwitch}
-                    onChange={() => {
-                        setAddLogoSwitch(!addLogoSwitch);
-                        setQRImageWithLogo("");
-                        setLogoSrc("");
-                    }}
-                    disabled={!qrImage}
-                />
-            </StyledBoxCenter>
-            {addLogoSwitch ? (
-                <StyledBoxCenter justifyContent="center" marginTop={2}>
-                    <ImageDropZone maxImageSize={512} unit="KB" handleOnDrop={handleSelectedFiles} />
-                </StyledBoxCenter>
-            ) : null}
-            <StyledImagePreviewContainer padding>{loadQRPreview()}</StyledImagePreviewContainer>
-            {qrImage ? (
-                <Toolbar>
-                    <Button onClick={handleDownload} variant="outlined" endIcon={<CloudDownload color="primary" />}>
-                        {downloadQRLabel}
-                    </Button>
-                </Toolbar>
-            ) : null}
-        </>
+        <ToolLayout>
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>QR Data</PanelLabel>
+                    {hasData && <MetaText>{qrData.length} chars</MetaText>}
+                </PanelHeader>
+                <QrInputWrap>
+                    <QrInput
+                        placeholder="Enter URL, text, or any data…"
+                        value={qrData}
+                        onChange={(e) => setQrData(e.target.value)}
+                        maxLength={2000}
+                    />
+                </QrInputWrap>
+                <ControlsSection>
+                    <ControlRow>
+                        <ControlLabel>Size</ControlLabel>
+                        <SliderWrap>
+                            <input type="range" min={100} max={1000} step={50} value={size} onChange={(e) => setSize(Number(e.target.value))} />
+                        </SliderWrap>
+                        <ControlValue>{size}px</ControlValue>
+                    </ControlRow>
+                    <ControlRow>
+                        <ControlLabel>Foreground</ControlLabel>
+                        <ColorInput type="color" value={fgColor} onChange={(e) => setFgColor(e.target.value)} />
+                        <ControlValue>{fgColor}</ControlValue>
+                    </ControlRow>
+                    <ControlRow>
+                        <ControlLabel>Background</ControlLabel>
+                        <ColorInput type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} />
+                        <ControlValue>{bgColor}</ControlValue>
+                    </ControlRow>
+                    <ControlRow>
+                        <ControlLabel>Logo</ControlLabel>
+                        <ModeToggle>
+                            <ModeBtn $active={!addLogo} onClick={disableLogo}>
+                                Off
+                            </ModeBtn>
+                            <ModeBtn $active={addLogo} onClick={enableLogo}>
+                                On
+                            </ModeBtn>
+                        </ModeToggle>
+                    </ControlRow>
+                    {addLogo && <ImageDropZone maxImageSize={512} unit="KB" handleOnDrop={handleLogoFiles} />}
+                </ControlsSection>
+            </Panel>
+
+            <Panel>
+                <PanelHeader>
+                    <PanelLabel>{qrPreviewLabel}</PanelLabel>
+                    {activeQr && (
+                        <MetaText>
+                            {size}×{size}px
+                        </MetaText>
+                    )}
+                </PanelHeader>
+                <QrPreviewArea>
+                    {activeQr ? (
+                        <QrPreviewImg src={activeQr} alt="QR Code" />
+                    ) : (
+                        <EmptyState>
+                            <QrCode sx={{ fontSize: 48 }} />
+                            <Typography variant="body2" sx={{ fontSize: "13px" }}>
+                                Enter data to generate QR
+                            </Typography>
+                        </EmptyState>
+                    )}
+                </QrPreviewArea>
+                <ActionBar>
+                    <ActionBtnGroup>
+                        <ActionBtn onClick={handleDownloadPNG} disabled={!activeQr}>
+                            <CloudDownload sx={{ fontSize: 13 }} /> PNG
+                        </ActionBtn>
+                        <ActionBtn onClick={handleDownloadSVG} disabled={!hasData}>
+                            <CloudDownload sx={{ fontSize: 13 }} /> SVG
+                        </ActionBtn>
+                    </ActionBtnGroup>
+                    <ActionBtn $danger onClick={handleClear} disabled={!hasData}>
+                        Clear
+                    </ActionBtn>
+                </ActionBar>
+            </Panel>
+        </ToolLayout>
     );
 }
