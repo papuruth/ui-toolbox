@@ -8,6 +8,7 @@ import storage from "utils/storage";
 import { fuzzyFilter } from "utils/fuzzySearch";
 import { detectInputType } from "utils/inputDetector";
 import { useToolChain } from "context/ToolChainContext";
+import { isMac } from "utils/helperFunctions";
 import { buildActions, CATEGORY_EMOJI, ENRICHED_TOOLS, getRecentToolEntries } from "./paletteData";
 import {
     Backdrop,
@@ -30,8 +31,6 @@ import {
     SmartBannerArrow,
     SmartBannerText
 } from "./styles";
-
-const isMac = /Mac|iPhone|iPod|iPad/i.test(navigator.userAgent);
 
 export default function CommandPalette({ open, onClose }) {
     const dispatch = useDispatch();

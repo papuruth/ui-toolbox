@@ -11,6 +11,7 @@ import { ENRICHED_TOOLS } from "components/CommandPalette/paletteData";
 import { GLOBAL_CONSTANTS, TOOL_CATEGORIES } from "utils/globalConstants";
 import storage from "utils/storage";
 import { toggleCommandPaletteAction } from "components/Header/HeaderAction";
+import { isMac } from "utils/helperFunctions";
 import {
     HeroCTAPrimary,
     HeroCTARow,
@@ -154,7 +155,7 @@ function HeroSearch({ onOpenPalette }) {
                     autoFocus
                 />
                 <HeroInputHints>
-                    <HeroInputKbd>Ctrl+K</HeroInputKbd>
+                    <HeroInputKbd>{isMac ? "Cmd + K" : "Ctrl + K"}</HeroInputKbd>
                     <HeroEnterHint>or ↵</HeroEnterHint>
                 </HeroInputHints>
             </HeroSearchBox>

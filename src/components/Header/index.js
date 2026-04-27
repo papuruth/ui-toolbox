@@ -11,11 +11,10 @@ import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import colors from "styles/colors";
 import { GLOBAL_CONSTANTS } from "utils/globalConstants";
+import { isMac } from "utils/helperFunctions";
 import ColorModeContext, { useColorMode } from "../../context/ColorModeContext";
 import { toggleCommandPaletteAction } from "./HeaderAction";
 import { PaletteTrigger, StyledContainer, TriggerKbd, TriggerKbdGroup, TriggerPlaceholder } from "./styles";
-
-const isMac = /Mac|iPhone|iPod|iPad/i.test(navigator.userAgent);
 
 function Header({ dispatch }) {
     const { mode, toggleColorMode } = useColorMode(ColorModeContext);
