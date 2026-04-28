@@ -75,6 +75,36 @@ const GlobalStyle = createGlobalStyle`
     color: ${colors.black};
   }
 
+  /* Window Controls Overlay — extend AppBar into the OS title bar */
+  @media (display-mode: window-controls-overlay) {
+    .MuiAppBar-root {
+      top: env(titlebar-area-y, 0px) !important;
+      left: env(titlebar-area-x, 0px) !important;
+      width: env(titlebar-area-width, 100%) !important;
+      height: env(titlebar-area-height, 64px) !important;
+      overflow: hidden;
+      -webkit-app-region: drag;
+      app-region: drag;
+    }
+    .MuiAppBar-root .MuiToolbar-root {
+      height: 100% !important;
+      min-height: unset !important;
+      padding-top: 4px !important;
+      padding-bottom: 4px !important;
+      box-sizing: border-box;
+    }
+    .MuiAppBar-root button,
+    .MuiAppBar-root a,
+    .MuiAppBar-root [role="button"] {
+      -webkit-app-region: no-drag;
+      app-region: no-drag;
+    }
+    .MuiAppBar-root button:not(.MuiIconButton-root) {
+      padding-top: 3px !important;
+      padding-bottom: 3px !important;
+    }
+  }
+
   /* Toast Notification */
   .toast-notification-error,
   .toast-notification-info,

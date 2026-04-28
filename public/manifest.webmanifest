@@ -7,10 +7,33 @@
   "theme_color": "#22c55e",
   "dir": "ltr",
   "display": "standalone",
-  "orientation": "portrait",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "natural",
   "scope": "/",
   "lang": "en-US",
   "id": "/",
+  "screenshots": [
+    {
+      "src": "assets/images/og-preview.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "DevDeck — Developer Tools (desktop)"
+    },
+    {
+      "src": "assets/images/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "DevDeck — Developer Tools (mobile)"
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+devdeck",
+      "url": "/?tool=%s"
+    }
+  ],
   "icons": [
     {
       "src": "assets/images/icon-16x16.png",

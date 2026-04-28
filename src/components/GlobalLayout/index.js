@@ -9,7 +9,23 @@ import CommandPalette from "components/CommandPalette";
 import { closeCommandPaletteAction, toggleCommandPaletteAction } from "components/Header/HeaderAction";
 import { StyledContainer, StyledMainViewContainer } from "./styles";
 
+function useProtocolHandler() {
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const toolParam = params.get("tool");
+        if (!toolParam) return;
+        try {
+            const url = new URL(toolParam);
+            const toolPath = `/${url.hostname}`;
+            history.replace(toolPath);
+        } catch {
+            // malformed protocol URL — ignore
+        }
+    }, []);
+}
+
 export default function GlobalLayout() {
+    useProtocolHandler();
     const dispatch = useDispatch();
     const paletteOpen = useSelector((state) => state.headerReducer.commandPaletteOpen);
 
