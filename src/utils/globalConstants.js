@@ -346,9 +346,6 @@ export const GLOBAL_CONSTANTS = {
             )
         }
     ],
-    APIS: {
-        urlShortner: "https://tinyurl.com/api-create.php"
-    },
     PASSWORD_GEN_LIST: {
         Uppers: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
         Lowers: "abcdefghijklmnopqrstuvwxyz",

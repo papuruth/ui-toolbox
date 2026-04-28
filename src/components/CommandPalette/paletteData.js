@@ -13,7 +13,7 @@ const TOOL_KEYWORDS = {
     "/aspect-ratio-calculator": ["aspect", "ratio", "width", "height", "dimension", "resolution"],
     "/base64-text": ["base64", "text", "encode", "decode", "string", "cipher", "convert"],
     "/url-validator": ["url", "http", "status", "validate", "link", "check", "http", "https"],
-    "/url-shortener": ["url", "shorten", "short", "link", "tinyurl", "compact"],
+    "/url-shortener": ["url", "shorten", "short", "link", "short.io", "compact"],
     "/json-viewer": ["json", "format", "validate", "tree", "viewer", "parse", "pretty", "object"],
     "/password-tools": ["password", "generate", "strength", "secure", "random", "entropy"],
     "/color-converter": ["color", "hex", "rgb", "hsl", "palette", "picker", "convert"],

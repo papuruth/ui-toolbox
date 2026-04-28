@@ -66,10 +66,10 @@ export const SEO_META = {
     },
     "/url-shortener": {
         title: "URL Shortener — Shorten Long Links Free | DevDeck",
-        description: "Shorten any long URL into a compact shareable link. Powered by TinyURL API.",
+        description: "Shorten any long URL into a compact shareable link. Powered by Short.io.",
         about:
-            "URL Shortener converts long URLs into short, shareable links using the TinyURL API. Great for sharing links in limited-character contexts like Twitter or SMS.",
-        keywords: "url shortener, shorten url, short link, tinyurl alternative, link shortener"
+            "URL Shortener converts long URLs into short, shareable links using the Short.io API. Great for sharing links in limited-character contexts like Twitter or SMS.",
+        keywords: "url shortener, shorten url, short link, short.io, link shortener"
     },
     "/password-tools": {
         title: "Password Generator & Strength Meter | DevDeck",

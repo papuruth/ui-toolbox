@@ -133,7 +133,7 @@ export default {
     urlShortner: {
         pageTitle: "URL Shortner",
         urlTextPlaceholder: "Enter URL to shorten",
-        creditText: "Powered by TinyURL",
+        creditText: "Powered by Short.io",
         shortLinkLabel: "Short Link:",
         shortenBtn: "Shorten",
         shorteningLabel: "Shortening...",
