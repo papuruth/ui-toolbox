@@ -9,9 +9,9 @@ export default function ImageDropZone({ handleOnDrop, maxImageSize, unit, fullWi
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: handleOnDrop });
 
     return (
-        <StyledPaper {...getRootProps()} $isDragActive={isDragActive} $fullWidth={fullWidth}>
+        <StyledPaper {...getRootProps()} $isDragActive={isDragActive} $fullWidth={fullWidth} data-drag-active={isDragActive}>
             <input {...getInputProps()} accept=".jpg,.png,.jpeg" />
-            <FileUpload sx={{ fontSize: 28, color: isDragActive ? "#22cc99" : "var(--text-secondary)", transition: "color 0.2s ease" }} />
+            <FileUpload className="upload-icon" sx={{ fontSize: 28, color: isDragActive ? "#22cc99" : "var(--text-secondary)", transition: "color 0.2s ease" }} />
             <Typography
                 variant="body2"
                 sx={{ color: isDragActive ? "#22cc99" : "var(--text-secondary)", fontWeight: 500, transition: "color 0.2s ease", fontSize: "13px" }}

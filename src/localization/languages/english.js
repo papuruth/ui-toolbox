@@ -91,9 +91,16 @@ export default {
         aspectLockedLabel: "Locked 16:9",
         aspectFreeLabel: "Free",
         cropOutputLabel: "Crop Output",
+        outputSizeLabel: "Output Size",
         previewLabel: "Preview",
         croppedResultLabel: "Cropped Result",
-        emptyStateMessage: "Upload an image to start cropping"
+        emptyStateMessage: "Upload an image to start cropping",
+        resetBtn: "Reset",
+        copyImageBtn: "Copy",
+        replaceImageBtn: "Replace",
+        gridOverlayLabel: "Grid",
+        copySuccessMsg: "Image copied to clipboard",
+        copyErrorMsg: "Copy not supported in this browser"
     },
     base64Encoder: {
         pageTitle: "Base64 Encoder"

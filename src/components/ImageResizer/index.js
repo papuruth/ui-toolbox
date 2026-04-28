@@ -1,8 +1,8 @@
-import { CloudDownload, CropOriginal } from "@mui/icons-material";
+import { CloudDownload, ContentCopy, CropOriginal, GridOn, Lock, LockOpen, RestartAlt, SwapHoriz } from "@mui/icons-material";
 import { Typography } from "@mui/material";
 import ImageDropZone from "components/ImageDropZone";
 import localization from "localization";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactCrop, { centerCrop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import { downloadFile, getDataUrl } from "utils/helperFunctions";
@@ -14,21 +14,47 @@ import {
     ActionBar,
     ActionBtn,
     ActionBtnGroup,
-    AspectToggle,
+    AspectChip,
+    AspectGroup,
+    AspectPreviewBox,
     CanvasWrap,
     ControlLabel,
     ControlRow,
     ControlValue,
     ControlsSection,
+    CropContainer,
     CropWrap,
+    DimInput,
+    DimPair,
     DropWrap,
     EmptyState,
+    FileInfoCard,
+    FileInfoDims,
+    FileInfoDot,
+    FileInfoName,
+    FormatBtn,
+    FormatGroup,
+    GridOverlay,
+    LiveDimsBadge,
+    LockBtn,
     MetaText,
     Panel,
     PanelHeader,
     PanelLabel,
+    PreviewPanel,
+    ReplaceBtn,
+    ResizerLayout,
+    ResultCanvas,
+    ResultMetaBadge,
+    ResultMetaRow,
     SliderWrap,
-    ToolLayout
+    WorkflowGuide,
+    WorkflowNum,
+    WorkflowStep,
+    WorkflowStepBody,
+    WorkflowStepDesc,
+    WorkflowStepTitle,
+    WorkflowTitle
 } from "./styles";
 
 const {
@@ -36,7 +62,14 @@ const {
     common: { maxImageSizeText }
 } = localization;
 
-const DEFAULT_ASPECT = 16 / 9;
+const ASPECT_PRESETS = [
+    { label: "Free", value: undefined, icon: null },
+    { label: "1:1",  value: 1,        icon: { w: 8,  h: 8 } },
+    { label: "4:3",  value: 4 / 3,    icon: { w: 11, h: 8 } },
+    { label: "3:2",  value: 3 / 2,    icon: { w: 12, h: 8 } },
+    { label: "16:9", value: 16 / 9,   icon: { w: 14, h: 8 } },
+    { label: "9:16", value: 9 / 16,   icon: { w: 5,  h: 9 } }
+];
 
 function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
     return centerCrop(makeAspectCrop({ unit: "%", width: 90 }, aspect, mediaWidth, mediaHeight), mediaWidth, mediaHeight);
@@ -51,9 +84,20 @@ export default function ImageResizer() {
     const [cropDims, setCropDims] = useState(null);
     const [scale, setScale] = useState(1);
     const [rotate, setRotate] = useState(0);
-    const [aspect, setAspect] = useState(DEFAULT_ASPECT);
+    const [aspect, setAspect] = useState(16 / 9);
+    const [outW, setOutW] = useState("");
+    const [outH, setOutH] = useState("");
+    const [lockAR, setLockAR] = useState(true);
+    const [showGrid, setShowGrid] = useState(false);
+    const [scaleActive, setScaleActive] = useState(false);
+    const [rotateActive, setRotateActive] = useState(false);
     const previewCanvasRef = useRef(null);
     const imgRef = useRef(null);
+    const userEditedDimsRef = useRef(false);
+    const dimTriggeredCropRef = useRef(false);
+    const prevCropRef = useRef(null);
+    const outWRef = useRef("");
+    const outHRef = useRef("");
 
     const handleSelectedFiles = useCallback((acceptedFiles) => {
         const loaderId = Date.now();
@@ -70,6 +114,17 @@ export default function ImageResizer() {
                 const result = await getDataUrl(file);
                 if (result) {
                     setImgSrc(result);
+                    setCompletedCrop(null);
+                    setCropDims(null);
+                    setOutW("");
+                    setOutH("");
+                    outWRef.current = "";
+                    outHRef.current = "";
+                    userEditedDimsRef.current = false;
+                    dimTriggeredCropRef.current = false;
+                    prevCropRef.current = null;
+                    setScale(1);
+                    setRotate(0);
                 }
                 topLoader.hide(true, loaderId);
             });
@@ -79,6 +134,54 @@ export default function ImageResizer() {
         }
     }, []);
 
+    const handleReplaceImage = useCallback(() => {
+        setImgSrc("");
+        setFileName("");
+        setImgDims(null);
+        setCrop(undefined);
+        setCompletedCrop(null);
+        setCropDims(null);
+        setOutW("");
+        setOutH("");
+        outWRef.current = "";
+        outHRef.current = "";
+        userEditedDimsRef.current = false;
+        dimTriggeredCropRef.current = false;
+        prevCropRef.current = null;
+        setScale(1);
+        setRotate(0);
+    }, []);
+
+    const handleReset = useCallback(() => {
+        setScale(1);
+        setRotate(0);
+        setAspect(16 / 9);
+        setCompletedCrop(null);
+        setCropDims(null);
+        setOutW("");
+        setOutH("");
+        setShowGrid(false);
+        outWRef.current = "";
+        outHRef.current = "";
+        userEditedDimsRef.current = false;
+        dimTriggeredCropRef.current = false;
+        prevCropRef.current = null;
+        if (imgRef.current) {
+            const { width, height } = imgRef.current;
+            setCrop(centerAspectCrop(width, height, 16 / 9));
+        }
+    }, []);
+
+    // Keyboard shortcut: R = Reset
+    useEffect(() => {
+        const handler = (e) => {
+            if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+            if ((e.key === "r" || e.key === "R") && !e.metaKey && !e.ctrlKey) handleReset();
+        };
+        window.addEventListener("keydown", handler);
+        return () => window.removeEventListener("keydown", handler);
+    }, [handleReset]);
+
     const onImageLoad = (e) => {
         const { width, height, naturalWidth, naturalHeight } = e.currentTarget;
         setImgDims({ w: naturalWidth, h: naturalHeight });
@@ -87,44 +190,168 @@ export default function ImageResizer() {
         }
     };
 
-    const handleAspectToggle = () => {
-        if (aspect) {
-            setAspect(undefined);
-        } else if (imgRef.current) {
+    const handleAspectSelect = (ratio) => {
+        setAspect(ratio);
+        if (ratio !== undefined && imgRef.current) {
             const { width, height } = imgRef.current;
-            setAspect(DEFAULT_ASPECT);
-            setCrop(centerAspectCrop(width, height, DEFAULT_ASPECT));
+            setCrop(centerAspectCrop(width, height, ratio));
         }
     };
 
-    const onDownloadCropClick = () => {
-        if (!previewCanvasRef.current) return;
-        previewCanvasRef.current.toBlob((blob) => {
-            if (!blob) return;
-            downloadFile(URL.createObjectURL(blob), fileName || "cropped");
-        });
+    const handleOutW = (val) => {
+        userEditedDimsRef.current = true;
+        outWRef.current = val;
+        setOutW(val);
+        const w = parseInt(val, 10);
+        if (w > 0 && imgDims) {
+            const wPct = Math.min((w / imgDims.w) * 100, 100);
+            if (lockAR && cropDims?.w) {
+                const newH = Math.round((w * cropDims.h) / cropDims.w);
+                const computed = String(newH);
+                outHRef.current = computed;
+                setOutH(computed);
+                const hPct = Math.min((newH / imgDims.h) * 100, 100);
+                dimTriggeredCropRef.current = true;
+                setCrop((prev) => ({
+                    unit: "%",
+                    x: Math.min(prev?.x ?? 0, 100 - wPct),
+                    y: Math.min(prev?.y ?? 0, 100 - hPct),
+                    width: wPct,
+                    height: hPct
+                }));
+            } else {
+                dimTriggeredCropRef.current = true;
+                setCrop((prev) => ({
+                    unit: "%",
+                    x: Math.min(prev?.x ?? 0, 100 - wPct),
+                    y: prev?.y ?? 0,
+                    width: wPct,
+                    height: prev?.height ?? wPct
+                }));
+            }
+        }
     };
+
+    const handleOutH = (val) => {
+        userEditedDimsRef.current = true;
+        outHRef.current = val;
+        setOutH(val);
+        const h = parseInt(val, 10);
+        if (h > 0 && imgDims) {
+            const hPct = Math.min((h / imgDims.h) * 100, 100);
+            if (lockAR && cropDims?.h) {
+                const newW = Math.round((h * cropDims.w) / cropDims.h);
+                const computed = String(newW);
+                outWRef.current = computed;
+                setOutW(computed);
+                const wPct = Math.min((newW / imgDims.w) * 100, 100);
+                dimTriggeredCropRef.current = true;
+                setCrop((prev) => ({
+                    unit: "%",
+                    x: Math.min(prev?.x ?? 0, 100 - wPct),
+                    y: Math.min(prev?.y ?? 0, 100 - hPct),
+                    width: wPct,
+                    height: hPct
+                }));
+            } else {
+                dimTriggeredCropRef.current = true;
+                setCrop((prev) => ({
+                    unit: "%",
+                    x: prev?.x ?? 0,
+                    y: Math.min(prev?.y ?? 0, 100 - hPct),
+                    width: prev?.width ?? hPct,
+                    height: hPct
+                }));
+            }
+        }
+    };
+
+    const handleDownloadFormat = useCallback(
+        (format) => {
+            if (!previewCanvasRef.current) return;
+            const mimeMap = { png: "image/png", jpg: "image/jpeg", webp: "image/webp" };
+            const mime = mimeMap[format] || "image/png";
+            previewCanvasRef.current.toBlob(
+                (blob) => {
+                    if (!blob) return;
+                    downloadFile(URL.createObjectURL(blob), `${fileName || "cropped"}.${format}`);
+                },
+                mime,
+                0.92
+            );
+        },
+        [fileName]
+    );
+
+    const handleCopyImage = useCallback(async () => {
+        if (!previewCanvasRef.current) return;
+        try {
+            previewCanvasRef.current.toBlob(async (blob) => {
+                if (!blob) return;
+                await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+                toast.success(L.copySuccessMsg);
+            }, "image/png");
+        } catch {
+            toast.error(L.copyErrorMsg);
+        }
+    }, []);
+
+    const estimatedFileSize = useMemo(() => {
+        const w = parseInt(outW, 10);
+        const h = parseInt(outH, 10);
+        if (!w || !h) return null;
+        const bytes = w * h * 3;
+        if (bytes >= 1024 * 1024) return `~${(bytes / 1024 / 1024).toFixed(1)} MB`;
+        return `~${Math.round(bytes / 1024)} KB`;
+    }, [outW, outH]);
 
     useDebounceEffect(
         async () => {
             if (completedCrop?.width && completedCrop?.height && imgRef.current && previewCanvasRef.current) {
-                canvasPreview(imgRef.current, previewCanvasRef.current, completedCrop, scale, rotate);
                 const scaleX = imgRef.current.naturalWidth / imgRef.current.width;
                 const scaleY = imgRef.current.naturalHeight / imgRef.current.height;
-                setCropDims({
-                    w: Math.round(completedCrop.width * scaleX),
-                    h: Math.round(completedCrop.height * scaleY)
-                });
+                const naturalW = Math.round(completedCrop.width * scaleX);
+                const naturalH = Math.round(completedCrop.height * scaleY);
+                const prev = prevCropRef.current;
+                const cropMoved =
+                    !prev ||
+                    prev.x !== completedCrop.x ||
+                    prev.y !== completedCrop.y ||
+                    prev.width !== completedCrop.width ||
+                    prev.height !== completedCrop.height;
+                const wasDimTriggered = dimTriggeredCropRef.current;
+                prevCropRef.current = completedCrop;
+                dimTriggeredCropRef.current = false;
+                setCropDims({ w: naturalW, h: naturalH });
+                if (!wasDimTriggered && (cropMoved || !userEditedDimsRef.current)) {
+                    outWRef.current = String(naturalW);
+                    outHRef.current = String(naturalH);
+                    setOutW(String(naturalW));
+                    setOutH(String(naturalH));
+                    userEditedDimsRef.current = false;
+                }
+                const tw = parseInt(outWRef.current, 10) || naturalW;
+                const th = parseInt(outHRef.current, 10) || naturalH;
+                canvasPreview(imgRef.current, previewCanvasRef.current, completedCrop, scale, rotate, tw, th);
             }
         },
         100,
         [completedCrop, scale, rotate]
     );
 
-    const aspectLabel = aspect ? L.aspectLockedLabel : L.aspectFreeLabel;
+    // Re-renders canvas when user manually edits output dimensions
+    useEffect(() => {
+        if (!completedCrop?.width || !completedCrop?.height || !imgRef.current || !previewCanvasRef.current) return;
+        const tw = parseInt(outW, 10) || null;
+        const th = parseInt(outH, 10) || null;
+        canvasPreview(imgRef.current, previewCanvasRef.current, completedCrop, scale, rotate, tw, th);
+    }, [outW, outH]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const scaleFill = `${((scale - 1) / 9) * 100}%`;
+    const rotateFill = `${(rotate / 180) * 100}%`;
 
     return (
-        <ToolLayout>
+        <ResizerLayout>
             <Panel>
                 <PanelHeader>
                     <PanelLabel>{L.controlsLabel}</PanelLabel>
@@ -134,9 +361,29 @@ export default function ImageResizer() {
                         </MetaText>
                     )}
                 </PanelHeader>
-                <DropWrap>
-                    <ImageDropZone handleOnDrop={handleSelectedFiles} />
-                </DropWrap>
+
+                {!imgSrc && (
+                    <DropWrap>
+                        <ImageDropZone handleOnDrop={handleSelectedFiles} maxImageSize={5} />
+                    </DropWrap>
+                )}
+
+                {imgSrc && (
+                    <FileInfoCard>
+                        <FileInfoDot />
+                        <FileInfoName>{fileName || "image"}</FileInfoName>
+                        {imgDims && (
+                            <FileInfoDims>
+                                {imgDims.w}×{imgDims.h}
+                            </FileInfoDims>
+                        )}
+                        <ReplaceBtn onClick={handleReplaceImage} title={L.replaceImageBtn}>
+                            <SwapHoriz sx={{ fontSize: 12 }} />
+                            {L.replaceImageBtn}
+                        </ReplaceBtn>
+                    </FileInfoCard>
+                )}
+
                 <ControlsSection>
                     <ControlRow>
                         <ControlLabel>{L.scaleLabel}</ControlLabel>
@@ -147,11 +394,16 @@ export default function ImageResizer() {
                                 max={10}
                                 step={0.1}
                                 value={scale}
+                                style={{ "--fill": scaleFill }}
                                 disabled={!imgSrc}
                                 onChange={(e) => setScale(Number(e.target.value))}
+                                onMouseDown={() => setScaleActive(true)}
+                                onMouseUp={() => setScaleActive(false)}
+                                onTouchStart={() => setScaleActive(true)}
+                                onTouchEnd={() => setScaleActive(false)}
                             />
                         </SliderWrap>
-                        <ControlValue>{scale.toFixed(1)}×</ControlValue>
+                        <ControlValue $active={scaleActive}>{scale.toFixed(1)}×</ControlValue>
                     </ControlRow>
                     <ControlRow>
                         <ControlLabel>{L.rotateLabel}</ControlLabel>
@@ -162,50 +414,128 @@ export default function ImageResizer() {
                                 max={180}
                                 step={1}
                                 value={rotate}
+                                style={{ "--fill": rotateFill }}
                                 disabled={!imgSrc}
-                                onChange={(e) => setRotate(Math.min(180, Math.max(-180, Number(e.target.value))))}
+                                onChange={(e) => {
+                                    const raw = Math.min(180, Math.max(0, Number(e.target.value)));
+                                    const snapped = [0, 90, 180].find((s) => Math.abs(raw - s) <= 4);
+                                    setRotate(snapped !== undefined ? snapped : raw);
+                                }}
+                                onMouseDown={() => setRotateActive(true)}
+                                onMouseUp={() => setRotateActive(false)}
+                                onTouchStart={() => setRotateActive(true)}
+                                onTouchEnd={() => setRotateActive(false)}
                             />
                         </SliderWrap>
-                        <ControlValue>{rotate}°</ControlValue>
+                        <ControlValue $active={rotateActive}>{rotate}°</ControlValue>
                     </ControlRow>
                     <ControlRow>
                         <ControlLabel>{L.aspectRatioLabel}</ControlLabel>
-                        <AspectToggle $active={!!aspect} onClick={handleAspectToggle} disabled={!imgSrc}>
-                            {aspectLabel}
-                        </AspectToggle>
+                        <AspectGroup>
+                            {ASPECT_PRESETS.map((p) => (
+                                <AspectChip key={p.label} $active={aspect === p.value} disabled={!imgSrc} onClick={() => handleAspectSelect(p.value)}>
+                                    {p.icon && <AspectPreviewBox $w={p.icon.w} $h={p.icon.h} $active={aspect === p.value} />}
+                                    {p.label}
+                                </AspectChip>
+                            ))}
+                        </AspectGroup>
                     </ControlRow>
                     {cropDims && (
                         <ControlRow>
-                            <ControlLabel>{L.cropOutputLabel}</ControlLabel>
-                            <MetaText>
-                                {cropDims.w}×{cropDims.h}px
-                            </MetaText>
+                            <ControlLabel>{L.outputSizeLabel}</ControlLabel>
+                            <DimPair>
+                                <DimInput type="number" min={1} value={outW} onChange={(e) => handleOutW(e.target.value)} placeholder="W" />
+                                <span>×</span>
+                                <DimInput type="number" min={1} value={outH} onChange={(e) => handleOutH(e.target.value)} placeholder="H" />
+                                <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>px</span>
+                            </DimPair>
+                            <LockBtn
+                                $active={lockAR}
+                                onClick={() => setLockAR((v) => !v)}
+                                title={lockAR ? "Unlock aspect ratio" : "Lock aspect ratio"}
+                            >
+                                {lockAR ? <Lock sx={{ fontSize: 14 }} /> : <LockOpen sx={{ fontSize: 14 }} />}
+                            </LockBtn>
                         </ControlRow>
                     )}
                 </ControlsSection>
+
+                {!imgSrc && (
+                    <WorkflowGuide>
+                        <WorkflowTitle>How it works</WorkflowTitle>
+                        <WorkflowStep>
+                            <WorkflowNum>1</WorkflowNum>
+                            <WorkflowStepBody>
+                                <WorkflowStepTitle>Upload</WorkflowStepTitle>
+                                <WorkflowStepDesc>Drag & drop or click to add a JPG, PNG, or JPEG image</WorkflowStepDesc>
+                            </WorkflowStepBody>
+                        </WorkflowStep>
+                        <WorkflowStep>
+                            <WorkflowNum>2</WorkflowNum>
+                            <WorkflowStepBody>
+                                <WorkflowStepTitle>Crop & Adjust</WorkflowStepTitle>
+                                <WorkflowStepDesc>Select a region, pick an aspect ratio, scale or rotate as needed</WorkflowStepDesc>
+                            </WorkflowStepBody>
+                        </WorkflowStep>
+                        <WorkflowStep>
+                            <WorkflowNum>3</WorkflowNum>
+                            <WorkflowStepBody>
+                                <WorkflowStepTitle>Export</WorkflowStepTitle>
+                                <WorkflowStepDesc>Set output dimensions and download the cropped result</WorkflowStepDesc>
+                            </WorkflowStepBody>
+                        </WorkflowStep>
+                    </WorkflowGuide>
+                )}
             </Panel>
 
-            <Panel>
+            <PreviewPanel>
                 <PanelHeader>
                     <PanelLabel>{L.previewLabel}</PanelLabel>
-                    {fileName && <MetaText>{fileName}</MetaText>}
+                    <ActionBtnGroup>
+                        {fileName && <MetaText>{fileName}</MetaText>}
+                        {imgSrc && (
+                            <ActionBtn
+                                $active={showGrid}
+                                onClick={() => setShowGrid((v) => !v)}
+                                title={L.gridOverlayLabel}
+                                style={showGrid ? { color: "#22cc99", borderColor: "rgba(34,204,153,0.4)" } : {}}
+                            >
+                                <GridOn sx={{ fontSize: 13 }} />
+                                {L.gridOverlayLabel}
+                            </ActionBtn>
+                        )}
+                    </ActionBtnGroup>
                 </PanelHeader>
+
                 <CropWrap>
                     {imgSrc ? (
-                        <ReactCrop
-                            crop={crop}
-                            onChange={(_, percentCrop) => setCrop(percentCrop)}
-                            onComplete={(c) => setCompletedCrop(c)}
-                            aspect={aspect}
-                        >
-                            <img
-                                ref={imgRef}
-                                src={imgSrc}
-                                alt="Crop me"
-                                style={{ transform: `scale(${scale}) rotate(${rotate}deg)`, maxWidth: "100%", display: "block" }}
-                                onLoad={onImageLoad}
-                            />
-                        </ReactCrop>
+                        <CropContainer>
+                            <ReactCrop
+                                crop={crop}
+                                onChange={(_, percentCrop) => setCrop(percentCrop)}
+                                onComplete={(c) => setCompletedCrop(c)}
+                                aspect={aspect}
+                            >
+                                <img
+                                    ref={imgRef}
+                                    src={imgSrc}
+                                    alt="Crop me"
+                                    style={{
+                                        transform: `scale(${scale}) rotate(${rotate}deg)`,
+                                        maxWidth: "100%",
+                                        maxHeight: "100%",
+                                        display: "block"
+                                    }}
+                                    onLoad={onImageLoad}
+                                />
+                            </ReactCrop>
+                            {showGrid && <GridOverlay />}
+                            {completedCrop && cropDims && (
+                                <LiveDimsBadge>
+                                    {cropDims.w} × {cropDims.h} px
+                                </LiveDimsBadge>
+                            )}
+                        </CropContainer>
                     ) : (
                         <EmptyState>
                             <CropOriginal sx={{ fontSize: 48 }} />
@@ -215,37 +545,62 @@ export default function ImageResizer() {
                         </EmptyState>
                     )}
                 </CropWrap>
+
                 {completedCrop && (
                     <CanvasWrap>
                         <PanelHeader>
                             <PanelLabel>{L.croppedResultLabel}</PanelLabel>
                             {cropDims && (
                                 <MetaText>
-                                    {cropDims.w}×{cropDims.h}px
+                                    {outW || cropDims.w}×{outH || cropDims.h}px
                                 </MetaText>
                             )}
                         </PanelHeader>
-                        <canvas
+                        <ResultCanvas
                             ref={previewCanvasRef}
                             style={{
-                                objectFit: "contain",
                                 width: completedCrop.width,
-                                height: completedCrop.height,
-                                display: "block",
-                                margin: "16px auto",
-                                maxWidth: "100%"
+                                height: completedCrop.height
                             }}
                         />
+                        {estimatedFileSize && (
+                            <ResultMetaRow>
+                                <ResultMetaBadge>{estimatedFileSize}</ResultMetaBadge>
+                                {outW && outH && (
+                                    <ResultMetaBadge>
+                                        {outW}×{outH}px
+                                    </ResultMetaBadge>
+                                )}
+                            </ResultMetaRow>
+                        )}
                     </CanvasWrap>
                 )}
+
                 <ActionBar>
                     <ActionBtnGroup>
-                        <ActionBtn onClick={onDownloadCropClick} disabled={!completedCrop}>
-                            <CloudDownload sx={{ fontSize: 13 }} /> {L.downloadImageBtn}
+                        <ActionBtn onClick={handleReset} disabled={!imgSrc} title="Reset (R)">
+                            <RestartAlt sx={{ fontSize: 13 }} />
+                            {L.resetBtn}
+                        </ActionBtn>
+                        <ActionBtn onClick={handleCopyImage} disabled={!completedCrop}>
+                            <ContentCopy sx={{ fontSize: 13 }} />
+                            {L.copyImageBtn}
                         </ActionBtn>
                     </ActionBtnGroup>
+                    <FormatGroup>
+                        <FormatBtn $primary onClick={() => handleDownloadFormat("png")} disabled={!completedCrop}>
+                            <CloudDownload sx={{ fontSize: 13 }} />
+                            PNG
+                        </FormatBtn>
+                        <FormatBtn onClick={() => handleDownloadFormat("jpg")} disabled={!completedCrop}>
+                            JPG
+                        </FormatBtn>
+                        <FormatBtn onClick={() => handleDownloadFormat("webp")} disabled={!completedCrop}>
+                            WebP
+                        </FormatBtn>
+                    </FormatGroup>
                 </ActionBar>
-            </Panel>
-        </ToolLayout>
+            </PreviewPanel>
+        </ResizerLayout>
     );
 }

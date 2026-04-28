@@ -1,6 +1,6 @@
 import { Chip, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import styled, { keyframes } from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 import { styledMedia } from "styles/global";
 
 // ── Animations ────────────────────────────────────────────────────────────────
@@ -12,6 +12,11 @@ const fadeUp = keyframes`
 const slideDown = keyframes`
     from { opacity: 0; transform: translateY(-8px); }
     to   { opacity: 1; transform: translateY(0);    }
+`;
+
+const glowPulse = keyframes`
+    0%,  100% { box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15), 0 0 20px  rgba(34, 197, 94, 0.15), 0 8px 32px rgba(0,0,0,0.3); }
+    50%        { box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25), 0 0 40px rgba(34, 197, 94, 0.25), 0 8px 32px rgba(0,0,0,0.3); }
 `;
 
 export const StyledContainer = styled.div`
@@ -110,8 +115,9 @@ export const HeroSearchBox = styled.div`
     padding: 14px 16px;
     cursor: text;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-    box-shadow: ${({ $focused }) => ($focused ? "0 0 0 4px rgba(34, 197, 94, 0.1), 0 8px 32px rgba(0,0,0,0.3)" : "0 4px 16px rgba(0,0,0,0.2)")};
+    box-shadow: ${({ $focused }) => ($focused ? "0 0 0 2px rgba(34, 197, 94, 0.15), 0 0 8px rgba(34, 197, 94, 0.15), 0 8px 32px rgba(0,0,0,0.3)" : "0 4px 16px rgba(0,0,0,0.2)")};
     transform: ${({ $focused }) => ($focused ? "scale(1.01)" : "scale(1)")};
+    ${({ $focused }) => $focused && css`animation: ${glowPulse} 2s ease-in-out infinite;`}
 `;
 
 export const HeroSearchIcon = styled.span`
