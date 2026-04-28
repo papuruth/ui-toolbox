@@ -30,7 +30,6 @@ export const StyledHero = styled.section`
     flex-direction: column;
     align-items: center;
     position: relative;
-    overflow: hidden;
 
     /* subtle radial glow */
     &::before {

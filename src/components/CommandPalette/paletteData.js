@@ -1,5 +1,9 @@
+import React from "react";
+import { ContentCopy, DeleteOutline, Fingerprint, Home } from "@mui/icons-material";
 import { GLOBAL_CONSTANTS } from "utils/globalConstants";
 import storage from "utils/storage";
+
+const ACTION_ICON_SX = { fontSize: "1.1rem" };
 
 // ── Per-tool keyword arrays ───────────────────────────────────────────────────
 const TOOL_KEYWORDS = {
@@ -55,6 +59,7 @@ export function buildActions({ onClose, navigateTo }) {
             description: "Generate a UUID v4 and copy to clipboard",
             kind: "action",
             category: "utilities",
+            icon: <Fingerprint sx={ACTION_ICON_SX} />,
             keywords: ["uuid", "guid", "unique", "id", "generate", "create", "copy"]
         },
         {
@@ -63,6 +68,7 @@ export function buildActions({ onClose, navigateTo }) {
             description: "Navigate back to the home page",
             kind: "action",
             category: "navigation",
+            icon: <Home sx={ACTION_ICON_SX} />,
             keywords: ["home", "start", "main", "navigate", "go", "back"]
         }
     ].map((action) => ({
@@ -78,13 +84,98 @@ export function buildActions({ onClose, navigateTo }) {
     }));
 }
 
-// ── Recent tools ─────────────────────────────────────────────────────────────
+// ── Suggested tools (curated, shown in default state when no query) ───────────
+export const SUGGESTED_TOOL_ROUTES = [
+    "/json-viewer",
+    "/jwt-decoder",
+    "/uuid-generator",
+    "/regex-tester",
+    "/base64-text"
+];
+
+export const SUGGESTED_TOOLS = SUGGESTED_TOOL_ROUTES.map((route) =>
+    ENRICHED_TOOLS.find((t) => t.route === route)
+).filter(Boolean);
+
+// ── Recent tools (frequency × recency_decay ranked) ──────────────────────────
 export function getRecentToolEntries() {
+    const freq = storage.getToolFrequency();
     return storage
         .getRecentTools()
-        .map((route) => ENRICHED_TOOLS.find((t) => t.route === route))
+        .map((route, idx) => {
+            const tool = ENRICHED_TOOLS.find((t) => t.route === route);
+            if (!tool) return null;
+            const frequency = freq[route] || 1;
+            const recencyDecay = 1 / (idx + 1);
+            return { ...tool, kind: "recent", _rankScore: frequency * recencyDecay };
+        })
         .filter(Boolean)
-        .map((t) => ({ ...t, kind: "recent" }));
+        .sort((a, b) => b._rankScore - a._rankScore);
+}
+
+// ── Contextual suggestions (tools related to the current page) ────────────────
+const RELATED_TOOLS = {
+    "/json-viewer":              ["/yaml-json", "/text-diff", "/jwt-decoder"],
+    "/jwt-decoder":              ["/json-viewer", "/base64-text", "/hash-generator"],
+    "/base64-text":              ["/base64-image", "/hash-generator", "/json-viewer"],
+    "/base64-image":             ["/image-resizer", "/base64-text"],
+    "/regex-tester":             ["/text-case", "/text-diff", "/word-counter"],
+    "/yaml-json":                ["/json-viewer", "/text-diff"],
+    "/text-diff":                ["/text-case", "/word-counter", "/regex-tester"],
+    "/uuid-generator":           ["/hash-generator", "/password-tools"],
+    "/hash-generator":           ["/uuid-generator", "/base64-text", "/password-tools"],
+    "/url-validator":            ["/url-shortener"],
+    "/url-shortener":            ["/url-validator", "/qr-generator"],
+    "/timestamp":                ["/number-base", "/uuid-generator"],
+    "/number-base":              ["/timestamp", "/hash-generator"],
+    "/image-resizer":            ["/base64-image", "/aspect-ratio-calculator"],
+    "/aspect-ratio-calculator":  ["/image-resizer"],
+    "/qr-generator":             ["/url-shortener", "/uuid-generator"],
+    "/color-converter":          ["/text-case"],
+    "/password-tools":           ["/hash-generator", "/uuid-generator"],
+    "/text-case":                ["/text-diff", "/word-counter", "/regex-tester"],
+    "/word-counter":             ["/text-diff", "/text-case", "/lorem-ipsum"],
+    "/lorem-ipsum":              ["/word-counter", "/text-case"],
+    "/csv-json":                 ["/json-viewer", "/yaml-json"]
+};
+
+export function getRelatedToolEntries(currentRoute) {
+    const routes = RELATED_TOOLS[currentRoute] || [];
+    return routes
+        .map((route) => ENRICHED_TOOLS.find((t) => t.route === route))
+        .filter(Boolean);
+}
+
+// ── Command mode actions (only shown when user types ">") ─────────────────────
+export function buildCommands({ onClose }) {
+    return [
+        {
+            id: "cmd-clear-history",
+            label: "Clear Recent History",
+            description: "Remove all recently used tools from history",
+            kind: "command",
+            category: "command",
+            icon: <DeleteOutline sx={{ fontSize: "1.1rem" }} />,
+            keywords: ["clear", "history", "recent", "remove", "reset"],
+            run: () => {
+                storage.clearRecentTools();
+                onClose();
+            }
+        },
+        {
+            id: "cmd-copy-url",
+            label: "Copy Current URL",
+            description: "Copy this page's URL to clipboard",
+            kind: "command",
+            category: "command",
+            icon: <ContentCopy sx={{ fontSize: "1.1rem" }} />,
+            keywords: ["copy", "url", "link", "clipboard", "page"],
+            run: () => {
+                navigator.clipboard.writeText(window.location.href).catch(() => {});
+                onClose();
+            }
+        }
+    ];
 }
 
 // ── Category emojis ───────────────────────────────────────────────────────────
@@ -95,5 +186,6 @@ export const CATEGORY_EMOJI = {
     utilities: "🛠️",
     action: "⚡",
     navigation: "🧭",
-    recent: "🕘"
+    recent: "🕘",
+    command: "⌘"
 };

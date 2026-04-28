@@ -11,6 +11,16 @@ const slideDown = keyframes`
     to   { opacity: 1; transform: translateY(0) scale(1); }
 `;
 
+const itemAppear = keyframes`
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+`;
+
+const borderPulse = keyframes`
+    0%, 100% { border-color: rgba(34,204,153,0.18); }
+    50%       { border-color: rgba(34,204,153,0.55); }
+`;
+
 // ── Palette always uses its own dark theme for premium feel ──────────────────
 const P = {
     bg: "#0f172a",
@@ -48,11 +58,14 @@ export const Backdrop = styled.div`
 export const PaletteBox = styled.div`
     width: 100%;
     max-width: 660px;
+    max-height: calc(100vh - 140px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
     background: ${P.bg};
     border: 1px solid ${P.border};
     border-radius: 16px;
     box-shadow: 0 32px 80px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.04);
-    overflow: hidden;
     animation: ${slideDown} 0.2s cubic-bezier(0.22, 1, 0.36, 1);
     ${styledMedia.lessThan("sm")`
         border-radius: 12px;
@@ -67,6 +80,13 @@ export const SearchBar = styled.div`
     padding: 0 16px;
     gap: 10px;
     border-bottom: 1px solid ${P.border};
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    flex-shrink: 0;
+
+    &:focus-within {
+        border-bottom-color: ${P.accent};
+        box-shadow: 0 1px 0 0 rgba(34, 204, 153, 0.25);
+    }
 `;
 
 export const SearchIconWrap = styled.span`
@@ -88,6 +108,42 @@ export const SearchInput = styled.input`
 
     &::placeholder {
         color: ${P.textMuted};
+        transition: opacity 0.25s ease;
+        opacity: ${({ $placeholderFading }) => ($placeholderFading ? 0 : 1)};
+    }
+`;
+
+export const CategoryFilterChip = styled.span`
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 8px 2px 6px;
+    border-radius: 6px;
+    background: rgba(34, 204, 153, 0.15);
+    border: 1px solid rgba(34, 204, 153, 0.35);
+    color: ${P.accent};
+    font-size: 0.72rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.1s ease;
+
+    &:hover {
+        background: rgba(34, 204, 153, 0.24);
+    }
+`;
+
+export const ChipX = styled.span`
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.85rem;
+    line-height: 1;
+    opacity: 0.55;
+    margin-left: 2px;
+
+    &:hover {
+        opacity: 1;
     }
 `;
 
@@ -140,10 +196,47 @@ export const ResultItem = styled.div`
     cursor: pointer;
     margin: 1px 6px;
     border-radius: 8px;
+    position: relative;
     transition: background 0.1s ease, border-color 0.1s ease;
     background: ${({ $active }) => ($active ? P.activeRow : "transparent")};
     border: 1px solid ${({ $active }) => ($active ? P.borderActive : "transparent")};
+    animation: ${itemAppear} 0.18s ease both;
+    animation-delay: ${({ $delay }) => $delay || 0}ms;
+
+    &::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 4px;
+        bottom: 4px;
+        width: 2px;
+        border-radius: 2px;
+        background: ${P.accent};
+        opacity: ${({ $active }) => ($active ? 1 : 0)};
+        transform: ${({ $active }) => ($active ? "scaleY(1)" : "scaleY(0.4)")};
+        transition: opacity 0.12s ease, transform 0.12s ease;
+    }
 `;
+
+const categoryBg = (cat) => {
+    if (cat === "image") return "rgba(34,204,153,0.12)";
+    if (cat === "encoding") return "rgba(34,153,255,0.12)";
+    if (cat === "url") return "rgba(255,152,0,0.12)";
+    if (cat === "utilities") return "rgba(180,122,230,0.12)";
+    if (cat === "navigation") return "rgba(34,204,153,0.12)";
+    if (cat === "command") return "rgba(245,158,11,0.12)";
+    return "rgba(255,255,255,0.06)";
+};
+
+const categoryColor = (cat) => {
+    if (cat === "image") return "#22cc99";
+    if (cat === "encoding") return "#2299ff";
+    if (cat === "url") return "#ff9800";
+    if (cat === "utilities") return "#b47ae6";
+    if (cat === "navigation") return "#22cc99";
+    if (cat === "command") return "#f59e0b";
+    return P.textMuted;
+};
 
 export const ItemIconWrap = styled.div`
     display: flex;
@@ -152,14 +245,19 @@ export const ItemIconWrap = styled.div`
     width: 32px;
     height: 32px;
     border-radius: 8px;
-    background: ${({ $kind }) => {
-        if ($kind === "action") return "rgba(255,152,0,0.12)";
-        if ($kind === "recent") return "rgba(34,204,153,0.1)";
-        return "rgba(255,255,255,0.05)";
-    }};
     flex-shrink: 0;
     font-size: 1rem;
     line-height: 1;
+    background: ${({ $kind, $category }) =>
+        $kind === "recent" ? "rgba(34,204,153,0.1)" : categoryBg($category)};
+    color: ${({ $kind, $category }) =>
+        $kind === "recent" ? "#22cc99" : categoryColor($category)};
+
+    & svg {
+        font-size: 1.1rem !important;
+        width: 1.1rem !important;
+        height: 1.1rem !important;
+    }
 `;
 
 export const ItemContent = styled.div`
@@ -171,7 +269,14 @@ export const ItemLabel = styled.span`
     display: block;
     font-size: 0.88rem;
     font-weight: 600;
-    color: ${P.text};
+    color: ${({ $dimmed }) => ($dimmed ? P.textSub : P.text)};
+    opacity: ${({ $dimmed }) => ($dimmed ? 0.6 : 1)};
+    transition: opacity 0.1s ease;
+`;
+
+export const MatchChar = styled.span`
+    color: ${P.accent};
+    font-weight: 700;
 `;
 
 export const ItemDescription = styled.span`
@@ -197,6 +302,7 @@ export const CategoryBadge = styled.span`
         if ($cat === "encoding") return "#2299ff";
         if ($cat === "url") return "#ff9800";
         if ($cat === "utilities") return "#b47ae6";
+        if ($cat === "command") return "#f59e0b";
         return "#ff9800";
     }};
     background: ${({ $cat }) => {
@@ -204,6 +310,7 @@ export const CategoryBadge = styled.span`
         if ($cat === "encoding") return "rgba(34,153,255,0.1)";
         if ($cat === "url") return "rgba(255,152,0,0.1)";
         if ($cat === "utilities") return "rgba(180,122,230,0.1)";
+        if ($cat === "command") return "rgba(245,158,11,0.1)";
         return "rgba(255,152,0,0.1)";
     }};
     border: 1px solid currentColor;
@@ -213,14 +320,14 @@ export const SmartBanner = styled.div`
     margin: 8px 6px 4px;
     padding: 10px 14px;
     border-radius: 10px;
-    background: rgba(34, 204, 153, 0.07);
-    border: 1px solid ${({ $active }) => ($active ? P.borderActive : "rgba(34,204,153,0.18)")};
     display: flex;
     align-items: center;
     gap: 10px;
     cursor: pointer;
     transition: border-color 0.1s ease, background 0.1s ease;
     background: ${({ $active }) => ($active ? P.activeRow : "rgba(34,204,153,0.07)")};
+    border: 1px solid ${({ $active }) => ($active ? P.borderActive : "rgba(34,204,153,0.18)")};
+    animation: ${borderPulse} 2s ease-in-out infinite;
 `;
 
 export const SmartBannerText = styled.span`

@@ -1,18 +1,20 @@
 import { Search } from "@mui/icons-material";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState, cloneElement } from "react";
 import { bool, func } from "prop-types";
 import { useDispatch } from "react-redux";
 import { push } from "connected-react-router";
 import localization from "localization";
 import storage from "utils/storage";
-import { fuzzyFilter } from "utils/fuzzySearch";
+import { fuzzyFilterWithPositions } from "utils/fuzzySearch";
 import { detectInputType } from "utils/inputDetector";
 import { useToolChain } from "context/ToolChainContext";
 import { isMac } from "utils/helperFunctions";
-import { buildActions, CATEGORY_EMOJI, ENRICHED_TOOLS, getRecentToolEntries } from "./paletteData";
+import { buildActions, buildCommands, CATEGORY_EMOJI, ENRICHED_TOOLS, getRecentToolEntries, getRelatedToolEntries, SUGGESTED_TOOLS } from "./paletteData";
 import {
     Backdrop,
     CategoryBadge,
+    CategoryFilterChip,
+    ChipX,
     EmptyMessage,
     Footer,
     ItemContent,
@@ -20,6 +22,7 @@ import {
     ItemIconWrap,
     ItemLabel,
     KbdHint,
+    MatchChar,
     PaletteBox,
     ResultItem,
     ResultsList,
@@ -31,6 +34,41 @@ import {
     SmartBannerArrow,
     SmartBannerText
 } from "./styles";
+
+const PLACEHOLDER_HINTS = [
+    "Search tools, paste a JWT, URL, or JSON…",
+    "Type # to filter by category…",
+    "Type > to run commands…",
+    "Paste a UUID, hash, or Base64…",
+    "Press Tab to autocomplete…"
+];
+
+function usePlaceholder(active) {
+    const [idx, setIdx] = useState(0);
+    const [fading, setFading] = useState(false);
+    const timeoutRef = useRef(null);
+
+    useEffect(() => {
+        if (!active) {
+            setIdx(0);
+            setFading(false);
+            return undefined;
+        }
+        const interval = setInterval(() => {
+            setFading(true);
+            timeoutRef.current = setTimeout(() => {
+                setIdx((i) => (i + 1) % PLACEHOLDER_HINTS.length);
+                setFading(false);
+            }, 250);
+        }, 3000);
+        return () => {
+            clearInterval(interval);
+            clearTimeout(timeoutRef.current);
+        };
+    }, [active]);
+
+    return { text: PLACEHOLDER_HINTS[idx], fading };
+}
 
 export default function CommandPalette({ open, onClose }) {
     const dispatch = useDispatch();
@@ -53,27 +91,73 @@ export default function CommandPalette({ open, onClose }) {
     // Inline actions (rebuilt when callbacks change)
     const actions = useMemo(() => buildActions({ onClose, navigateTo }), [onClose, navigateTo]);
 
-    // Smart detection fires when query looks like data, not a search phrase
-    const smartDetection = useMemo(() => {
-        if (query.length < 8) return null;
-        return detectInputType(query);
-    }, [query]);
+    // Command-mode items (rebuilt when onClose changes)
+    const commands = useMemo(() => buildCommands({ onClose }), [onClose]);
+
+    // Derived mode flags — computed from query prefix, available to useMemo and JSX alike
+    const isCategoryMode = query.startsWith("#");
+    const isCommandMode = query.startsWith(">");
+    const categorySlug = isCategoryMode ? query.slice(1).trim().toLowerCase() : null;
+
+    // Smart detection fires when query looks like structured data, not a search phrase
+    const smartDetection = useMemo(() => detectInputType(query), [query]);
 
     // Build sections and flat selectable list
     const { sections, selectables } = useMemo(() => {
         const secs = [];
 
-        if (!query.trim()) {
-            // Empty query: recent first, then all tools
+        if (isCategoryMode) {
+            // "#encoding", "#url", etc. — filter tools by category prefix
+            const filtered = categorySlug
+                ? ENRICHED_TOOLS.filter((t) => t.category.startsWith(categorySlug))
+                : ENRICHED_TOOLS;
+            const sectionLabel = categorySlug
+                ? `${categorySlug.charAt(0).toUpperCase()}${categorySlug.slice(1)} tools`
+                : "All tools";
+            if (filtered.length > 0) {
+                secs.push({ id: "category-filter", label: sectionLabel, items: filtered });
+            }
+        } else if (isCommandMode) {
+            // ">" or ">clear" — fuzzy-search within command list
+            const cmdQuery = query.slice(1).trim();
+            const matched = cmdQuery
+                ? fuzzyFilterWithPositions(commands, cmdQuery, (c) => [c.label, c.description || "", ...(c.keywords || [])])
+                      .map(({ item, score, positions }) => ({ ...item, _score: score, _positions: positions }))
+                : commands;
+            if (matched.length > 0) {
+                secs.push({ id: "commands", label: "Commands", items: matched });
+            }
+        } else if (!query.trim()) {
             const recent = getRecentToolEntries();
             if (recent.length > 0) {
                 secs.push({ id: "recent", label: "Recent", items: recent });
             }
-            secs.push({ id: "tools", label: "Tools", items: ENRICHED_TOOLS });
+
+            const shownRoutes = new Set(recent.map((t) => t.route));
+
+            // Related tools based on current page context
+            const related = getRelatedToolEntries(window.location.pathname).filter(
+                (t) => !shownRoutes.has(t.route)
+            );
+            if (related.length > 0) {
+                related.forEach((t) => shownRoutes.add(t.route));
+                secs.push({ id: "related", label: "Related", items: related });
+            }
+
+            // Fill remaining slots with suggested tools, cap total at 8
+            const suggested = SUGGESTED_TOOLS.filter((t) => !shownRoutes.has(t.route));
+            const remaining = Math.max(0, 8 - recent.length - related.length);
+            if (suggested.length > 0 && remaining > 0) {
+                secs.push({ id: "suggested", label: "Suggested", items: suggested.slice(0, remaining) });
+            }
         } else {
-            // Search: fuzzy across tools + actions
+            // Search: fuzzy across tools + actions, with per-item score + highlight positions
             const allItems = [...ENRICHED_TOOLS, ...actions];
-            const matched = fuzzyFilter(allItems, query, (item) => [item.label, item.description || "", ...(item.keywords || [])]);
+            const matched = fuzzyFilterWithPositions(
+                allItems,
+                query,
+                (item) => [item.label, item.description || "", ...(item.keywords || [])]
+            ).map(({ item, score, positions }) => ({ ...item, _score: score, _positions: positions }));
 
             const matchedActions = matched.filter((i) => i.kind === "action");
             const matchedTools = matched.filter((i) => i.kind !== "action");
@@ -90,7 +174,7 @@ export default function CommandPalette({ open, onClose }) {
         const smartItem = smartDetection ? [{ kind: "smart", detection: smartDetection }] : [];
         const all = [...smartItem, ...secs.flatMap((s) => s.items)];
         return { sections: secs, selectables: all };
-    }, [query, actions, smartDetection]);
+    }, [query, isCategoryMode, isCommandMode, categorySlug, actions, commands, smartDetection]);
 
     // Reset on open
     useEffect(() => {
@@ -119,7 +203,7 @@ export default function CommandPalette({ open, onClose }) {
             if (item.kind === "smart") {
                 sendTo(query, item.detection.route);
                 navigateTo(item.detection.route);
-            } else if (item.kind === "action") {
+            } else if (item.kind === "action" || item.kind === "command") {
                 item.run();
             } else {
                 navigateTo(item.route);
@@ -136,6 +220,16 @@ export default function CommandPalette({ open, onClose }) {
             } else if (e.key === "ArrowUp") {
                 e.preventDefault();
                 setActiveIndex((i) => Math.max(i - 1, 0));
+            } else if (e.key === "Tab") {
+                e.preventDefault();
+                if (e.shiftKey) {
+                    setActiveIndex((i) => Math.max(i - 1, 0));
+                } else {
+                    const active = selectables[activeIndex];
+                    if (active && active.kind !== "smart" && active.label) {
+                        setQuery(active.label);
+                    }
+                }
             } else if (e.key === "Enter") {
                 executeItem(selectables[activeIndex]);
             } else if (e.key === "Escape") {
@@ -150,7 +244,30 @@ export default function CommandPalette({ open, onClose }) {
         setActiveIndex(0);
     };
 
+    const { text: placeholderText, fading: placeholderFading } = usePlaceholder(open && !query);
+
     if (!open) return null;
+
+    // Split label into highlighted/plain segments; key each by its start position in the string
+    const highlightLabel = (label, positions) => {
+        if (!positions || positions.length === 0) return label;
+        const posSet = new Set(positions);
+        const segments = [];
+        let i = 0;
+        while (i < label.length) {
+            const highlighted = posSet.has(i);
+            const startIdx = i;
+            let text = "";
+            while (i < label.length && posSet.has(i) === highlighted) {
+                text += label[i];
+                i += 1;
+            }
+            segments.push({ highlighted, text, key: `s${startIdx}` });
+        }
+        return segments.map((seg) =>
+            seg.highlighted ? <MatchChar key={seg.key}>{seg.text}</MatchChar> : seg.text
+        );
+    };
 
     // Flatten smart detection offset for section items
     const smartOffset = smartDetection ? 1 : 0;
@@ -178,12 +295,19 @@ export default function CommandPalette({ open, onClose }) {
                     <SearchIconWrap>
                         <Search sx={{ fontSize: "1.2rem" }} />
                     </SearchIconWrap>
+                    {isCategoryMode && (
+                        <CategoryFilterChip onMouseDown={() => setQuery("")}>
+                            #{categorySlug || "filter"}
+                            <ChipX aria-hidden>×</ChipX>
+                        </CategoryFilterChip>
+                    )}
                     <SearchInput
                         ref={inputRef}
                         value={query}
                         onChange={handleQueryChange}
                         onKeyDown={handleKeyDown}
-                        placeholder={L.placeholder}
+                        placeholder={placeholderText}
+                        $placeholderFading={placeholderFading}
                         aria-label="Search tools"
                         autoComplete="off"
                         spellCheck={false}
@@ -220,21 +344,24 @@ export default function CommandPalette({ open, onClose }) {
                             {sec.items.map((item, i) => {
                                 const globalIdx = sec.startIndex + i;
                                 const isActive = globalIdx === activeIndex;
-                                let emoji = CATEGORY_EMOJI[item.category] || "🛠️";
-                                if (item.kind === "recent") emoji = CATEGORY_EMOJI.recent;
-                                else if (item.kind === "action") emoji = CATEGORY_EMOJI[item.category] || CATEGORY_EMOJI.action;
+                                const iconEl = item.icon
+                                    ? cloneElement(item.icon, { sx: { fontSize: "1.1rem" }, fontSize: undefined })
+                                    : (CATEGORY_EMOJI[item.category] || "🛠️");
 
                                 return (
                                     <ResultItem
                                         key={item.id || item.route}
                                         $active={isActive}
+                                        $delay={i * 18}
                                         data-active={isActive}
                                         onMouseEnter={() => setActiveIndex(globalIdx)}
                                         onMouseDown={() => executeItem(item)}
                                     >
-                                        <ItemIconWrap $kind={item.kind}>{emoji}</ItemIconWrap>
+                                        <ItemIconWrap $kind={item.kind} $category={item.category}>{iconEl}</ItemIconWrap>
                                         <ItemContent>
-                                            <ItemLabel>{item.label}</ItemLabel>
+                                            <ItemLabel $dimmed={item._score > 0 && item._score < 15}>
+                                                {highlightLabel(item.label, item._positions)}
+                                            </ItemLabel>
                                             <ItemDescription>{item.description}</ItemDescription>
                                         </ItemContent>
                                         <CategoryBadge $cat={item.kind === "action" ? item.category : item.category}>

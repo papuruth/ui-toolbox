@@ -1,33 +1,45 @@
-import AspectRatioCalculator from "components/AspectRatioCalculator";
-import Base64Image from "components/Base64Image";
-import Base64Text from "components/Base64Text";
-import ColorConverter from "components/ColorConverter";
-import CSVToJSON from "components/CSVToJSON";
-import HashGenerator from "components/HashGenerator";
-import ImageResizer from "components/ImageResizer";
-import JWTDecoder from "components/JWTDecoder";
-import LoremIpsum from "components/LoremIpsum";
-import NumberBaseConverter from "components/NumberBaseConverter";
-import PasswordTools from "components/PasswordTools";
-import QRGenerator from "components/QRGenerator";
-import RegexTester from "components/RegexTester";
-import TextCaseConverter from "components/TextCaseConverter";
-import TextDiff from "components/TextDiff";
-import TimestampConverter from "components/TimestampConverter";
-import UUIDGenerator from "components/UUIDGenerator";
-import WordCounter from "components/WordCounter";
-import YAMLJSONConverter from "components/YAMLJSONConverter";
-import { Box, Chip, Typography } from "@mui/material";
+import { Box, Chip, CircularProgress, Typography } from "@mui/material";
 import { object, oneOfType } from "prop-types";
-import React, { useEffect } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import StepperNavigation from "components/StepperNavigation";
-import UrlValidator from "components/UrlValidator";
 import localization from "localization";
-import URLShortner from "components/URLShortner";
-import JSONViewer from "components/JSONViewer";
 import { GLOBAL_CONSTANTS, TOOL_CATEGORIES } from "utils/globalConstants";
 import storage from "utils/storage";
+import ToolSEO from "components/Shared/ToolSEO";
+import RelatedTools from "components/Shared/RelatedTools";
+import { SEO_META } from "utils/seoMeta";
 import { StyledHeroContent, StyledToolBody, StyledToolCard, StyledToolHero, StyledToolPage } from "./styles";
+
+const AspectRatioCalculator = lazy(() => import("components/AspectRatioCalculator"));
+const Base64Image = lazy(() => import("components/Base64Image"));
+const Base64Text = lazy(() => import("components/Base64Text"));
+const ColorConverter = lazy(() => import("components/ColorConverter"));
+const CSVToJSON = lazy(() => import("components/CSVToJSON"));
+const HashGenerator = lazy(() => import("components/HashGenerator"));
+const ImageResizer = lazy(() => import("components/ImageResizer"));
+const JWTDecoder = lazy(() => import("components/JWTDecoder"));
+const JSONViewer = lazy(() => import("components/JSONViewer"));
+const LoremIpsum = lazy(() => import("components/LoremIpsum"));
+const NumberBaseConverter = lazy(() => import("components/NumberBaseConverter"));
+const PasswordTools = lazy(() => import("components/PasswordTools"));
+const QRGenerator = lazy(() => import("components/QRGenerator"));
+const RegexTester = lazy(() => import("components/RegexTester"));
+const TextCaseConverter = lazy(() => import("components/TextCaseConverter"));
+const TextDiff = lazy(() => import("components/TextDiff"));
+const TimestampConverter = lazy(() => import("components/TimestampConverter"));
+const URLShortner = lazy(() => import("components/URLShortner"));
+const UrlValidator = lazy(() => import("components/UrlValidator"));
+const UUIDGenerator = lazy(() => import("components/UUIDGenerator"));
+const WordCounter = lazy(() => import("components/WordCounter"));
+const YAMLJSONConverter = lazy(() => import("components/YAMLJSONConverter"));
+
+function ToolFallback() {
+    return (
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 200 }}>
+            <CircularProgress size={32} sx={{ color: "var(--color-primary, #22c55e)" }} />
+        </Box>
+    );
+}
 
 function Operations({ location }) {
     const { pathname } = location || {};
@@ -120,8 +132,12 @@ function Operations({ location }) {
     const currentItem = GLOBAL_CONSTANTS.OPERATIONS_ITEMS.find((item) => item.route === pathname);
     const category = currentItem ? TOOL_CATEGORIES.find((c) => c.id === currentItem.category) : null;
 
+    const toolSeo = SEO_META[pathname];
+
     return (
-        <StyledToolPage>
+        <>
+            <ToolSEO route={pathname} />
+            <StyledToolPage>
             <StyledToolHero $categoryColor={category?.color}>
                 <StepperNavigation currentView={title} category={category} />
                 <StyledHeroContent>
@@ -153,10 +169,24 @@ function Operations({ location }) {
             </StyledToolHero>
             <StyledToolBody>
                 <StyledToolCard elevation={2}>
-                    <Component />
+                    <Suspense fallback={<ToolFallback />}>
+                        <Component />
+                    </Suspense>
                 </StyledToolCard>
+                {toolSeo?.about && (
+                    <Box sx={{ mt: 3, px: 1 }}>
+                        <Typography variant="subtitle2" fontWeight={700} gutterBottom sx={{ color: "var(--text-primary)" }}>
+                            About this tool
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: "var(--text-secondary)" }}>
+                            {toolSeo.about}
+                        </Typography>
+                    </Box>
+                )}
+                <RelatedTools currentRoute={pathname} />
             </StyledToolBody>
         </StyledToolPage>
+        </>
     );
 }
 

@@ -1,51 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <!-- Favicon -->
+        <link rel="icon" type="image/x-icon" href="%PUBLIC_URL%/favicon.ico" />
+        <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/favicon.svg" />
+        <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/assets/images/icon-16x16.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/assets/images/icon-32x32.png" />
+        <!-- Apple -->
+        <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/assets/images/apple-touch-icon.png" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <!-- PWA / theme -->
+        <meta name="theme-color" content="#22c55e" />
+        <meta name="application-name" content="DevDeck" />
+        <meta name="google-site-verification" content="d9X2uV7QOAgl6y0GrAk5ijW1ufkps8N9azwPvUAwKzQ" />
+        <meta
+            name="description"
+            content="DevDeck is a fast, smart developer toolbox with 22+ tools. Convert, encode, validate, and generate instantly."
+        />
+        <link rel="manifest" id="manifest" href="%PUBLIC_URL%/manifest.webmanifest" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+        <title>DevDeck — All your dev tools. One command away.</title>
+    </head>
 
-<head>
-  <meta charset="utf-8" />
-  <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="%PUBLIC_URL%/favicon.ico" />
-  <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/favicon.svg" />
-  <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/assets/images/icon-16x16.png" />
-  <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/assets/images/icon-32x32.png" />
-  <!-- Apple -->
-  <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/assets/images/apple-touch-icon.png" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- PWA / theme -->
-  <meta name="theme-color" content="#22c55e" />
-  <meta name="application-name" content="DevDeck" />
-  <link rel="manifest" id="manifest" href="%PUBLIC_URL%/manifest.webmanifest" />
-  <meta name="google-site-verification" content="d9X2uV7QOAgl6y0GrAk5ijW1ufkps8N9azwPvUAwKzQ" />
-  <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
-
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <title>DevDeck — All your dev tools. One command away.</title>
-  <meta name="description"
-    content="DevDeck is a fast, smart developer toolbox with 22+ tools. Convert, encode, validate, and generate instantly.">
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9TLJ1DP0E3"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-    gtag("js", new Date());
-
-    gtag("config", "G-9TLJ1DP0E3");
-  </script>
-</head>
-
-<body>
-  <noscript>You need to enable JavaScript to run this app!</noscript>
-  <div id="root"></div>
-</body>
-
+    <body>
+        <noscript>
+            <h1>DevDeck — Free Developer Tools Online</h1>
+            <p>
+                DevDeck is a free, browser-based developer toolbox with 22+ utilities. All tools run locally in your
+                browser — no sign-up, no data sent to servers.
+            </p>
+            <h2>Available Tools</h2>
+            <ul>
+                <li><a href="/json-viewer">JSON Viewer &amp; Formatter</a> — Format, validate, and browse JSON data</li>
+                <li><a href="/jwt-decoder">JWT Decoder</a> — Decode and inspect JSON Web Tokens</li>
+                <li><a href="/regex-tester">Regex Tester</a> — Test regular expressions with live match highlighting</li>
+                <li><a href="/base64-text">Base64 Text Encoder / Decoder</a> — Encode and decode Base64 strings</li>
+                <li><a href="/base64-image">Base64 Image Converter</a> — Convert images to and from Base64</li>
+                <li><a href="/uuid-generator">UUID Generator</a> — Generate UUID v4 values instantly</li>
+                <li><a href="/password-tools">Password Generator &amp; Strength Meter</a> — Create secure passwords</li>
+                <li><a href="/hash-generator">Hash Generator</a> — Generate MD5, SHA-256, SHA-512 hashes</li>
+                <li><a href="/qr-generator">QR Code Generator</a> — Create QR codes from any text or URL</li>
+                <li><a href="/color-converter">Color Converter</a> — Convert HEX, RGB, and HSL color codes</li>
+                <li><a href="/text-case">Text Case Converter</a> — Transform text to camelCase, snake_case, and more</li>
+                <li><a href="/url-validator">URL Validator</a> — Check HTTP status codes for any URL</li>
+                <li><a href="/url-shortener">URL Shortener</a> — Shorten long URLs instantly</li>
+                <li><a href="/timestamp">Unix Timestamp Converter</a> — Convert epoch time to readable dates</li>
+                <li><a href="/number-base">Number Base Converter</a> — Convert between binary, hex, octal, decimal</li>
+                <li><a href="/yaml-json">YAML to JSON Converter</a> — Convert YAML and JSON bidirectionally</li>
+                <li><a href="/text-diff">Text Diff Tool</a> — Compare two texts and highlight differences</li>
+                <li><a href="/word-counter">Word Counter</a> — Count words, characters, and reading time</li>
+                <li><a href="/csv-json">CSV to JSON Converter</a> — Parse CSV data into JSON</li>
+                <li><a href="/image-resizer">Image Resizer</a> — Crop, scale, and rotate images in the browser</li>
+                <li><a href="/aspect-ratio-calculator">Aspect Ratio Calculator</a> — Calculate image aspect ratios</li>
+                <li><a href="/lorem-ipsum">Lorem Ipsum Generator</a> — Generate placeholder text</li>
+            </ul>
+            <p>Enable JavaScript to use DevDeck.</p>
+        </noscript>
+        <div id="root"></div>
+    </body>
 </html>

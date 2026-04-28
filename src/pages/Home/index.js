@@ -1,4 +1,5 @@
 import NoData from "components/Shared/NoData";
+import ToolSEO from "components/Shared/ToolSEO";
 import localization from "localization";
 import { filter, includes, isEmpty, map, toLower } from "lodash";
 import PropTypes, { string } from "prop-types";
@@ -272,6 +273,8 @@ function Home({ searchQuery }) {
     if (searchQuery) {
         const filtered = filter(OPERATIONS_ITEMS, (item) => includes(toLower(item.label), toLower(searchQuery)));
         return (
+            <>
+            <ToolSEO route="/" />
             <StyledContainer>
                 <StyledSectionWrapper>
                     <StyledSectionHeader>
@@ -289,10 +292,13 @@ function Home({ searchQuery }) {
                     )}
                 </StyledSectionWrapper>
             </StyledContainer>
+            </>
         );
     }
 
     return (
+        <>
+        <ToolSEO route="/" />
         <StyledContainer>
             {/* ── Hero ─────────────────────────────────────────────────────── */}
             <StyledHero>
@@ -361,6 +367,7 @@ function Home({ searchQuery }) {
                 })}
             </StyledSectionWrapper>
         </StyledContainer>
+        </>
     );
 }
 

@@ -3,6 +3,7 @@ import GlobalLayout from "components/GlobalLayout";
 import UpdateBanner from "components/Shared/UpdateBanner";
 import React, { useEffect, useMemo, useState } from "react";
 import { useClearCache } from "react-clear-cache";
+import { HelmetProvider } from "react-helmet-async";
 import { Provider } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -96,6 +97,7 @@ function App() {
     );
 
     return (
+        <HelmetProvider>
         <ColorModeContext.Provider value={colorMode}>
             <Provider store={store}>
                 <StyleSheetManager shouldForwardProp={shouldForwardProp}>
@@ -125,6 +127,7 @@ function App() {
                 </StyleSheetManager>
             </Provider>
         </ColorModeContext.Provider>
+        </HelmetProvider>
     );
 }
 
