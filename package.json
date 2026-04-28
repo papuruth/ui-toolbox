@@ -1,8 +1,37 @@
 {
     "name": "devdeck",
     "description": "A free, open-source, all-in-one developer toolbox — 22 utilities available in a single progressive web app, with dark mode, search, and offline support.",
-    "version": "1.0.1",
+    "version": "2.0.0",
+    "private": true,
     "license": "MIT",
+    "homepage": "https://devdeckio.netlify.app",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/papuruth/devdeck.git"
+    },
+    "bugs": {
+        "url": "https://github.com/papuruth/devdeck/issues"
+    },
+    "keywords": [
+        "developer-tools",
+        "toolbox",
+        "pwa",
+        "utilities",
+        "react",
+        "open-source",
+        "offline",
+        "dark-mode"
+    ],
+    "engines": {
+        "node": ">=22.0.0",
+        "yarn": ">=1.22.0"
+    },
+    "packageManager": "yarn@1.22.22",
+    "author": {
+      "name": "Papu Kumar",
+      "email": "papuruth@gmail.com",
+      "url": "https://p-folio.netlify.app"
+    },
     "scripts": {
         "start": "craco start",
         "prebuild": "yarn run generate-build-meta",
