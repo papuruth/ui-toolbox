@@ -36,7 +36,7 @@ A free, open-source, all-in-one developer toolbox — 22 utilities available in 
 | Tool          | Route            | Description                                                     |
 | ------------- | ---------------- | --------------------------------------------------------------- |
 | URL Validator | `/url-validator` | Check HTTP status codes and strip tracking parameters from URLs |
-| URL Shortener | `/url-shortener` | Shorten any long URL to a compact shareable link (via TinyURL)  |
+| URL Shortener | `/url-shortener` | Shorten any long URL to a compact shareable link (via Short.io)  |
 
 ### Utilities
 
@@ -99,7 +99,7 @@ yarn lint
 yarn format
 ```
 
-Requires **Node ≥ 14** and **Yarn**.
+Requires **Node ≥ 22** and **Yarn ≥ 1.22**.
 
 ---
 
