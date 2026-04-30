@@ -50,9 +50,9 @@ export default function GlobalLayout() {
                 <ConnectedRouter history={history}>
                     <Header />
                     <Routes />
+                    <Footer />
                 </ConnectedRouter>
             </StyledMainViewContainer>
-            <Footer />
             <CommandPalette open={paletteOpen} onClose={() => dispatch(closeCommandPaletteAction())} />
         </StyledContainer>
     );
