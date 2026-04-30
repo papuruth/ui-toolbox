@@ -381,6 +381,7 @@ function Home({ searchQuery }) {
                             { slug: "password-generator", label: "Password Security Guide" }
                         ].map((g) => (
                             <button
+                                type="button"
                                 key={g.slug}
                                 onClick={() => dispatch(push(`/blog/${g.slug}`))}
                                 style={{
@@ -400,6 +401,7 @@ function Home({ searchQuery }) {
                             </button>
                         ))}
                         <button
+                            type="button"
                             onClick={() => dispatch(push("/blog"))}
                             style={{
                                 background: "none",
