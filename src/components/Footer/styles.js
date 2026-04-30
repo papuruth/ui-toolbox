@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 import colors from "styles/colors";
 
@@ -38,11 +39,7 @@ export const GuidesRow = styled.div`
     color: rgba(255, 255, 255, 0.35);
 `;
 
-export const GuideLink = styled.button`
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
+export const GuideLink = styled(Link)`
     color: rgba(34, 204, 153, 0.55);
     font-size: 10px;
     font-family: "Inter", sans-serif;
