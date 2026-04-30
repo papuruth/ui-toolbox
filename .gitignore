@@ -23,7 +23,6 @@ yarn-error.log*
 meta.json
 
 #documentation
-docs/
 .cache/
 debug.json
 .eslintcache

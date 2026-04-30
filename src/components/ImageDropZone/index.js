@@ -1,16 +1,36 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FileUpload } from "@mui/icons-material";
 import { func, bool, number, string } from "prop-types";
 import { Typography } from "@mui/material";
 import { StyledPaper } from "./styles";
 
+const ACCEPTED_TYPES = {
+    "image/jpeg": [".jpg", ".jpeg"],
+    "image/png": [".png"]
+};
+
 export default function ImageDropZone({ handleOnDrop, maxImageSize, unit, fullWidth }) {
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: handleOnDrop });
+    const [dropError, setDropError] = useState("");
+
+    const onDrop = useCallback((acceptedFiles) => {
+        setDropError("");
+        handleOnDrop(acceptedFiles);
+    }, [handleOnDrop]);
+
+    const onDropRejected = useCallback(() => {
+        setDropError("Invalid file type. Please upload a JPG, PNG, or JPEG image.");
+    }, []);
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        onDropRejected,
+        accept: ACCEPTED_TYPES
+    });
 
     return (
         <StyledPaper {...getRootProps()} $isDragActive={isDragActive} $fullWidth={fullWidth} data-drag-active={isDragActive}>
-            <input {...getInputProps()} accept=".jpg,.png,.jpeg" />
+            <input {...getInputProps()} />
             <FileUpload className="upload-icon" sx={{ fontSize: 28, color: isDragActive ? "#22cc99" : "var(--text-secondary)", transition: "color 0.2s ease" }} />
             <Typography
                 variant="body2"
@@ -21,6 +41,11 @@ export default function ImageDropZone({ handleOnDrop, maxImageSize, unit, fullWi
             <Typography variant="caption" sx={{ color: "var(--text-secondary)", opacity: 0.5, fontSize: "11px" }}>
                 JPG, PNG, JPEG · Max {maxImageSize} {unit}
             </Typography>
+            {dropError && (
+                <Typography variant="caption" sx={{ color: "#ff5252", fontSize: "11px", mt: 0.5 }}>
+                    {dropError}
+                </Typography>
+            )}
         </StyledPaper>
     );
 }

@@ -62,13 +62,16 @@ const {
     common: { maxImageSizeText }
 } = localization;
 
+const ORIGINAL_ASPECT = "original";
+
 const ASPECT_PRESETS = [
-    { label: "Free", value: undefined, icon: null },
-    { label: "1:1",  value: 1,        icon: { w: 8,  h: 8 } },
-    { label: "4:3",  value: 4 / 3,    icon: { w: 11, h: 8 } },
-    { label: "3:2",  value: 3 / 2,    icon: { w: 12, h: 8 } },
-    { label: "16:9", value: 16 / 9,   icon: { w: 14, h: 8 } },
-    { label: "9:16", value: 9 / 16,   icon: { w: 5,  h: 9 } }
+    { label: "Free",     value: undefined,       icon: null },
+    { label: "Original", value: ORIGINAL_ASPECT, icon: null },
+    { label: "1:1",      value: 1,               icon: { w: 8,  h: 8 } },
+    { label: "4:3",      value: 4 / 3,           icon: { w: 11, h: 8 } },
+    { label: "3:2",      value: 3 / 2,           icon: { w: 12, h: 8 } },
+    { label: "16:9",     value: 16 / 9,          icon: { w: 14, h: 8 } },
+    { label: "9:16",     value: 9 / 16,          icon: { w: 5,  h: 9 } }
 ];
 
 function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
@@ -78,13 +81,16 @@ function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
 export default function ImageResizer() {
     const [imgSrc, setImgSrc] = useState("");
     const [fileName, setFileName] = useState("");
+    const [fileSize, setFileSize] = useState("");
     const [imgDims, setImgDims] = useState(null);
     const [crop, setCrop] = useState();
     const [completedCrop, setCompletedCrop] = useState(null);
     const [cropDims, setCropDims] = useState(null);
     const [scale, setScale] = useState(1);
     const [rotate, setRotate] = useState(0);
-    const [aspect, setAspect] = useState(16 / 9);
+    const [aspect, setAspect] = useState(undefined);
+    const [originalAspect, setOriginalAspect] = useState(null);
+    const [selectedPresetLabel, setSelectedPresetLabel] = useState("Free");
     const [outW, setOutW] = useState("");
     const [outH, setOutH] = useState("");
     const [lockAR, setLockAR] = useState(true);
@@ -110,6 +116,8 @@ export default function ImageResizer() {
                 const nameParts = file.name.split(".");
                 nameParts.pop();
                 setFileName(nameParts.join("."));
+                const bytes = file.size;
+                setFileSize(bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.round(bytes / 1024)} KB`);
                 topLoader.show(true, loaderId);
                 const result = await getDataUrl(file);
                 if (result) {
@@ -137,7 +145,12 @@ export default function ImageResizer() {
     const handleReplaceImage = useCallback(() => {
         setImgSrc("");
         setFileName("");
+        setFileSize("");
+        setActualFileSize(null);
         setImgDims(null);
+        setOriginalAspect(null);
+        setAspect(undefined);
+        setSelectedPresetLabel("Free");
         setCrop(undefined);
         setCompletedCrop(null);
         setCropDims(null);
@@ -155,8 +168,6 @@ export default function ImageResizer() {
     const handleReset = useCallback(() => {
         setScale(1);
         setRotate(0);
-        setAspect(16 / 9);
-        setCompletedCrop(null);
         setCropDims(null);
         setOutW("");
         setOutH("");
@@ -166,11 +177,18 @@ export default function ImageResizer() {
         userEditedDimsRef.current = false;
         dimTriggeredCropRef.current = false;
         prevCropRef.current = null;
-        if (imgRef.current) {
+        if (imgRef.current && originalAspect) {
             const { width, height } = imgRef.current;
-            setCrop(centerAspectCrop(width, height, 16 / 9));
+            setAspect(originalAspect);
+            setSelectedPresetLabel("Original");
+            const newCrop = centerCrop(makeAspectCrop({ unit: "%", width: 100 }, originalAspect, width, height), width, height);
+            setCrop(newCrop);
+            // Use exact rendered dimensions (same as onImageLoad) to avoid float rounding
+            setCompletedCrop({ unit: "px", x: 0, y: 0, width, height });
+        } else {
+            setCompletedCrop(null);
         }
-    }, []);
+    }, [originalAspect]);
 
     // Keyboard shortcut: R = Reset
     useEffect(() => {
@@ -185,28 +203,55 @@ export default function ImageResizer() {
     const onImageLoad = (e) => {
         const { width, height, naturalWidth, naturalHeight } = e.currentTarget;
         setImgDims({ w: naturalWidth, h: naturalHeight });
-        if (aspect) {
-            setCrop(centerAspectCrop(width, height, aspect));
-        }
+        const origRatio = naturalWidth / naturalHeight;
+        setOriginalAspect(origRatio);
+        setAspect(origRatio);
+        setSelectedPresetLabel("Original");
+        const newCrop = centerCrop(makeAspectCrop({ unit: "%", width: 100 }, origRatio, width, height), width, height);
+        setCrop(newCrop);
+        userEditedDimsRef.current = false;
+        // Use exact rendered dimensions to avoid floating-point rounding errors
+        setCompletedCrop({ unit: "px", x: 0, y: 0, width, height });
     };
 
-    const handleAspectSelect = (ratio) => {
+    const handleAspectSelect = (value) => {
+        const preset = ASPECT_PRESETS.find((p) => p.value === value);
+        setSelectedPresetLabel(preset?.label ?? "Free");
+        const ratio = value === ORIGINAL_ASPECT ? originalAspect : value;
         setAspect(ratio);
         if (ratio !== undefined && imgRef.current) {
             const { width, height } = imgRef.current;
-            setCrop(centerAspectCrop(width, height, ratio));
+            userEditedDimsRef.current = false;
+            if (value === ORIGINAL_ASPECT) {
+                // Full-image crop — use exact rendered dims to show the true original dimensions
+                const newCrop = centerCrop(makeAspectCrop({ unit: "%", width: 100 }, ratio, width, height), width, height);
+                setCrop(newCrop);
+                setCompletedCrop({ unit: "px", x: 0, y: 0, width, height });
+            } else {
+                const newCrop = centerAspectCrop(width, height, ratio);
+                setCrop(newCrop);
+                setCompletedCrop({
+                    unit: "px",
+                    x: Math.round((newCrop.x / 100) * width),
+                    y: Math.round((newCrop.y / 100) * height),
+                    width: Math.round((newCrop.width / 100) * width),
+                    height: Math.round((newCrop.height / 100) * height)
+                });
+            }
         }
     };
 
     const handleOutW = (val) => {
+        const raw = parseInt(val, 10);
+        const w = imgDims && raw > imgDims.w ? imgDims.w : raw;
+        const cappedVal = imgDims && raw > imgDims.w ? String(imgDims.w) : val;
         userEditedDimsRef.current = true;
-        outWRef.current = val;
-        setOutW(val);
-        const w = parseInt(val, 10);
+        outWRef.current = cappedVal;
+        setOutW(cappedVal);
         if (w > 0 && imgDims) {
             const wPct = Math.min((w / imgDims.w) * 100, 100);
             if (lockAR && cropDims?.w) {
-                const newH = Math.round((w * cropDims.h) / cropDims.w);
+                const newH = Math.min(Math.round((w * cropDims.h) / cropDims.w), imgDims.h);
                 const computed = String(newH);
                 outHRef.current = computed;
                 setOutH(computed);
@@ -233,14 +278,16 @@ export default function ImageResizer() {
     };
 
     const handleOutH = (val) => {
+        const raw = parseInt(val, 10);
+        const h = imgDims && raw > imgDims.h ? imgDims.h : raw;
+        const cappedVal = imgDims && raw > imgDims.h ? String(imgDims.h) : val;
         userEditedDimsRef.current = true;
-        outHRef.current = val;
-        setOutH(val);
-        const h = parseInt(val, 10);
+        outHRef.current = cappedVal;
+        setOutH(cappedVal);
         if (h > 0 && imgDims) {
             const hPct = Math.min((h / imgDims.h) * 100, 100);
             if (lockAR && cropDims?.h) {
-                const newW = Math.round((h * cropDims.w) / cropDims.h);
+                const newW = Math.min(Math.round((h * cropDims.w) / cropDims.h), imgDims.w);
                 const computed = String(newW);
                 outWRef.current = computed;
                 setOutW(computed);
@@ -296,14 +343,27 @@ export default function ImageResizer() {
         }
     }, []);
 
-    const estimatedFileSize = useMemo(() => {
+    const dimError = useMemo(() => {
+        if (aspect === undefined || !outW || !outH || lockAR) return null;
         const w = parseInt(outW, 10);
         const h = parseInt(outH, 10);
         if (!w || !h) return null;
-        const bytes = w * h * 3;
-        if (bytes >= 1024 * 1024) return `~${(bytes / 1024 / 1024).toFixed(1)} MB`;
-        return `~${Math.round(bytes / 1024)} KB`;
-    }, [outW, outH]);
+        // Dims still match the crop output — system hasn't updated yet or user hasn't changed them
+        if (cropDims && w === cropDims.w && h === cropDims.h) return null;
+        if (Math.abs(w / h - aspect) > 0.02) return L.dimMismatchWarning;
+        return null;
+    }, [aspect, outW, outH, lockAR, cropDims]);
+
+    const [actualFileSize, setActualFileSize] = useState(null);
+
+    const updateActualSize = useCallback(() => {
+        if (!previewCanvasRef.current) return;
+        previewCanvasRef.current.toBlob((blob) => {
+            if (!blob) return;
+            const bytes = blob.size;
+            setActualFileSize(bytes >= 1024 * 1024 ? `~${(bytes / 1024 / 1024).toFixed(1)} MB` : `~${Math.round(bytes / 1024)} KB`);
+        }, "image/png");
+    }, []);
 
     useDebounceEffect(
         async () => {
@@ -333,10 +393,11 @@ export default function ImageResizer() {
                 const tw = parseInt(outWRef.current, 10) || naturalW;
                 const th = parseInt(outHRef.current, 10) || naturalH;
                 canvasPreview(imgRef.current, previewCanvasRef.current, completedCrop, scale, rotate, tw, th);
+                updateActualSize();
             }
         },
         100,
-        [completedCrop, scale, rotate]
+        [completedCrop, scale, rotate, updateActualSize]
     );
 
     // Re-renders canvas when user manually edits output dimensions
@@ -345,6 +406,7 @@ export default function ImageResizer() {
         const tw = parseInt(outW, 10) || null;
         const th = parseInt(outH, 10) || null;
         canvasPreview(imgRef.current, previewCanvasRef.current, completedCrop, scale, rotate, tw, th);
+        updateActualSize();
     }, [outW, outH]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const scaleFill = `${((scale - 1) / 9) * 100}%`;
@@ -377,6 +439,7 @@ export default function ImageResizer() {
                                 {imgDims.w}×{imgDims.h}
                             </FileInfoDims>
                         )}
+                        {fileSize && <FileInfoDims>{fileSize}</FileInfoDims>}
                         <ReplaceBtn onClick={handleReplaceImage} title={L.replaceImageBtn}>
                             <SwapHoriz sx={{ fontSize: 12 }} />
                             {L.replaceImageBtn}
@@ -433,8 +496,8 @@ export default function ImageResizer() {
                         <ControlLabel>{L.aspectRatioLabel}</ControlLabel>
                         <AspectGroup>
                             {ASPECT_PRESETS.map((p) => (
-                                <AspectChip key={p.label} $active={aspect === p.value} disabled={!imgSrc} onClick={() => handleAspectSelect(p.value)}>
-                                    {p.icon && <AspectPreviewBox $w={p.icon.w} $h={p.icon.h} $active={aspect === p.value} />}
+                                <AspectChip key={p.label} $active={selectedPresetLabel === p.label} disabled={!imgSrc} onClick={() => handleAspectSelect(p.value)}>
+                                    {p.icon && <AspectPreviewBox $w={p.icon.w} $h={p.icon.h} $active={selectedPresetLabel === p.label} />}
                                     {p.label}
                                 </AspectChip>
                             ))}
@@ -444,9 +507,9 @@ export default function ImageResizer() {
                         <ControlRow>
                             <ControlLabel>{L.outputSizeLabel}</ControlLabel>
                             <DimPair>
-                                <DimInput type="number" min={1} value={outW} onChange={(e) => handleOutW(e.target.value)} placeholder="W" />
+                                <DimInput type="number" min={1} max={imgDims?.w} value={outW} onChange={(e) => handleOutW(e.target.value)} placeholder="W" />
                                 <span>×</span>
-                                <DimInput type="number" min={1} value={outH} onChange={(e) => handleOutH(e.target.value)} placeholder="H" />
+                                <DimInput type="number" min={1} max={imgDims?.h} value={outH} onChange={(e) => handleOutH(e.target.value)} placeholder="H" />
                                 <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>px</span>
                             </DimPair>
                             <LockBtn
@@ -456,6 +519,11 @@ export default function ImageResizer() {
                             >
                                 {lockAR ? <Lock sx={{ fontSize: 14 }} /> : <LockOpen sx={{ fontSize: 14 }} />}
                             </LockBtn>
+                            {dimError && (
+                                <Typography variant="caption" sx={{ color: "#ff5252", fontSize: 11, mt: 0.5, width: "100%" }}>
+                                    {dimError}
+                                </Typography>
+                            )}
                         </ControlRow>
                     )}
                 </ControlsSection>
@@ -563,9 +631,9 @@ export default function ImageResizer() {
                                 height: completedCrop.height
                             }}
                         />
-                        {estimatedFileSize && (
+                        {actualFileSize && (
                             <ResultMetaRow>
-                                <ResultMetaBadge>{estimatedFileSize}</ResultMetaBadge>
+                                <ResultMetaBadge>{actualFileSize}</ResultMetaBadge>
                                 {outW && outH && (
                                     <ResultMetaBadge>
                                         {outW}×{outH}px

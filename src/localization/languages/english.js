@@ -100,7 +100,8 @@ export default {
         replaceImageBtn: "Replace",
         gridOverlayLabel: "Grid",
         copySuccessMsg: "Image copied to clipboard",
-        copyErrorMsg: "Copy not supported in this browser"
+        copyErrorMsg: "Copy not supported in this browser",
+        dimMismatchWarning: "Dimensions don't match the selected aspect ratio"
     },
     base64Encoder: {
         pageTitle: "Base64 Encoder"
@@ -280,7 +281,27 @@ export default {
         jwtTokenLabel: "JWT Token",
         copyBtn: "Copy",
         copiedLabel: "Copied",
-        emptyStateMessage: "Paste a JWT token above to decode it"
+        emptyStateMessage: "Paste a JWT token above to decode it",
+        generateExampleBtn: "Generate Example",
+        validJwtLabel: "✓ Valid JWT",
+        decodedHeaderLabel: "Decoded Header",
+        decodedPayloadLabel: "Decoded Payload",
+        signatureLabel: "Signature",
+        signatureVerifyLabel: "Signature Verification",
+        secretKeyPlaceholder: "Enter HMAC secret…",
+        base64EncodedToggle: "BASE64URL ENCODED",
+        verifyBtn: "Verify",
+        sigValidLabel: "✓ Signature Verified",
+        sigInvalidLabel: "✗ Invalid Signature",
+        sigUnsupportedLabel: "Algorithm not supported",
+        jsonTab: "JSON",
+        claimsBreakdownTab: "Claims",
+        showDetailsLabel: "Show Details",
+        hideDetailsLabel: "Hide Details",
+        claimCol: "Claim",
+        valueCol: "Value",
+        descriptionCol: "Description",
+        numericDateNote: "This value must be a NumericDate type, representing seconds."
     },
     uuidGenerator: {
         pageTitle: "UUID Generator",

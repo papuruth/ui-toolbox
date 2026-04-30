@@ -9,17 +9,14 @@ export async function canvasPreview(image, canvas, crop, scale = 1, rotate = 0, 
 
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
-    const pixelRatio = window.devicePixelRatio;
 
     const naturalCropW = crop.width * scaleX;
     const naturalCropH = crop.height * scaleY;
     const finalW = targetW || naturalCropW;
     const finalH = targetH || naturalCropH;
 
-    canvas.width = Math.floor(finalW * pixelRatio);
-    canvas.height = Math.floor(finalH * pixelRatio);
-
-    ctx.scale(pixelRatio, pixelRatio);
+    canvas.width = Math.floor(finalW);
+    canvas.height = Math.floor(finalH);
     ctx.imageSmoothingQuality = "high";
 
     // Map natural crop space to the requested output dimensions

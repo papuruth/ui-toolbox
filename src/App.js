@@ -26,14 +26,14 @@ function shouldForwardProp(propName, target) {
 
 function App() {
     const [mode, setMode] = useState(() => {
-        const saved = localStorage.getItem("ui-toolbox-theme");
+        const saved = localStorage.getItem("devdeck-theme");
         if (saved) return saved;
         return window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark";
     });
     const { isLatestVersion, emptyCacheStorage } = useClearCache();
 
     useEffect(() => {
-        localStorage.setItem("ui-toolbox-theme", mode);
+        localStorage.setItem("devdeck-theme", mode);
         document.documentElement.setAttribute("data-theme", mode);
     }, [mode]);
 
@@ -98,35 +98,35 @@ function App() {
 
     return (
         <HelmetProvider>
-        <ColorModeContext.Provider value={colorMode}>
-            <Provider store={store}>
-                <StyleSheetManager shouldForwardProp={shouldForwardProp}>
-                    <CssBaseline />
-                    <GlobalStyled />
-                    <StyledEngineProvider injectFirst>
-                        <ThemeProvider theme={theme}>
-                            <ToolChainProvider>
-                                <GlobalLayout />
-                            </ToolChainProvider>
-                        </ThemeProvider>
-                    </StyledEngineProvider>
-                    <ToastContainer
-                        position="top-center"
-                        autoClose={3000}
-                        hideProgressBar={false}
-                        newestOnTop={false}
-                        closeOnClick
-                        rtl={false}
-                        pauseOnFocusLoss
-                        draggable={false}
-                        pauseOnHover
-                        theme="colored"
-                        closeButton={false}
-                    />
-                    {!isLatestVersion && process.env.NODE_ENV === "production" && <UpdateBanner onUpdate={() => emptyCacheStorage()} />}
-                </StyleSheetManager>
-            </Provider>
-        </ColorModeContext.Provider>
+            <ColorModeContext.Provider value={colorMode}>
+                <Provider store={store}>
+                    <StyleSheetManager shouldForwardProp={shouldForwardProp}>
+                        <CssBaseline />
+                        <GlobalStyled />
+                        <StyledEngineProvider injectFirst>
+                            <ThemeProvider theme={theme}>
+                                <ToolChainProvider>
+                                    <GlobalLayout />
+                                </ToolChainProvider>
+                            </ThemeProvider>
+                        </StyledEngineProvider>
+                        <ToastContainer
+                            position="top-center"
+                            autoClose={3000}
+                            hideProgressBar={false}
+                            newestOnTop={false}
+                            closeOnClick
+                            rtl={false}
+                            pauseOnFocusLoss
+                            draggable={false}
+                            pauseOnHover
+                            theme="colored"
+                            closeButton={false}
+                        />
+                        {!isLatestVersion && process.env.NODE_ENV === "production" && <UpdateBanner onUpdate={() => emptyCacheStorage()} />}
+                    </StyleSheetManager>
+                </Provider>
+            </ColorModeContext.Provider>
         </HelmetProvider>
     );
 }
