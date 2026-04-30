@@ -23,6 +23,7 @@ export const StyledContainer = styled.div`
     background-color: var(--bg-page);
     color: var(--text-primary);
     min-height: 100vh;
+    padding-bottom: 80px;
 `;
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
@@ -115,9 +116,14 @@ export const HeroSearchBox = styled.div`
     padding: 14px 16px;
     cursor: text;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-    box-shadow: ${({ $focused }) => ($focused ? "0 0 0 2px rgba(34, 197, 94, 0.15), 0 0 8px rgba(34, 197, 94, 0.15), 0 8px 32px rgba(0,0,0,0.3)" : "0 4px 16px rgba(0,0,0,0.2)")};
+    box-shadow: ${({ $focused }) =>
+        $focused ? "0 0 0 2px rgba(34, 197, 94, 0.15), 0 0 8px rgba(34, 197, 94, 0.15), 0 8px 32px rgba(0,0,0,0.3)" : "0 4px 16px rgba(0,0,0,0.2)"};
     transform: ${({ $focused }) => ($focused ? "scale(1.01)" : "scale(1)")};
-    ${({ $focused }) => $focused && css`animation: ${glowPulse} 2s ease-in-out infinite;`}
+    ${({ $focused }) =>
+        $focused &&
+        css`
+            animation: ${glowPulse} 2s ease-in-out infinite;
+        `}
 `;
 
 export const HeroSearchIcon = styled.span`

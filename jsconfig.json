@@ -13,7 +13,8 @@
             "localization/*": ["./localization/*"],
             "assets/*": ["./assets/*"],
             "services/*": ["./services/*"],
-            "context/*": ["./context/*"]
+            "context/*": ["./context/*"],
+            "data/*": ["./data/*"]
         }
     },
     "exclude": ["node_modules", "**/node_modules/*", "build/"]

@@ -72,12 +72,12 @@ export const PaletteTrigger = muiStyled("button")(({ theme }) => {
         borderRadius: "10px",
         cursor: "pointer",
         color: isDark ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.95)",
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "Inter, sans-serif",
         fontSize: "0.82rem",
         transition: "background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease, width 0.2s ease",
         outline: "none",
         userSelect: "none",
-        width: 220,
+        width: 240,
         minWidth: 40,
         boxShadow: isDark ? "inset 0 1px 0 rgba(255,255,255,0.05)" : "inset 0 1px 0 rgba(255,255,255,0.3), 0 1px 3px rgba(0,0,0,0.1)",
 
@@ -151,3 +151,60 @@ export const TriggerKbd = muiStyled("kbd")(({ theme }) => {
         lineHeight: 1.6
     };
 });
+
+// ── Nav divider between logo/nav and utilities ────────────────────────────────
+export const NavDivider = muiStyled("span")(() => ({
+    width: "1px",
+    height: "20px",
+    background: "rgba(255,255,255,0.15)",
+    margin: "0 12px",
+    flexShrink: 0
+}));
+
+// ── Blog / Guides nav link ─────────────────────────────────────────────────────
+export const BlogNavLink = muiStyled("button")(({ $active }) => ({
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "5px",
+    background: $active ? "rgba(34,204,153,0.12)" : "none",
+    border: $active ? "1px solid rgba(34,204,153,0.35)" : "1px solid transparent",
+    borderRadius: "8px",
+    padding: "5px 11px",
+    cursor: "pointer",
+    fontFamily: "Inter, sans-serif",
+    fontSize: "0.82rem",
+    fontWeight: 600,
+    color: $active ? "#22cc99" : "rgba(255,255,255,0.65)",
+    letterSpacing: "0.01em",
+    transition: "color 0.17s ease, background 0.17s ease, border-color 0.17s ease",
+    outline: "none",
+    position: "relative",
+    flexShrink: 0,
+
+    // active bottom accent line
+    "&::after": {
+        content: "\"\"",
+        position: "absolute",
+        bottom: "-1px",
+        left: "50%",
+        transform: $active ? "translateX(-50%) scaleX(1)" : "translateX(-50%) scaleX(0)",
+        width: "60%",
+        height: "2px",
+        borderRadius: "2px",
+        background: "#22cc99",
+        transition: "transform 0.2s ease"
+    },
+
+    "&:hover": {
+        color: "#22cc99",
+        background: "rgba(34,204,153,0.08)",
+        borderColor: "rgba(34,204,153,0.25)",
+        "&::after": {
+            transform: "translateX(-50%) scaleX(1)"
+        }
+    },
+
+    "&:active": {
+        opacity: 0.8
+    }
+}));

@@ -38,6 +38,147 @@ export const ENRICHED_TOOLS = GLOBAL_CONSTANTS.OPERATIONS_ITEMS.map((tool) => ({
     keywords: TOOL_KEYWORDS[tool.route] || []
 }));
 
+// ── Blog guides (searchable in palette) ──────────────────────────────────────
+export const BLOG_GUIDES = [
+    {
+        slug: "json-viewer",
+        label: "JSON Viewer Guide",
+        description: "How to format and validate JSON",
+        keywords: ["json", "format", "guide", "blog", "viewer", "parse"]
+    },
+    {
+        slug: "base64-text-encoder",
+        label: "Base64 Encoding Guide",
+        description: "Understand Base64 encoding and decoding",
+        keywords: ["base64", "encode", "decode", "guide", "blog", "text"]
+    },
+    {
+        slug: "regex-tester",
+        label: "Regex Guide",
+        description: "Learn regular expressions from scratch",
+        keywords: ["regex", "regexp", "pattern", "guide", "blog", "match"]
+    },
+    {
+        slug: "jwt-decoder",
+        label: "JWT Decoded Guide",
+        description: "How JSON Web Tokens work",
+        keywords: ["jwt", "token", "auth", "guide", "blog", "decode"]
+    },
+    {
+        slug: "password-generator",
+        label: "Password Security Guide",
+        description: "Create strong, secure passwords",
+        keywords: ["password", "security", "guide", "blog", "generate"]
+    },
+    {
+        slug: "hash-generator",
+        label: "Hash Generator Guide",
+        description: "MD5, SHA-256, SHA-512 explained",
+        keywords: ["hash", "sha", "md5", "checksum", "guide", "blog"]
+    },
+    {
+        slug: "uuid-generator",
+        label: "UUID Generator Guide",
+        description: "What is UUID and when to use it",
+        keywords: ["uuid", "guid", "unique", "id", "guide", "blog"]
+    },
+    {
+        slug: "timestamp-converter",
+        label: "Timestamp Converter Guide",
+        description: "Unix timestamps and date conversions",
+        keywords: ["timestamp", "unix", "epoch", "date", "guide", "blog"]
+    },
+    {
+        slug: "url-parser",
+        label: "URL Parser Guide",
+        description: "Anatomy of a URL explained",
+        keywords: ["url", "parser", "href", "guide", "blog", "query"]
+    },
+    {
+        slug: "color-converter",
+        label: "Color Converter Guide",
+        description: "HEX, RGB, HSL color formats",
+        keywords: ["color", "hex", "rgb", "hsl", "guide", "blog"]
+    },
+    {
+        slug: "text-diff-checker",
+        label: "Text Diff Guide",
+        description: "Compare text and find differences",
+        keywords: ["diff", "compare", "text", "guide", "blog", "changes"]
+    },
+    {
+        slug: "image-resizer",
+        label: "Image Resizer Guide",
+        description: "Resize images in the browser",
+        keywords: ["image", "resize", "guide", "blog", "photo"]
+    },
+    {
+        slug: "qr-code-generator",
+        label: "QR Code Generator Guide",
+        description: "Generate QR codes for any URL",
+        keywords: ["qr", "code", "guide", "blog", "generate", "barcode"]
+    },
+    {
+        slug: "csv-to-json-converter",
+        label: "CSV to JSON Guide",
+        description: "Convert spreadsheet data to JSON",
+        keywords: ["csv", "json", "convert", "guide", "blog", "table"]
+    },
+    {
+        slug: "yaml-to-json-converter",
+        label: "YAML to JSON Guide",
+        description: "Convert YAML configuration to JSON",
+        keywords: ["yaml", "json", "convert", "guide", "blog"]
+    },
+    {
+        slug: "number-base-converter",
+        label: "Number Base Converter Guide",
+        description: "Binary, hex, octal conversions",
+        keywords: ["binary", "hex", "octal", "decimal", "guide", "blog"]
+    },
+    {
+        slug: "lorem-ipsum-generator",
+        label: "Lorem Ipsum Generator Guide",
+        description: "Generate placeholder text",
+        keywords: ["lorem", "ipsum", "placeholder", "guide", "blog"]
+    },
+    {
+        slug: "word-counter",
+        label: "Word Counter Guide",
+        description: "Count words, characters, reading time",
+        keywords: ["word", "count", "character", "guide", "blog"]
+    },
+    {
+        slug: "text-case-converter",
+        label: "Text Case Converter Guide",
+        description: "camelCase, snake_case, Title Case",
+        keywords: ["text", "case", "camel", "snake", "guide", "blog"]
+    },
+    {
+        slug: "url-shortener",
+        label: "URL Shortener Guide",
+        description: "Shorten long URLs instantly",
+        keywords: ["url", "shorten", "short", "guide", "blog"]
+    },
+    {
+        slug: "aspect-ratio-calculator",
+        label: "Aspect Ratio Guide",
+        description: "Calculate image and screen ratios",
+        keywords: ["aspect", "ratio", "width", "height", "guide", "blog"]
+    },
+    {
+        slug: "base64-image-converter",
+        label: "Base64 Image Guide",
+        description: "Encode images to Base64 strings",
+        keywords: ["base64", "image", "encode", "guide", "blog", "photo"]
+    }
+].map((g) => ({
+    ...g,
+    kind: "guide",
+    route: `/blog/${g.slug}`,
+    category: "guides"
+}));
+
 // ── Generate UUID (no external dep) ──────────────────────────────────────────
 function generateUUID() {
     if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -85,17 +226,9 @@ export function buildActions({ onClose, navigateTo }) {
 }
 
 // ── Suggested tools (curated, shown in default state when no query) ───────────
-export const SUGGESTED_TOOL_ROUTES = [
-    "/json-viewer",
-    "/jwt-decoder",
-    "/uuid-generator",
-    "/regex-tester",
-    "/base64-text"
-];
+export const SUGGESTED_TOOL_ROUTES = ["/json-viewer", "/jwt-decoder", "/uuid-generator", "/regex-tester", "/base64-text"];
 
-export const SUGGESTED_TOOLS = SUGGESTED_TOOL_ROUTES.map((route) =>
-    ENRICHED_TOOLS.find((t) => t.route === route)
-).filter(Boolean);
+export const SUGGESTED_TOOLS = SUGGESTED_TOOL_ROUTES.map((route) => ENRICHED_TOOLS.find((t) => t.route === route)).filter(Boolean);
 
 // ── Recent tools (frequency × recency_decay ranked) ──────────────────────────
 export function getRecentToolEntries() {
@@ -115,35 +248,33 @@ export function getRecentToolEntries() {
 
 // ── Contextual suggestions (tools related to the current page) ────────────────
 const RELATED_TOOLS = {
-    "/json-viewer":              ["/yaml-json", "/text-diff", "/jwt-decoder"],
-    "/jwt-decoder":              ["/json-viewer", "/base64-text", "/hash-generator"],
-    "/base64-text":              ["/base64-image", "/hash-generator", "/json-viewer"],
-    "/base64-image":             ["/image-resizer", "/base64-text"],
-    "/regex-tester":             ["/text-case", "/text-diff", "/word-counter"],
-    "/yaml-json":                ["/json-viewer", "/text-diff"],
-    "/text-diff":                ["/text-case", "/word-counter", "/regex-tester"],
-    "/uuid-generator":           ["/hash-generator", "/password-tools"],
-    "/hash-generator":           ["/uuid-generator", "/base64-text", "/password-tools"],
-    "/url-validator":            ["/url-shortener"],
-    "/url-shortener":            ["/url-validator", "/qr-generator"],
-    "/timestamp":                ["/number-base", "/uuid-generator"],
-    "/number-base":              ["/timestamp", "/hash-generator"],
-    "/image-resizer":            ["/base64-image", "/aspect-ratio-calculator"],
-    "/aspect-ratio-calculator":  ["/image-resizer"],
-    "/qr-generator":             ["/url-shortener", "/uuid-generator"],
-    "/color-converter":          ["/text-case"],
-    "/password-tools":           ["/hash-generator", "/uuid-generator"],
-    "/text-case":                ["/text-diff", "/word-counter", "/regex-tester"],
-    "/word-counter":             ["/text-diff", "/text-case", "/lorem-ipsum"],
-    "/lorem-ipsum":              ["/word-counter", "/text-case"],
-    "/csv-json":                 ["/json-viewer", "/yaml-json"]
+    "/json-viewer": ["/yaml-json", "/text-diff", "/jwt-decoder"],
+    "/jwt-decoder": ["/json-viewer", "/base64-text", "/hash-generator"],
+    "/base64-text": ["/base64-image", "/hash-generator", "/json-viewer"],
+    "/base64-image": ["/image-resizer", "/base64-text"],
+    "/regex-tester": ["/text-case", "/text-diff", "/word-counter"],
+    "/yaml-json": ["/json-viewer", "/text-diff"],
+    "/text-diff": ["/text-case", "/word-counter", "/regex-tester"],
+    "/uuid-generator": ["/hash-generator", "/password-tools"],
+    "/hash-generator": ["/uuid-generator", "/base64-text", "/password-tools"],
+    "/url-validator": ["/url-shortener"],
+    "/url-shortener": ["/url-validator", "/qr-generator"],
+    "/timestamp": ["/number-base", "/uuid-generator"],
+    "/number-base": ["/timestamp", "/hash-generator"],
+    "/image-resizer": ["/base64-image", "/aspect-ratio-calculator"],
+    "/aspect-ratio-calculator": ["/image-resizer"],
+    "/qr-generator": ["/url-shortener", "/uuid-generator"],
+    "/color-converter": ["/text-case"],
+    "/password-tools": ["/hash-generator", "/uuid-generator"],
+    "/text-case": ["/text-diff", "/word-counter", "/regex-tester"],
+    "/word-counter": ["/text-diff", "/text-case", "/lorem-ipsum"],
+    "/lorem-ipsum": ["/word-counter", "/text-case"],
+    "/csv-json": ["/json-viewer", "/yaml-json"]
 };
 
 export function getRelatedToolEntries(currentRoute) {
     const routes = RELATED_TOOLS[currentRoute] || [];
-    return routes
-        .map((route) => ENRICHED_TOOLS.find((t) => t.route === route))
-        .filter(Boolean);
+    return routes.map((route) => ENRICHED_TOOLS.find((t) => t.route === route)).filter(Boolean);
 }
 
 // ── Command mode actions (only shown when user types ">") ─────────────────────
@@ -187,5 +318,6 @@ export const CATEGORY_EMOJI = {
     action: "⚡",
     navigation: "🧭",
     recent: "🕘",
-    command: "⌘"
+    command: "⌘",
+    guides: "📘"
 };

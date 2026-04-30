@@ -9,7 +9,16 @@ import { fuzzyFilterWithPositions } from "utils/fuzzySearch";
 import { detectInputType } from "utils/inputDetector";
 import { useToolChain } from "context/ToolChainContext";
 import { isMac } from "utils/helperFunctions";
-import { buildActions, buildCommands, CATEGORY_EMOJI, ENRICHED_TOOLS, getRecentToolEntries, getRelatedToolEntries, SUGGESTED_TOOLS } from "./paletteData";
+import {
+    buildActions,
+    buildCommands,
+    BLOG_GUIDES,
+    CATEGORY_EMOJI,
+    ENRICHED_TOOLS,
+    getRecentToolEntries,
+    getRelatedToolEntries,
+    SUGGESTED_TOOLS
+} from "./paletteData";
 import {
     Backdrop,
     CategoryBadge,
@@ -108,12 +117,8 @@ export default function CommandPalette({ open, onClose }) {
 
         if (isCategoryMode) {
             // "#encoding", "#url", etc. — filter tools by category prefix
-            const filtered = categorySlug
-                ? ENRICHED_TOOLS.filter((t) => t.category.startsWith(categorySlug))
-                : ENRICHED_TOOLS;
-            const sectionLabel = categorySlug
-                ? `${categorySlug.charAt(0).toUpperCase()}${categorySlug.slice(1)} tools`
-                : "All tools";
+            const filtered = categorySlug ? ENRICHED_TOOLS.filter((t) => t.category.startsWith(categorySlug)) : ENRICHED_TOOLS;
+            const sectionLabel = categorySlug ? `${categorySlug.charAt(0).toUpperCase()}${categorySlug.slice(1)} tools` : "All tools";
             if (filtered.length > 0) {
                 secs.push({ id: "category-filter", label: sectionLabel, items: filtered });
             }
@@ -121,8 +126,9 @@ export default function CommandPalette({ open, onClose }) {
             // ">" or ">clear" — fuzzy-search within command list
             const cmdQuery = query.slice(1).trim();
             const matched = cmdQuery
-                ? fuzzyFilterWithPositions(commands, cmdQuery, (c) => [c.label, c.description || "", ...(c.keywords || [])])
-                      .map(({ item, score, positions }) => ({ ...item, _score: score, _positions: positions }))
+                ? fuzzyFilterWithPositions(commands, cmdQuery, (c) => [c.label, c.description || "", ...(c.keywords || [])]).map(
+                      ({ item, score, positions }) => ({ ...item, _score: score, _positions: positions })
+                  )
                 : commands;
             if (matched.length > 0) {
                 secs.push({ id: "commands", label: "Commands", items: matched });
@@ -136,9 +142,7 @@ export default function CommandPalette({ open, onClose }) {
             const shownRoutes = new Set(recent.map((t) => t.route));
 
             // Related tools based on current page context
-            const related = getRelatedToolEntries(window.location.pathname).filter(
-                (t) => !shownRoutes.has(t.route)
-            );
+            const related = getRelatedToolEntries(window.location.pathname).filter((t) => !shownRoutes.has(t.route));
             if (related.length > 0) {
                 related.forEach((t) => shownRoutes.add(t.route));
                 secs.push({ id: "related", label: "Related", items: related });
@@ -151,19 +155,21 @@ export default function CommandPalette({ open, onClose }) {
                 secs.push({ id: "suggested", label: "Suggested", items: suggested.slice(0, remaining) });
             }
         } else {
-            // Search: fuzzy across tools + actions, with per-item score + highlight positions
-            const allItems = [...ENRICHED_TOOLS, ...actions];
-            const matched = fuzzyFilterWithPositions(
-                allItems,
-                query,
-                (item) => [item.label, item.description || "", ...(item.keywords || [])]
-            ).map(({ item, score, positions }) => ({ ...item, _score: score, _positions: positions }));
+            // Search: fuzzy across tools + actions + guides, with per-item score + highlight positions
+            const allItems = [...ENRICHED_TOOLS, ...actions, ...BLOG_GUIDES];
+            const matched = fuzzyFilterWithPositions(allItems, query, (item) => [item.label, item.description || "", ...(item.keywords || [])]).map(
+                ({ item, score, positions }) => ({ ...item, _score: score, _positions: positions })
+            );
 
             const matchedActions = matched.filter((i) => i.kind === "action");
-            const matchedTools = matched.filter((i) => i.kind !== "action");
+            const matchedGuides = matched.filter((i) => i.kind === "guide");
+            const matchedTools = matched.filter((i) => i.kind !== "action" && i.kind !== "guide");
 
             if (matchedActions.length > 0) {
                 secs.push({ id: "actions", label: "Actions", items: matchedActions });
+            }
+            if (matchedGuides.length > 0) {
+                secs.push({ id: "guides", label: "Guides", items: matchedGuides });
             }
             if (matchedTools.length > 0) {
                 secs.push({ id: "tools", label: "Tools", items: matchedTools });
@@ -264,9 +270,7 @@ export default function CommandPalette({ open, onClose }) {
             }
             segments.push({ highlighted, text, key: `s${startIdx}` });
         }
-        return segments.map((seg) =>
-            seg.highlighted ? <MatchChar key={seg.key}>{seg.text}</MatchChar> : seg.text
-        );
+        return segments.map((seg) => (seg.highlighted ? <MatchChar key={seg.key}>{seg.text}</MatchChar> : seg.text));
     };
 
     // Flatten smart detection offset for section items
@@ -346,7 +350,7 @@ export default function CommandPalette({ open, onClose }) {
                                 const isActive = globalIdx === activeIndex;
                                 const iconEl = item.icon
                                     ? cloneElement(item.icon, { sx: { fontSize: "1.1rem" }, fontSize: undefined })
-                                    : (CATEGORY_EMOJI[item.category] || "🛠️");
+                                    : CATEGORY_EMOJI[item.category] || "🛠️";
 
                                 return (
                                     <ResultItem
@@ -357,7 +361,9 @@ export default function CommandPalette({ open, onClose }) {
                                         onMouseEnter={() => setActiveIndex(globalIdx)}
                                         onMouseDown={() => executeItem(item)}
                                     >
-                                        <ItemIconWrap $kind={item.kind} $category={item.category}>{iconEl}</ItemIconWrap>
+                                        <ItemIconWrap $kind={item.kind} $category={item.category}>
+                                            {iconEl}
+                                        </ItemIconWrap>
                                         <ItemContent>
                                             <ItemLabel $dimmed={item._score > 0 && item._score < 15}>
                                                 {highlightLabel(item.label, item._positions)}

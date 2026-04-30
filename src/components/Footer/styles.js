@@ -25,3 +25,31 @@ export const TrustLine = styled.span`
     letter-spacing: 0.04em;
     margin-top: 2px;
 `;
+
+export const GuidesRow = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 3px;
+    font-size: 10px;
+    font-family: "Inter", sans-serif;
+    color: rgba(255, 255, 255, 0.35);
+`;
+
+export const GuideLink = styled.button`
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: rgba(34, 204, 153, 0.55);
+    font-size: 10px;
+    font-family: "Inter", sans-serif;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.15s ease;
+    &:hover {
+        color: rgba(34, 204, 153, 0.9);
+    }
+`;

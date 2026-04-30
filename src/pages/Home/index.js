@@ -274,99 +274,150 @@ function Home({ searchQuery }) {
         const filtered = filter(OPERATIONS_ITEMS, (item) => includes(toLower(item.label), toLower(searchQuery)));
         return (
             <>
-            <ToolSEO route="/" />
-            <StyledContainer>
-                <StyledSectionWrapper>
-                    <StyledSectionHeader>
-                        <StyledSectionAccent $color="#22cc99" />
-                        <StyledSectionTitle variant="h6">Search results for &ldquo;{searchQuery}&rdquo;</StyledSectionTitle>
-                    </StyledSectionHeader>
-                    {!isEmpty(filtered) ? (
-                        <StyledGridContainer>
-                            {map(filtered, (item) => (
-                                <ToolCard key={item.route} item={item} />
-                            ))}
-                        </StyledGridContainer>
-                    ) : (
-                        <NoData title={noSearchDataMessage.replace("[DATA]", searchQuery)} />
-                    )}
-                </StyledSectionWrapper>
-            </StyledContainer>
+                <ToolSEO route="/" />
+                <StyledContainer>
+                    <StyledSectionWrapper>
+                        <StyledSectionHeader>
+                            <StyledSectionAccent $color="#22cc99" />
+                            <StyledSectionTitle variant="h6">Search results for &ldquo;{searchQuery}&rdquo;</StyledSectionTitle>
+                        </StyledSectionHeader>
+                        {!isEmpty(filtered) ? (
+                            <StyledGridContainer>
+                                {map(filtered, (item) => (
+                                    <ToolCard key={item.route} item={item} />
+                                ))}
+                            </StyledGridContainer>
+                        ) : (
+                            <NoData title={noSearchDataMessage.replace("[DATA]", searchQuery)} />
+                        )}
+                    </StyledSectionWrapper>
+                </StyledContainer>
             </>
         );
     }
 
     return (
         <>
-        <ToolSEO route="/" />
-        <StyledContainer>
-            {/* ── Hero ─────────────────────────────────────────────────────── */}
-            <StyledHero>
-                <StyledHeroTitle variant="h3">DevDeck</StyledHeroTitle>
-                <StyledHeroSubtitle variant="h6">All your dev tools. One command away.</StyledHeroSubtitle>
-                <HeroMicroText>No signup&nbsp;&nbsp;•&nbsp;&nbsp;Instant results&nbsp;&nbsp;•&nbsp;&nbsp;Works offline</HeroMicroText>
-                <StyledHeroBadge label={`⚡ ${totalTools} tools • Instant • No signup`} variant="outlined" size="small" />
+            <ToolSEO route="/" />
+            <StyledContainer>
+                {/* ── Hero ─────────────────────────────────────────────────────── */}
+                <StyledHero>
+                    <StyledHeroTitle variant="h3">DevDeck</StyledHeroTitle>
+                    <StyledHeroSubtitle variant="h6">All your dev tools. One command away.</StyledHeroSubtitle>
+                    <HeroMicroText>No signup&nbsp;&nbsp;•&nbsp;&nbsp;Instant results&nbsp;&nbsp;•&nbsp;&nbsp;Works offline</HeroMicroText>
+                    <StyledHeroBadge label={`⚡ ${totalTools} tools • Instant • No signup`} variant="outlined" size="small" />
 
-                {/* Inline search with live suggestions + smart paste detection */}
-                <HeroSearch onOpenPalette={() => dispatch(toggleCommandPaletteAction())} />
+                    {/* Inline search with live suggestions + smart paste detection */}
+                    <HeroSearch onOpenPalette={() => dispatch(toggleCommandPaletteAction())} />
 
-                {/* CTA buttons */}
-                <HeroCTARow>
-                    <HeroCTAPrimary onClick={() => dispatch(toggleCommandPaletteAction())}>Get Started</HeroCTAPrimary>
-                    <HeroCTASecondary onClick={scrollToTools}>View Tools</HeroCTASecondary>
-                </HeroCTARow>
+                    {/* CTA buttons */}
+                    <HeroCTARow>
+                        <HeroCTAPrimary onClick={() => dispatch(toggleCommandPaletteAction())}>Get Started</HeroCTAPrimary>
+                        <HeroCTASecondary onClick={scrollToTools}>View Tools</HeroCTASecondary>
+                    </HeroCTARow>
 
-                {/* Feature highlights */}
-                <HeroFeatureRow>
-                    <HeroFeature>
-                        <span className="icon">⚡</span>
-                        <span className="label">Instant Tools</span>
-                    </HeroFeature>
-                    <HeroFeature>
-                        <span className="icon">🧠</span>
-                        <span className="label">Smart Detection</span>
-                    </HeroFeature>
-                    <HeroFeature>
-                        <span className="icon">⌨️</span>
-                        <span className="label">Command First</span>
-                    </HeroFeature>
-                </HeroFeatureRow>
-            </StyledHero>
+                    {/* Feature highlights */}
+                    <HeroFeatureRow>
+                        <HeroFeature>
+                            <span className="icon">⚡</span>
+                            <span className="label">Instant Tools</span>
+                        </HeroFeature>
+                        <HeroFeature>
+                            <span className="icon">🧠</span>
+                            <span className="label">Smart Detection</span>
+                        </HeroFeature>
+                        <HeroFeature>
+                            <span className="icon">⌨️</span>
+                            <span className="label">Command First</span>
+                        </HeroFeature>
+                    </HeroFeatureRow>
+                </StyledHero>
 
-            <StyledSectionWrapper id="tools-section">
-                {recentItems.length > 0 ? (
-                    <>
-                        <StyledSectionHeader>
-                            <StyledSectionAccent $color="#ff9800" />
-                            <StyledSectionTitle variant="h6">Recently Used</StyledSectionTitle>
-                        </StyledSectionHeader>
-                        <StyledGridContainer>
-                            {map(recentItems, (item) => (
-                                <ToolCard key={`recent-${item.route}`} item={item} />
-                            ))}
-                        </StyledGridContainer>
-                    </>
-                ) : null}
-
-                {map(TOOL_CATEGORIES, (category) => {
-                    const categoryItems = filter(OPERATIONS_ITEMS, (item) => item.category === category.id);
-                    if (isEmpty(categoryItems)) return null;
-                    return (
-                        <div key={category.id}>
+                <StyledSectionWrapper id="tools-section">
+                    {recentItems.length > 0 ? (
+                        <>
                             <StyledSectionHeader>
-                                <StyledSectionAccent $color={category.color} />
-                                <StyledSectionTitle variant="h6">{category.label}</StyledSectionTitle>
+                                <StyledSectionAccent $color="#ff9800" />
+                                <StyledSectionTitle variant="h6">Recently Used</StyledSectionTitle>
                             </StyledSectionHeader>
                             <StyledGridContainer>
-                                {map(categoryItems, (item) => (
-                                    <ToolCard key={item.route} item={item} />
+                                {map(recentItems, (item) => (
+                                    <ToolCard key={`recent-${item.route}`} item={item} />
                                 ))}
                             </StyledGridContainer>
-                        </div>
-                    );
-                })}
-            </StyledSectionWrapper>
-        </StyledContainer>
+                        </>
+                    ) : null}
+
+                    {map(TOOL_CATEGORIES, (category) => {
+                        const categoryItems = filter(OPERATIONS_ITEMS, (item) => item.category === category.id);
+                        if (isEmpty(categoryItems)) return null;
+                        return (
+                            <div key={category.id}>
+                                <StyledSectionHeader>
+                                    <StyledSectionAccent $color={category.color} />
+                                    <StyledSectionTitle variant="h6">{category.label}</StyledSectionTitle>
+                                </StyledSectionHeader>
+                                <StyledGridContainer>
+                                    {map(categoryItems, (item) => (
+                                        <ToolCard key={item.route} item={item} />
+                                    ))}
+                                </StyledGridContainer>
+                            </div>
+                        );
+                    })}
+                </StyledSectionWrapper>
+
+                <StyledSectionWrapper>
+                    <StyledSectionHeader>
+                        <StyledSectionAccent $color="#22cc99" />
+                        <StyledSectionTitle variant="h6">Learn</StyledSectionTitle>
+                    </StyledSectionHeader>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", paddingBottom: "8px" }}>
+                        {[
+                            { slug: "json-viewer", label: "What is JSON Viewer?" },
+                            { slug: "base64-text-encoder", label: "How Base64 Encoding Works" },
+                            { slug: "regex-tester", label: "Regex Explained" },
+                            { slug: "jwt-decoder", label: "Understanding JWTs" },
+                            { slug: "password-generator", label: "Password Security Guide" }
+                        ].map((g) => (
+                            <button
+                                key={g.slug}
+                                onClick={() => dispatch(push(`/blog/${g.slug}`))}
+                                style={{
+                                    background: "var(--bg-card)",
+                                    border: "1px solid var(--border-color)",
+                                    borderRadius: "var(--radius-btn, 8px)",
+                                    padding: "8px 14px",
+                                    cursor: "pointer",
+                                    color: "#22cc99",
+                                    fontSize: "0.82rem",
+                                    fontFamily: "inherit",
+                                    textDecoration: "none",
+                                    transition: "border-color 0.15s ease, opacity 0.15s ease"
+                                }}
+                            >
+                                {g.label} →
+                            </button>
+                        ))}
+                        <button
+                            onClick={() => dispatch(push("/blog"))}
+                            style={{
+                                background: "none",
+                                border: "1px dashed var(--border-color)",
+                                borderRadius: "var(--radius-btn, 8px)",
+                                padding: "8px 14px",
+                                cursor: "pointer",
+                                color: "var(--text-secondary)",
+                                fontSize: "0.82rem",
+                                fontFamily: "inherit",
+                                transition: "border-color 0.15s ease, opacity 0.15s ease"
+                            }}
+                        >
+                            View all guides →
+                        </button>
+                    </div>
+                </StyledSectionWrapper>
+            </StyledContainer>
         </>
     );
 }

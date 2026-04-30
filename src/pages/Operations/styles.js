@@ -34,13 +34,13 @@ export const StyledHeroContent = styled(Box)`
 
 export const StyledToolBody = styled(Box)`
     width: 100%;
-    padding: 28px 40px 0;
+    padding: 28px 40px 80px;
     box-sizing: border-box;
     ${styledMedia.lessThan("sm")`
-        padding: 20px 20px 0;
+        padding: 20px 20px 80px;
     `}
     ${styledMedia.lessThan("xs")`
-        padding: 14px 12px 0;
+        padding: 14px 12px 80px;
     `}
 `;
 

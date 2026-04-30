@@ -1,5 +1,7 @@
 import Home from "pages/Home";
 import Operations from "pages/Operations";
+import BlogIndex from "pages/Blog";
+import BlogPost from "pages/Blog/BlogPost";
 
 export default [
     {
@@ -7,6 +9,18 @@ export default [
         component: Home,
         exact: true,
         key: "HOMECOMPONENT"
+    },
+    {
+        path: "/blog",
+        component: BlogIndex,
+        exact: true,
+        key: "BLOG"
+    },
+    {
+        path: "/blog/:slug",
+        component: BlogPost,
+        exact: true,
+        key: "BLOGPOST"
     },
     {
         path: "/base64-image",
