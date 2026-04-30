@@ -194,7 +194,16 @@ export default function HashGenerator() {
                 {(input || fileName) && (
                     <ActionBar>
                         <ActionBtnGroup>
-                            <ActionBtn $danger onClick={() => { setInput(""); setFileName(null); setFileHashes({}); }}>{C.clearBtn}</ActionBtn>
+                            <ActionBtn
+                                $danger
+                                onClick={() => {
+                                    setInput("");
+                                    setFileName(null);
+                                    setFileHashes({});
+                                }}
+                            >
+                                {C.clearBtn}
+                            </ActionBtn>
                         </ActionBtnGroup>
                     </ActionBar>
                 )}

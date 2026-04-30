@@ -15,11 +15,7 @@ export function detectInputType(text) {
     // Three dot-separated base64url segments; first segment starts with "eyJ" (= '{"')
     // Structure check is strong enough — no length minimum needed.
     const jwtParts = trimmed.split(".");
-    if (
-        jwtParts.length === 3 &&
-        /^eyJ/i.test(jwtParts[0]) &&
-        jwtParts.every((p) => /^[A-Za-z0-9_-]+=*$/.test(p))
-    ) {
+    if (jwtParts.length === 3 && /^eyJ/i.test(jwtParts[0]) && jwtParts.every((p) => /^[A-Za-z0-9_-]+=*$/.test(p))) {
         return { type: "jwt", label: "JWT Token", route: "/jwt-decoder" };
     }
 

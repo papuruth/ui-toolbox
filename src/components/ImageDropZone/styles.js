@@ -26,10 +26,7 @@ export const StyledPaper = styled(Paper)`
     background: ${(props) => (props.$isDragActive ? "rgba(34,204,153,0.08)" : "transparent")} !important;
     border-radius: 10px !important;
     transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease !important;
-    box-shadow: ${(props) =>
-        props.$isDragActive
-            ? "0 0 0 4px rgba(34,204,153,0.2), inset 0 0 24px rgba(34,204,153,0.05)"
-            : "none"} !important;
+    box-shadow: ${(props) => (props.$isDragActive ? "0 0 0 4px rgba(34,204,153,0.2), inset 0 0 24px rgba(34,204,153,0.05)" : "none")} !important;
     transform: ${(props) => (props.$isDragActive ? "scale(1.02)" : "scale(1)")};
 
     &:hover {

@@ -421,12 +421,7 @@ function ClaimsCard({ title, data, showDetails, onToggleDetails }) {
         </>
     );
 
-    const renderContent = () =>
-        tab === "json" ? (
-            <JsonOutput>{JSON.stringify(data, null, 2)}</JsonOutput>
-        ) : (
-            renderTable()
-        );
+    const renderContent = () => (tab === "json" ? <JsonOutput>{JSON.stringify(data, null, 2)}</JsonOutput> : renderTable());
 
     const renderTabRow = (inDialog) => (
         <TabRow>
@@ -447,19 +442,11 @@ function ClaimsCard({ title, data, showDetails, onToggleDetails }) {
                 {showDetails ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
             </IconButton>
             {inDialog ? (
-                <IconButton
-                    size="small"
-                    onClick={() => setExpanded(false)}
-                    sx={{ color: "var(--text-secondary)", borderRadius: 1, px: 1 }}
-                >
+                <IconButton size="small" onClick={() => setExpanded(false)} sx={{ color: "var(--text-secondary)", borderRadius: 1, px: 1 }}>
                     <Close fontSize="small" />
                 </IconButton>
             ) : (
-                <IconButton
-                    size="small"
-                    onClick={() => setExpanded(true)}
-                    sx={{ color: "var(--text-secondary)", borderRadius: 1, px: 1 }}
-                >
+                <IconButton size="small" onClick={() => setExpanded(true)} sx={{ color: "var(--text-secondary)", borderRadius: 1, px: 1 }}>
                     <OpenInFull fontSize="small" />
                 </IconButton>
             )}
@@ -595,9 +582,16 @@ export default function JWTDecoder() {
             const end1 = end0 + 1 + parts[1].length;
             let start;
             let end;
-            if (pos <= end0) { start = 0; end = end0; }
-            else if (pos <= end1) { start = end0 + 1; end = end1; }
-            else { start = end1 + 1; end = token.length; }
+            if (pos <= end0) {
+                start = 0;
+                end = end0;
+            } else if (pos <= end1) {
+                start = end0 + 1;
+                end = end1;
+            } else {
+                start = end1 + 1;
+                end = token.length;
+            }
             selectionRef.current = { start, end };
             textareaRef.current.setSelectionRange(start, end);
         });
@@ -611,13 +605,13 @@ export default function JWTDecoder() {
 
     useEffect(() => {
         if (state?.prefill) setTokenEnd(state.prefill);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [state?.prefill]);
 
     useEffect(() => {
         const chained = consumeChain("/jwt-decoder");
         if (chained) setTokenEnd(chained);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [consumeChain]);
 
     const { header, payload, signature, badges, error } = useMemo(() => {
@@ -671,11 +665,7 @@ export default function JWTDecoder() {
                 </PanelHeader>
                 <TokenWrapper>
                     <TokenHighlight aria-hidden="true">
-                        {token ? (
-                            renderHighlight(token)
-                        ) : (
-                            <span style={{ color: "var(--text-secondary)", opacity: 0.4 }}>{L.placeholder}</span>
-                        )}
+                        {token ? renderHighlight(token) : <span style={{ color: "var(--text-secondary)", opacity: 0.4 }}>{L.placeholder}</span>}
                     </TokenHighlight>
                     <TokenTextarea
                         ref={textareaRef}
@@ -691,11 +681,7 @@ export default function JWTDecoder() {
                         <ActionBtn $danger onClick={() => setToken("")}>
                             {C.clearBtn}
                         </ActionBtn>
-                        {isValid ? (
-                            <StatusBadge $valid>{L.validJwtLabel}</StatusBadge>
-                        ) : (
-                            error && <StatusBadge>{error}</StatusBadge>
-                        )}
+                        {isValid ? <StatusBadge $valid>{L.validJwtLabel}</StatusBadge> : error && <StatusBadge>{error}</StatusBadge>}
                     </ActionBar>
                 )}
                 {badges.length > 0 && (

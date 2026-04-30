@@ -198,7 +198,9 @@ export default function CSVToJSON() {
                 {csv && (
                     <ActionBar>
                         <ActionBtnGroup>
-                            <ActionBtn $danger onClick={() => setCsv("")}>{C.clearBtn}</ActionBtn>
+                            <ActionBtn $danger onClick={() => setCsv("")}>
+                                {C.clearBtn}
+                            </ActionBtn>
                         </ActionBtnGroup>
                     </ActionBar>
                 )}

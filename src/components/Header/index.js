@@ -1,6 +1,6 @@
 import { DarkMode, GitHub, LightMode } from "@mui/icons-material";
 import SearchIcon from "@mui/icons-material/Search";
-import { Box, IconButton, Tooltip } from "@mui/material";
+import { Box, IconButton, Tooltip, useMediaQuery, useTheme } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import DevDeckLogo from "components/DevDeckLogo";
@@ -22,6 +22,8 @@ function Header({ dispatch }) {
     const [scrolled, setScrolled] = useState(false);
     const { pathname } = useLocation();
     const isBlogActive = pathname.startsWith("/blog");
+    const theme = useTheme();
+    const isCompact = useMediaQuery(theme.breakpoints.down("sm"));
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 10);
@@ -47,8 +49,8 @@ function Header({ dispatch }) {
                     }}
                 >
                     {/* Left: Logo + Blog nav */}
-                    <Box sx={{ display: "flex", alignItems: "center", gap: "16px", flexGrow: 1 }}>
-                        <DevDeckLogo compact={false} />
+                    <Box sx={{ display: "flex", alignItems: "center", gap: { xs: "8px", sm: "16px" }, flexGrow: 1, minWidth: 0 }}>
+                        <DevDeckLogo compact={isCompact} />
                         <BlogNavLink $active={isBlogActive} onClick={() => dispatch(push("/blog"))} aria-label="Blog and Guides">
                             <span style={{ fontSize: "0.9rem", lineHeight: 1 }}>📘</span>
                             Blog
@@ -56,15 +58,27 @@ function Header({ dispatch }) {
                     </Box>
 
                     {/* Right: Search | Theme | GitHub */}
-                    <Box sx={{ display: "flex", alignItems: "center", gap: "4px", flexShrink: 0 }}>
-                        <PaletteTrigger onClick={() => dispatch(toggleCommandPaletteAction())} aria-label="Open command palette" tabIndex={0}>
-                            <SearchIcon sx={{ fontSize: "1rem", color: "rgba(255,255,255,0.45)", flexShrink: 0 }} />
-                            <TriggerPlaceholder>{localization.commandPalette.placeholder}</TriggerPlaceholder>
-                            <TriggerKbdGroup aria-hidden>
-                                <TriggerKbd>{isMac ? "⌘" : "Ctrl"}</TriggerKbd>
-                                <TriggerKbd>K</TriggerKbd>
-                            </TriggerKbdGroup>
-                        </PaletteTrigger>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: { xs: "0px", sm: "4px" }, flexShrink: 0 }}>
+                        {/* Full pill on sm+, icon-only on mobile */}
+                        <Box sx={{ display: { xs: "none", sm: "flex" } }}>
+                            <PaletteTrigger onClick={() => dispatch(toggleCommandPaletteAction())} aria-label="Open command palette" tabIndex={0}>
+                                <SearchIcon sx={{ fontSize: "1rem", color: "rgba(255,255,255,0.45)", flexShrink: 0 }} />
+                                <TriggerPlaceholder>{localization.commandPalette.placeholder}</TriggerPlaceholder>
+                                <TriggerKbdGroup aria-hidden>
+                                    <TriggerKbd>{isMac ? "⌘" : "Ctrl"}</TriggerKbd>
+                                    <TriggerKbd>K</TriggerKbd>
+                                </TriggerKbdGroup>
+                            </PaletteTrigger>
+                        </Box>
+                        <Tooltip title="Search tools">
+                            <IconButton
+                                sx={{ display: { xs: "flex", sm: "none" }, color: colors.white, "&:hover": { color: "#22cc99" } }}
+                                onClick={() => dispatch(toggleCommandPaletteAction())}
+                                aria-label="Open command palette"
+                            >
+                                <SearchIcon />
+                            </IconButton>
+                        </Tooltip>
 
                         <NavDivider aria-hidden />
 
@@ -99,7 +113,7 @@ function Header({ dispatch }) {
                                 <GitHub />
                             </IconButton>
                         </Tooltip>
-                        </Box>
+                    </Box>
                 </Toolbar>
             </AppBar>
         </StyledContainer>

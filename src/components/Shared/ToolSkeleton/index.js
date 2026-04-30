@@ -18,9 +18,9 @@ export default function ToolSkeleton({ rows = 4 }) {
     return (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5, p: 2 }}>
             <Skeleton variant="rounded" height={48} animation="wave" sx={{ background: "rgba(255,255,255,0.06)" }} />
-            {Array.from({ length: rows }).map((_, i) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <Skeleton key={i}
+            {Array.from({ length: rows }, (_, i) => (
+                <Skeleton
+                    key={`skeleton-row-${i}`}
                     variant="rounded"
                     height={32}
                     animation="wave"

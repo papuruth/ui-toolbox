@@ -28,9 +28,9 @@
     },
     "packageManager": "yarn@1.22.22",
     "author": {
-      "name": "Papu Kumar",
-      "email": "papuruth@gmail.com",
-      "url": "https://p-folio.netlify.app"
+        "name": "Papu Kumar",
+        "email": "papuruth@gmail.com",
+        "url": "https://p-folio.netlify.app"
     },
     "scripts": {
         "start": "craco start",

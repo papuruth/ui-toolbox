@@ -171,12 +171,7 @@ export default function QRGenerator() {
                     {hasData && <MetaText>{qrData.length} chars</MetaText>}
                 </PanelHeader>
                 <QrInputWrap>
-                    <QrInput
-                        placeholder={L.inputPlaceholder}
-                        value={qrData}
-                        onChange={(e) => setQrData(e.target.value)}
-                        maxLength={2000}
-                    />
+                    <QrInput placeholder={L.inputPlaceholder} value={qrData} onChange={(e) => setQrData(e.target.value)} maxLength={2000} />
                 </QrInputWrap>
                 <ControlsSection>
                     <ControlRow>

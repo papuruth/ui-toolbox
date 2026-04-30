@@ -27,11 +27,7 @@ const Wrap = styled.div`
 
 export default function LocalBadge() {
     return (
-        <Tooltip
-            title="All tools run locally in your browser. We do not store or send your data."
-            placement="bottom"
-            arrow
-        >
+        <Tooltip title="All tools run locally in your browser. We do not store or send your data." placement="bottom" arrow>
             <Wrap>
                 <Lock style={{ fontSize: 10 }} />
                 Processed locally

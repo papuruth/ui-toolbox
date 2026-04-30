@@ -260,19 +260,19 @@ export default function WordCounter() {
             <Panel>
                 <PanelHeader>
                     <PanelLabel>{L.textLabel}</PanelLabel>
-                    {text && <MetaText>{stats.words.toLocaleString()} {L.wordsLabel}</MetaText>}
+                    {text && (
+                        <MetaText>
+                            {stats.words.toLocaleString()} {L.wordsLabel}
+                        </MetaText>
+                    )}
                 </PanelHeader>
-                <InputArea
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    placeholder={L.placeholder}
-                    spellCheck
-                    style={{ minHeight: 400 }}
-                />
+                <InputArea value={text} onChange={(e) => setText(e.target.value)} placeholder={L.placeholder} spellCheck style={{ minHeight: 400 }} />
                 {text && (
                     <ActionBar>
                         <ActionBtnGroup>
-                            <ActionBtn $danger onClick={() => setText("")}>{C.clearBtn}</ActionBtn>
+                            <ActionBtn $danger onClick={() => setText("")}>
+                                {C.clearBtn}
+                            </ActionBtn>
                             <ActionBtn onClick={() => shareURL(text)}>
                                 <IosShare style={{ fontSize: 11 }} /> {L.shareBtn}
                             </ActionBtn>

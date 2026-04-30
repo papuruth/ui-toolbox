@@ -95,7 +95,6 @@ const NoMatch = styled.div`
     opacity: 0.6;
 `;
 
-
 const ViewerBtnGroup = styled(ActionBtnGroup)`
     flex-shrink: 0;
 `;
@@ -247,11 +246,7 @@ export default function JSONViewer() {
                 )}
             </Panel>
 
-            <LoadJSONModal
-                open={showLinkModal}
-                onClose={() => setShowLinkModal(false)}
-                onLoad={handleModalLoad}
-            />
+            <LoadJSONModal open={showLinkModal} onClose={() => setShowLinkModal(false)} onLoad={handleModalLoad} />
         </ToolWrap>
     );
 }

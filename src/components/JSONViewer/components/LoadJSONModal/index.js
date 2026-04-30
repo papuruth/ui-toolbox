@@ -429,11 +429,7 @@ export default function LoadJSONModal({ open, onClose, onLoad }) {
                                     spellCheck={false}
                                 />
                                 <InputActions>
-                                    {urlValue && (
-                                        <ValidationMark $valid={urlState === "valid"}>
-                                            {urlState === "valid" ? "✓" : "✕"}
-                                        </ValidationMark>
-                                    )}
+                                    {urlValue && <ValidationMark $valid={urlState === "valid"}>{urlState === "valid" ? "✓" : "✕"}</ValidationMark>}
                                     <InlineBtn type="button" onClick={handlePasteClipboard}>
                                         Paste
                                     </InlineBtn>
@@ -444,7 +440,9 @@ export default function LoadJSONModal({ open, onClose, onLoad }) {
                                 <RecentSection>
                                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                                         <RecentLabel>Recent</RecentLabel>
-                                        <InlineBtn type="button" onClick={clearUrlHistory}>Clear</InlineBtn>
+                                        <InlineBtn type="button" onClick={clearUrlHistory}>
+                                            Clear
+                                        </InlineBtn>
                                     </div>
                                     <ChipsRow>
                                         {urlHistory.map((url) => (

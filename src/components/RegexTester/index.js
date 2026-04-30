@@ -290,7 +290,15 @@ export default function RegexTester() {
                 {(pattern || testStr) && (
                     <ActionBar>
                         <ActionBtnGroup>
-                            <ActionBtn $danger onClick={() => { setPattern(""); setTestStr(""); }}>{C.clearBtn}</ActionBtn>
+                            <ActionBtn
+                                $danger
+                                onClick={() => {
+                                    setPattern("");
+                                    setTestStr("");
+                                }}
+                            >
+                                {C.clearBtn}
+                            </ActionBtn>
                             <ActionBtn onClick={handleShare}>
                                 <IosShare style={{ fontSize: 11 }} /> {L.shareBtn}
                             </ActionBtn>

@@ -501,3 +501,102 @@ export const StyledText = styled(Typography)`
       font-size: 11px;
     `}
 `;
+
+// ── Learn section links ───────────────────────────────────────────────────────
+export const LearnLinksRow = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-bottom: 8px;
+`;
+
+export const LearnLink = styled(Link)`
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-btn, 8px);
+    padding: 8px 14px;
+    cursor: pointer;
+    color: #22cc99;
+    font-size: 0.82rem;
+    font-family: inherit;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    position: relative;
+    overflow: hidden;
+    animation: ${fadeUp} 0.4s ease ${({ $index }) => `${0.05 * ($index || 0)}s`} both;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+
+    /* shimmer sweep on hover */
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent 30%, rgba(34, 204, 153, 0.12) 50%, transparent 70%);
+        transform: translateX(-100%);
+        transition: transform 0.45s ease;
+    }
+
+    .arrow {
+        display: inline-block;
+        transition: transform 0.2s ease;
+    }
+
+    &:hover {
+        color: #4ade80;
+        border-color: rgba(34, 204, 153, 0.55);
+        background: rgba(34, 204, 153, 0.06);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(34, 204, 153, 0.18);
+
+        &::after {
+            transform: translateX(100%);
+        }
+
+        .arrow {
+            transform: translateX(4px);
+        }
+    }
+
+    &:active {
+        transform: translateY(0);
+        box-shadow: none;
+    }
+`;
+
+export const LearnViewAll = styled(Link)`
+    background: none;
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-btn, 8px);
+    padding: 8px 14px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    animation: ${fadeUp} 0.4s ease 0.28s both;
+    transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+
+    .arrow {
+        display: inline-block;
+        transition: transform 0.2s ease;
+    }
+
+    &:hover {
+        color: #22cc99;
+        border-color: rgba(34, 204, 153, 0.5);
+        border-style: solid;
+        transform: translateY(-2px);
+
+        .arrow {
+            transform: translateX(4px);
+        }
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+`;

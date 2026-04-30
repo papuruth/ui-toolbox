@@ -110,7 +110,9 @@ export default function YAMLJSONConverter() {
                     {input && (
                         <ActionBar>
                             <ActionBtnGroup>
-                                <ActionBtn $danger onClick={() => setInput("")}>{C.clearBtn}</ActionBtn>
+                                <ActionBtn $danger onClick={() => setInput("")}>
+                                    {C.clearBtn}
+                                </ActionBtn>
                             </ActionBtnGroup>
                         </ActionBar>
                     )}
@@ -139,9 +141,7 @@ export default function YAMLJSONConverter() {
                         </>
                     ) : (
                         <EmptyState>
-                            <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>
-                                {error ? L.fixErrorMessage : outputPlaceholder}
-                            </span>
+                            <span style={{ fontSize: 12, fontFamily: "Inter, sans-serif" }}>{error ? L.fixErrorMessage : outputPlaceholder}</span>
                         </EmptyState>
                     )}
                 </Panel>

@@ -3,17 +3,7 @@ import { Panel as BasePanel, ToolLayout as BaseToolLayout } from "components/Sha
 import styled, { css, keyframes } from "styled-components";
 import { styledMedia } from "styles/global";
 
-export {
-    ActionBar,
-    ActionBtn,
-    ActionBtnGroup,
-    DropWrap,
-    EmptyState,
-    MetaText,
-    PanelHeader,
-    PanelLabel,
-    ToolLayout
-} from "components/Shared/ToolKit";
+export { ActionBar, ActionBtn, ActionBtnGroup, DropWrap, EmptyState, MetaText, PanelHeader, PanelLabel, ToolLayout } from "components/Shared/ToolKit";
 
 // ── Animations ────────────────────────────────────────────────────────────────
 
@@ -290,7 +280,9 @@ export const CropWrap = styled(Box)`
     padding: 16px;
     overflow: auto;
     position: relative;
-    > * { margin: auto; }
+    > * {
+        margin: auto;
+    }
     ${styledMedia.lessThan("md")`
         min-height: 280px;
         flex: none;
@@ -311,11 +303,10 @@ export const GridOverlay = styled.div`
     inset: 0;
     pointer-events: none;
     z-index: 10;
-    background-image:
-        linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
     background-size: 33.333% 33.333%;
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     animation: ${fadeIn} 0.2s ease;
 `;
 
@@ -348,7 +339,7 @@ export const CanvasWrap = styled(Box)`
     align-items: center;
     padding: 16px;
     overflow: auto;
-    background: linear-gradient(180deg, var(--bg-input) 0%, rgba(34,204,153,0.02) 100%);
+    background: linear-gradient(180deg, var(--bg-input) 0%, rgba(34, 204, 153, 0.02) 100%);
     animation: ${fadeInUp} 0.3s ease;
 `;
 
@@ -359,7 +350,7 @@ export const ResultCanvas = styled.canvas`
     max-width: 100%;
     max-height: 160px;
     border-radius: 6px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255,255,255,0.06);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.06);
     animation: ${fadeInUp} 0.35s ease;
 `;
 

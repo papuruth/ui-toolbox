@@ -248,10 +248,8 @@ export const ItemIconWrap = styled.div`
     flex-shrink: 0;
     font-size: 1rem;
     line-height: 1;
-    background: ${({ $kind, $category }) =>
-        $kind === "recent" ? "rgba(34,204,153,0.1)" : categoryBg($category)};
-    color: ${({ $kind, $category }) =>
-        $kind === "recent" ? "#22cc99" : categoryColor($category)};
+    background: ${({ $kind, $category }) => ($kind === "recent" ? "rgba(34,204,153,0.1)" : categoryBg($category))};
+    color: ${({ $kind, $category }) => ($kind === "recent" ? "#22cc99" : categoryColor($category))};
 
     & svg {
         font-size: 1.1rem !important;

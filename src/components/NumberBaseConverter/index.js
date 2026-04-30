@@ -2,7 +2,18 @@ import { Check, ContentCopy } from "@mui/icons-material";
 import localization from "localization";
 import React, { useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
-import { ActionBar, ActionBtn, ActionBtnGroup, EmptyState, ModeBtn, ModeToggle, Panel, PanelHeader, PanelLabel, ToolLayout } from "components/Shared/ToolKit";
+import {
+    ActionBar,
+    ActionBtn,
+    ActionBtnGroup,
+    EmptyState,
+    ModeBtn,
+    ModeToggle,
+    Panel,
+    PanelHeader,
+    PanelLabel,
+    ToolLayout
+} from "components/Shared/ToolKit";
 
 const { numberBaseConverter: L, common: C } = localization;
 
@@ -100,7 +111,8 @@ export default function NumberBaseConverter() {
     const { results, error } = useMemo(() => {
         if (!input.trim()) return { results: null, error: "" };
         const decimal = parseInt(input.trim(), sourceBase);
-        if (Number.isNaN(decimal)) return { results: null, error: L.invalidInputError.replace("[INPUT]", input.trim()).replace("[BASE]", sourceBase) };
+        if (Number.isNaN(decimal))
+            return { results: null, error: L.invalidInputError.replace("[INPUT]", input.trim()).replace("[BASE]", sourceBase) };
         return {
             results: OUTPUTS.map(({ base, label, prefix }) => ({
                 label,
@@ -132,11 +144,19 @@ export default function NumberBaseConverter() {
                         </ModeBtn>
                     ))}
                 </ModeToggle>
-                <NumberInput value={input} onChange={(e) => setInput(e.target.value)} placeholder={L.numberInputPlaceholder} spellCheck={false} autoFocus />
+                <NumberInput
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder={L.numberInputPlaceholder}
+                    spellCheck={false}
+                    autoFocus
+                />
                 {input && (
                     <ActionBar>
                         <ActionBtnGroup>
-                            <ActionBtn $danger onClick={() => setInput("")}>{C.clearBtn}</ActionBtn>
+                            <ActionBtn $danger onClick={() => setInput("")}>
+                                {C.clearBtn}
+                            </ActionBtn>
                         </ActionBtnGroup>
                     </ActionBar>
                 )}

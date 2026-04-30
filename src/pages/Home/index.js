@@ -51,7 +51,10 @@ import {
     StyledSectionAccent,
     StyledSectionHeader,
     StyledSectionTitle,
-    StyledSectionWrapper
+    StyledSectionWrapper,
+    LearnLinksRow,
+    LearnLink,
+    LearnViewAll
 } from "./styles";
 
 function highlightMatch(text, query) {
@@ -372,52 +375,22 @@ function Home({ searchQuery }) {
                         <StyledSectionAccent $color="#22cc99" />
                         <StyledSectionTitle variant="h6">Learn</StyledSectionTitle>
                     </StyledSectionHeader>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", paddingBottom: "8px" }}>
+                    <LearnLinksRow>
                         {[
                             { slug: "json-viewer", label: "What is JSON Viewer?" },
                             { slug: "base64-text-encoder", label: "How Base64 Encoding Works" },
                             { slug: "regex-tester", label: "Regex Explained" },
                             { slug: "jwt-decoder", label: "Understanding JWTs" },
                             { slug: "password-generator", label: "Password Security Guide" }
-                        ].map((g) => (
-                            <button
-                                type="button"
-                                key={g.slug}
-                                onClick={() => dispatch(push(`/blog/${g.slug}`))}
-                                style={{
-                                    background: "var(--bg-card)",
-                                    border: "1px solid var(--border-color)",
-                                    borderRadius: "var(--radius-btn, 8px)",
-                                    padding: "8px 14px",
-                                    cursor: "pointer",
-                                    color: "#22cc99",
-                                    fontSize: "0.82rem",
-                                    fontFamily: "inherit",
-                                    textDecoration: "none",
-                                    transition: "border-color 0.15s ease, opacity 0.15s ease"
-                                }}
-                            >
-                                {g.label} →
-                            </button>
+                        ].map((g, i) => (
+                            <LearnLink key={g.slug} $index={i} to={`/blog/${g.slug}`}>
+                                {g.label} <span className="arrow">→</span>
+                            </LearnLink>
                         ))}
-                        <button
-                            type="button"
-                            onClick={() => dispatch(push("/blog"))}
-                            style={{
-                                background: "none",
-                                border: "1px dashed var(--border-color)",
-                                borderRadius: "var(--radius-btn, 8px)",
-                                padding: "8px 14px",
-                                cursor: "pointer",
-                                color: "var(--text-secondary)",
-                                fontSize: "0.82rem",
-                                fontFamily: "inherit",
-                                transition: "border-color 0.15s ease, opacity 0.15s ease"
-                            }}
-                        >
-                            View all guides →
-                        </button>
-                    </div>
+                        <LearnViewAll to="/blog">
+                            View all guides <span className="arrow">→</span>
+                        </LearnViewAll>
+                    </LearnLinksRow>
                 </StyledSectionWrapper>
             </StyledContainer>
         </>

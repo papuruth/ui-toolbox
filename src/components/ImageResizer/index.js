@@ -65,13 +65,13 @@ const {
 const ORIGINAL_ASPECT = "original";
 
 const ASPECT_PRESETS = [
-    { label: "Free",     value: undefined,       icon: null },
+    { label: "Free", value: undefined, icon: null },
     { label: "Original", value: ORIGINAL_ASPECT, icon: null },
-    { label: "1:1",      value: 1,               icon: { w: 8,  h: 8 } },
-    { label: "4:3",      value: 4 / 3,           icon: { w: 11, h: 8 } },
-    { label: "3:2",      value: 3 / 2,           icon: { w: 12, h: 8 } },
-    { label: "16:9",     value: 16 / 9,          icon: { w: 14, h: 8 } },
-    { label: "9:16",     value: 9 / 16,          icon: { w: 5,  h: 9 } }
+    { label: "1:1", value: 1, icon: { w: 8, h: 8 } },
+    { label: "4:3", value: 4 / 3, icon: { w: 11, h: 8 } },
+    { label: "3:2", value: 3 / 2, icon: { w: 12, h: 8 } },
+    { label: "16:9", value: 16 / 9, icon: { w: 14, h: 8 } },
+    { label: "9:16", value: 9 / 16, icon: { w: 5, h: 9 } }
 ];
 
 function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
@@ -496,7 +496,12 @@ export default function ImageResizer() {
                         <ControlLabel>{L.aspectRatioLabel}</ControlLabel>
                         <AspectGroup>
                             {ASPECT_PRESETS.map((p) => (
-                                <AspectChip key={p.label} $active={selectedPresetLabel === p.label} disabled={!imgSrc} onClick={() => handleAspectSelect(p.value)}>
+                                <AspectChip
+                                    key={p.label}
+                                    $active={selectedPresetLabel === p.label}
+                                    disabled={!imgSrc}
+                                    onClick={() => handleAspectSelect(p.value)}
+                                >
                                     {p.icon && <AspectPreviewBox $w={p.icon.w} $h={p.icon.h} $active={selectedPresetLabel === p.label} />}
                                     {p.label}
                                 </AspectChip>
@@ -507,9 +512,23 @@ export default function ImageResizer() {
                         <ControlRow>
                             <ControlLabel>{L.outputSizeLabel}</ControlLabel>
                             <DimPair>
-                                <DimInput type="number" min={1} max={imgDims?.w} value={outW} onChange={(e) => handleOutW(e.target.value)} placeholder="W" />
+                                <DimInput
+                                    type="number"
+                                    min={1}
+                                    max={imgDims?.w}
+                                    value={outW}
+                                    onChange={(e) => handleOutW(e.target.value)}
+                                    placeholder="W"
+                                />
                                 <span>×</span>
-                                <DimInput type="number" min={1} max={imgDims?.h} value={outH} onChange={(e) => handleOutH(e.target.value)} placeholder="H" />
+                                <DimInput
+                                    type="number"
+                                    min={1}
+                                    max={imgDims?.h}
+                                    value={outH}
+                                    onChange={(e) => handleOutH(e.target.value)}
+                                    placeholder="H"
+                                />
                                 <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>px</span>
                             </DimPair>
                             <LockBtn

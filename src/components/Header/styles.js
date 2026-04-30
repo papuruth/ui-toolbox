@@ -153,12 +153,16 @@ export const TriggerKbd = muiStyled("kbd")(({ theme }) => {
 });
 
 // ── Nav divider between logo/nav and utilities ────────────────────────────────
-export const NavDivider = muiStyled("span")(() => ({
+export const NavDivider = muiStyled("span")(({ theme }) => ({
     width: "1px",
     height: "20px",
     background: "rgba(255,255,255,0.15)",
     margin: "0 12px",
-    flexShrink: 0
+    flexShrink: 0,
+
+    [theme.breakpoints.down("sm")]: {
+        margin: "0 4px"
+    }
 }));
 
 // ── Blog / Guides nav link ─────────────────────────────────────────────────────
@@ -183,7 +187,7 @@ export const BlogNavLink = muiStyled("button")(({ $active }) => ({
 
     // active bottom accent line
     "&::after": {
-        content: "\"\"",
+        content: `""`,
         position: "absolute",
         bottom: "-1px",
         left: "50%",

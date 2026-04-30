@@ -237,7 +237,9 @@ export default function PasswordStrengthMeter() {
                 {password && (
                     <ActionBar>
                         <ActionBtnGroup>
-                            <ActionBtn $danger onClick={() => setPassword("")}>{C.clearBtn}</ActionBtn>
+                            <ActionBtn $danger onClick={() => setPassword("")}>
+                                {C.clearBtn}
+                            </ActionBtn>
                         </ActionBtnGroup>
                     </ActionBar>
                 )}
