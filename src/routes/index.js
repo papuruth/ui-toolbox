@@ -1,5 +1,5 @@
 import { map } from "lodash";
-import React from "react";
+import React, { useEffect } from "react";
 import { Redirect, Route, Switch, useLocation } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 import routes from "./routes";
@@ -24,6 +24,11 @@ const PageWrapper = styled.div`
 
 function Routes() {
     const location = useLocation();
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location.pathname]);
+
     return (
         <PageWrapper key={location.pathname}>
             <Switch location={location}>

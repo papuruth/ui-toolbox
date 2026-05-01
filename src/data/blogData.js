@@ -1314,6 +1314,87 @@ const blogData = {
             { q: "Does it store my data?", a: "No. All conversion happens locally in your browser." },
             { q: "Can YAML represent everything JSON can?", a: "Yes. YAML is a superset of JSON — valid JSON is also valid YAML." }
         ]
+    },
+
+    "api-request-builder": {
+        slug: "api-request-builder",
+        title: "API Request Builder — Test HTTP Endpoints in Your Browser",
+        metaDescription:
+            "Build and fire HTTP requests directly from your browser — no Postman, no curl. Test REST APIs with custom headers, JSON body, and real-time response inspection.",
+        metaKeywords: "api request builder, http client online, test api online, rest client browser, api tester, http request tool, postman alternative",
+        intro: "Testing an API endpoint usually means firing up Postman, writing a curl command, or switching to a terminal. DevDeck's API Request Builder lets you do it all in one tab — pick a method, enter a URL, add headers, send the request, and inspect the response without leaving your browser.",
+        sections: [
+            {
+                heading: "What is an API Request Builder?",
+                body: "An API request builder is a tool that lets you construct and send HTTP requests without writing code or installing a desktop app. You choose a method (GET, POST, PUT, DELETE, PATCH), enter a URL, optionally add request headers and a body, and then fire the request. The response — status code, timing, headers, and body — is displayed immediately."
+            },
+            {
+                heading: "Why Use a Browser-Based API Tester?",
+                body: "Desktop tools like Postman are powerful but heavy. curl is fast but requires a terminal and remembering flag syntax. A browser-based builder gives you a clean UI with zero installation. It's perfect for quick endpoint checks, debugging webhook payloads, exploring public APIs, or sharing a reproducible request with a colleague — just copy the URL."
+            },
+            {
+                heading: "Key Features",
+                list: [
+                    "GET, POST, PUT, DELETE, and PATCH method support",
+                    "Custom request headers with key/value editor",
+                    "JSON and form-encoded request body",
+                    "Real-time response with status code and timing",
+                    "Colour-coded JSON response viewer with syntax highlighting",
+                    "Response headers tab with all returned header values",
+                    "Paste a cURL command directly into the URL field — it auto-parses",
+                    "Code snippet export in 12 languages: cURL, fetch, axios, XHR, Node.js, Python, Go, PHP, Ruby, Swift, C#, and Java",
+                    "Send response body directly to JSON Viewer for deeper inspection",
+                    "No data leaves your device — requests are sent directly from your browser"
+                ]
+            },
+            {
+                heading: "How to Use the API Request Builder",
+                steps: [
+                    "Select an HTTP method (GET, POST, PUT, DELETE, or PATCH)",
+                    "Enter the full URL of the endpoint you want to test",
+                    "Add any required headers in the Headers tab (e.g. Authorization, Content-Type)",
+                    "For POST/PUT/PATCH, switch to the Body tab and enter your JSON payload",
+                    "Click SEND — the response appears instantly in the right panel",
+                    "Use the Body / Headers tabs in the response panel to inspect the result",
+                    "Click the </> button to export the request as runnable code in any language"
+                ]
+            },
+            {
+                heading: "Paste a cURL Command and It Just Works",
+                body: "One of the most useful features: paste any curl command directly into the URL field and the builder automatically parses it — extracting the method, URL, headers, and body. This means you can copy a curl snippet from API documentation or a terminal and immediately have it loaded in the visual editor, ready to tweak and re-send."
+            },
+            {
+                heading: "Export as Code Snippets",
+                body: "Once you've built your request, click the </> icon next to the URL bar to open the Code Snippet panel. Choose from 12 languages and runtimes — cURL, JavaScript (fetch), JavaScript (axios), XHR, Node.js (http), Python (requests), Go, PHP, Ruby, Swift, C# (HttpClient), and Java (OkHttp). The snippet updates live as you change the method, URL, headers, or body, so you always have ready-to-paste code."
+            },
+            {
+                heading: "Understanding CORS Limitations",
+                body: "Because requests are sent from your browser rather than a server, you may encounter CORS (Cross-Origin Resource Sharing) errors when testing APIs that don't allow browser-based requests. This is a browser security restriction, not a bug in the tool. Public APIs and APIs you control will generally work fine. For restricted APIs, use the exported code snippet to run the request from a server-side environment like Node.js or Python instead."
+            },
+            {
+                heading: "Tips",
+                list: [
+                    "Set Content-Type: application/json when sending a JSON body — many APIs require it",
+                    "Use the Authorization header with Bearer <token> for protected endpoints",
+                    "Paste a JWT directly into the command palette to jump to the JWT Decoder",
+                    "Use the Prettify button in the response panel to auto-format minified JSON",
+                    "Forward a JSON response to the JSON Viewer using the Send To button for tree browsing",
+                    "The timing shown (e.g. 142ms) is round-trip time from your browser to the server",
+                    "cURL snippets generated by the tool include all headers and body, ready to run in a terminal"
+                ]
+            }
+        ],
+        cta: { label: "Try API Request Builder →", toolRoute: "/api-builder" },
+        relatedSlugs: ["json-viewer", "jwt-decoder", "url-parser"],
+        faq: [
+            { q: "Is the API Request Builder free?", a: "Yes, completely free with no signup required." },
+            { q: "Does it store my requests or responses?", a: "No. All requests are sent directly from your browser and nothing is stored on any server." },
+            { q: "Why am I getting a CORS error?", a: "Requests run from your browser, so APIs that don't set permissive CORS headers will block them. This is a browser security policy. Use the exported code snippet to make the same request from a server-side environment." },
+            { q: "Can I test authenticated APIs?", a: "Yes. Add an Authorization header with your token (e.g. Bearer eyJ...) in the Headers tab." },
+            { q: "What is the request timeout?", a: "Requests time out after 10 seconds. If a server doesn't respond within that window you'll see a timeout error." },
+            { q: "How do I test a POST request with a JSON body?", a: "Select POST, enter the URL, add a Content-Type: application/json header, switch to the Body tab, enter your JSON, and click SEND." },
+            { q: "Can I import a cURL command?", a: "Yes. Paste any curl command directly into the URL input and the builder will automatically parse the method, URL, headers, and body." }
+        ]
     }
 };
 
@@ -1321,6 +1402,7 @@ export default blogData;
 
 // Ordered list for the blog index page
 export const blogList = [
+    blogData["api-request-builder"],
     blogData["json-viewer"],
     blogData["jwt-decoder"],
     blogData["base64-text-encoder"],

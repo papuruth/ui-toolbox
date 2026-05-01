@@ -171,6 +171,12 @@ export const BLOG_GUIDES = [
         label: "Base64 Image Guide",
         description: "Encode images to Base64 strings",
         keywords: ["base64", "image", "encode", "guide", "blog", "photo"]
+    },
+    {
+        slug: "api-request-builder",
+        label: "API Request Builder Guide",
+        description: "Test HTTP endpoints directly in your browser",
+        keywords: ["api", "http", "rest", "request", "builder", "guide", "blog", "curl", "postman"]
     }
 ].map((g) => ({
     ...g,
@@ -248,8 +254,8 @@ export function getRecentToolEntries() {
 
 // ── Contextual suggestions (tools related to the current page) ────────────────
 const RELATED_TOOLS = {
-    "/json-viewer": ["/yaml-json", "/text-diff", "/jwt-decoder"],
-    "/jwt-decoder": ["/json-viewer", "/base64-text", "/hash-generator"],
+    "/json-viewer": ["/yaml-json", "/text-diff", "/jwt-decoder", "/api-builder"],
+    "/jwt-decoder": ["/json-viewer", "/base64-text", "/hash-generator", "/api-builder"],
     "/base64-text": ["/base64-image", "/hash-generator", "/json-viewer"],
     "/base64-image": ["/image-resizer", "/base64-text"],
     "/regex-tester": ["/text-case", "/text-diff", "/word-counter"],
@@ -257,7 +263,7 @@ const RELATED_TOOLS = {
     "/text-diff": ["/text-case", "/word-counter", "/regex-tester"],
     "/uuid-generator": ["/hash-generator", "/password-tools"],
     "/hash-generator": ["/uuid-generator", "/base64-text", "/password-tools"],
-    "/url-validator": ["/url-shortener"],
+    "/url-validator": ["/url-shortener", "/api-builder"],
     "/url-shortener": ["/url-validator", "/qr-generator"],
     "/timestamp": ["/number-base", "/uuid-generator"],
     "/number-base": ["/timestamp", "/hash-generator"],
@@ -269,7 +275,8 @@ const RELATED_TOOLS = {
     "/text-case": ["/text-diff", "/word-counter", "/regex-tester"],
     "/word-counter": ["/text-diff", "/text-case", "/lorem-ipsum"],
     "/lorem-ipsum": ["/word-counter", "/text-case"],
-    "/csv-json": ["/json-viewer", "/yaml-json"]
+    "/csv-json": ["/json-viewer", "/yaml-json"],
+    "/api-builder": ["/json-viewer", "/jwt-decoder", "/url-validator", "/hash-generator"]
 };
 
 export function getRelatedToolEntries(currentRoute) {

@@ -19,6 +19,11 @@ export function detectInputType(text) {
         return { type: "jwt", label: "JWT Token", route: "/jwt-decoder" };
     }
 
+    // ── cURL command ─────────────────────────────────────────────────────────
+    if (/^curl\s/i.test(trimmed)) {
+        return { type: "curl", label: "cURL Command", route: "/api-builder" };
+    }
+
     // ── URL ──────────────────────────────────────────────────────────────────
     // Fire as soon as the user has typed a valid scheme + at least one char ("http://x")
     if (/^https?:\/\/.+/i.test(trimmed)) {

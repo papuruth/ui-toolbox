@@ -35,7 +35,8 @@ const TOOL_BLOG_SLUG = {
     "/text-diff": "text-diff-checker",
     "/lorem-ipsum": "lorem-ipsum-generator",
     "/word-counter": "word-counter",
-    "/csv-json": "csv-to-json-converter"
+    "/csv-json": "csv-to-json-converter",
+    "/api-builder": "api-request-builder"
 };
 
 const AspectRatioCalculator = lazy(() => import("components/AspectRatioCalculator"));
@@ -60,6 +61,7 @@ const UrlValidator = lazy(() => import("components/UrlValidator"));
 const UUIDGenerator = lazy(() => import("components/UUIDGenerator"));
 const WordCounter = lazy(() => import("components/WordCounter"));
 const YAMLJSONConverter = lazy(() => import("components/YAMLJSONConverter"));
+const APIRequestBuilder = lazy(() => import("components/APIRequestBuilder"));
 
 function ToolFallback() {
     return (
@@ -102,7 +104,8 @@ function Operations({ location }) {
             textDiff,
             loremIpsum,
             wordCounter,
-            csvToJson
+            csvToJson,
+            apiRequestBuilder
         } = localization;
         switch (pathname) {
             case "/base64-image":
@@ -149,6 +152,8 @@ function Operations({ location }) {
                 return { title: wordCounter.pageTitle, component: WordCounter };
             case "/csv-json":
                 return { title: csvToJson.pageTitle, component: CSVToJSON };
+            case "/api-builder":
+                return { title: apiRequestBuilder.pageTitle, component: APIRequestBuilder };
             default:
                 return null;
         }

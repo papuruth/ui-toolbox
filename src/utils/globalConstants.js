@@ -8,6 +8,7 @@ import {
     DataObject,
     Difference,
     FormatSize,
+    Http,
     Link as LinkIcon,
     Lock,
     Notes,
@@ -47,14 +48,16 @@ const {
     textDiff,
     loremIpsum,
     wordCounter,
-    csvToJson
+    csvToJson,
+    apiRequestBuilder
 } = localization;
 
 export const TOOL_CATEGORIES = [
     { id: "image", label: "Image Tools", color: "#22cc99" },
     { id: "encoding", label: "Encoding & Text", color: "#2299ff" },
     { id: "url", label: "URL & Web", color: "#ff9800" },
-    { id: "utilities", label: "Utilities", color: "#9c27b0" }
+    { id: "utilities", label: "Utilities", color: "#9c27b0" },
+    { id: "developer", label: "Developer Tools", color: "#e91e63" }
 ];
 
 export const GLOBAL_CONSTANTS = {
@@ -340,6 +343,19 @@ export const GLOBAL_CONSTANTS = {
             badge: null,
             icon: (
                 <TableChart
+                    fontSize="large"
+                    sx={{ fontSize: "5rem", width: { xs: "0.5em", sm: "0.5em", md: "1em" }, height: { xs: "0.5em", sm: "0.5em", md: "1em" } }}
+                />
+            )
+        },
+        {
+            label: apiRequestBuilder.pageTitle,
+            route: "/api-builder",
+            description: "Build and test HTTP requests directly in your browser with a full-featured request editor",
+            category: "developer",
+            badge: "new",
+            icon: (
+                <Http
                     fontSize="large"
                     sx={{ fontSize: "5rem", width: { xs: "0.5em", sm: "0.5em", md: "1em" }, height: { xs: "0.5em", sm: "0.5em", md: "1em" } }}
                 />

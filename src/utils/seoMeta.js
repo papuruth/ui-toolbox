@@ -142,6 +142,14 @@ export const SEO_META = {
         keywords: "csv to json, csv converter, parse csv online, csv parser, convert csv to json"
     },
 
+    "/api-builder": {
+        title: "API Request Builder — Test HTTP Endpoints Online | DevDeck",
+        description:
+            "Build and send HTTP requests directly in your browser. Test GET, POST, PUT, DELETE, PATCH endpoints with custom headers and JSON body. No backend required.",
+        about: "API Request Builder lets you construct and fire HTTP requests from the browser — choose a method, enter a URL, add headers, and inspect the JSON response with status code and timing. Useful for testing REST APIs, debugging webhooks, and exploring public endpoints.",
+        keywords: "api tester, http client, test api online, rest client, api request builder, http request tester"
+    },
+
     // ── Blog index ───────────────────────────────────────────────────────────
     "/blog": {
         title: "DevDeck Blog — Developer Tools Explained",
@@ -260,5 +268,10 @@ export const SEO_META = {
         title: "YAML to JSON Converter — Online YAML Parser Guide | DevDeck",
         description: "Convert YAML to JSON and JSON to YAML with error feedback. Learn when to use YAML vs JSON.",
         keywords: "yaml to json, json to yaml, yaml converter, yaml parser online, yaml formatter, yaml json"
+    },
+    "/blog/api-request-builder": {
+        title: "API Request Builder — Test HTTP Endpoints in Your Browser | DevDeck",
+        description: "Build and send HTTP requests without Postman or curl. Test REST APIs with custom headers, JSON body, and live response inspection — free and browser-based.",
+        keywords: "api request builder, http client online, test api online, rest client browser, api tester, postman alternative, curl command online"
     }
 };

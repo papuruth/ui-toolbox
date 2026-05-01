@@ -153,5 +153,11 @@ export default [
         component: Operations,
         exact: true,
         key: "CSVJSON"
+    },
+    {
+        path: "/api-builder",
+        component: Operations,
+        exact: true,
+        key: "APIBUILDER"
     }
 ];
