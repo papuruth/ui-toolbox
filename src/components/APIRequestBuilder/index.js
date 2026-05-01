@@ -741,9 +741,11 @@ export default function APIRequestBuilder() {
     const showBody = ["POST", "PUT", "PATCH"].includes(method);
 
     useEffect(() => {
-        if (showBody && !headers.find((h) => h.key.toLowerCase() === "content-type")) {
-            setHeaders((prev) => [...prev, { key: "Content-Type", value: "application/json", id: Date.now() }]);
-        }
+        if (!showBody) return;
+        setHeaders((prev) => {
+            if (prev.find((h) => h.key.toLowerCase() === "content-type")) return prev;
+            return [...prev, { key: "Content-Type", value: "application/json", id: Date.now() }];
+        });
     }, [method, showBody]);
 
     const addHeader = () => setHeaders((prev) => [...prev, { key: "", value: "", id: Date.now() }]);
