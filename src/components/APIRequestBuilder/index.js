@@ -212,6 +212,7 @@ const UrlRow = styled.div`
 
 const UrlInput = styled.input`
     flex: 1;
+    min-width: 0;
     background: var(--bg-input);
     color: var(--text-primary);
     border: none;
@@ -237,6 +238,8 @@ const SendBtn = styled.button`
     text-transform: uppercase;
     cursor: pointer;
     transition: opacity 0.15s ease;
+    flex-shrink: 0;
+    white-space: nowrap;
     &:hover {
         opacity: 0.88;
     }

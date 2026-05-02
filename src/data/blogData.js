@@ -1376,7 +1376,7 @@ const blogData = {
                 list: [
                     "Set Content-Type: application/json when sending a JSON body — many APIs require it",
                     "Use the Authorization header with Bearer <token> for protected endpoints",
-                    "Paste a JWT directly into the command palette to jump to the JWT Decoder",
+                    "Paste a cURL command directly into the command palette to jump to the API Request Builder with it preloaded",
                     "Use the Prettify button in the response panel to auto-format minified JSON",
                     "Forward a JSON response to the JSON Viewer using the Send To button for tree browsing",
                     "The timing shown (e.g. 142ms) is round-trip time from your browser to the server",

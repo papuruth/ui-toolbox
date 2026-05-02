@@ -48,6 +48,7 @@ const PLACEHOLDER_HINTS = [
     "Search tools, paste a JWT, URL, or JSON…",
     "Type # to filter by category…",
     "Type > to run commands…",
+    "Type 'blog json' to find the guide…",
     "Paste a UUID, hash, or Base64…",
     "Press Tab to autocomplete…"
 ];
@@ -106,7 +107,9 @@ export default function CommandPalette({ open, onClose }) {
     // Derived mode flags — computed from query prefix, available to useMemo and JSX alike
     const isCategoryMode = query.startsWith("#");
     const isCommandMode = query.startsWith(">");
+    const isBlogMode = !isCategoryMode && !isCommandMode && /^blog(\s|$)/i.test(query.trim());
     const categorySlug = isCategoryMode ? query.slice(1).trim().toLowerCase() : null;
+    const blogSubQuery = isBlogMode ? query.replace(/^blog\s*/i, "").trim() : null;
 
     // Smart detection fires when query looks like structured data, not a search phrase
     const smartDetection = useMemo(() => detectInputType(query), [query]);
@@ -115,7 +118,20 @@ export default function CommandPalette({ open, onClose }) {
     const { sections, selectables } = useMemo(() => {
         const secs = [];
 
-        if (isCategoryMode) {
+        if (isBlogMode) {
+            // "blog json" / "blog jwt" — search guides only
+            const matched = blogSubQuery
+                ? fuzzyFilterWithPositions(
+                      BLOG_GUIDES,
+                      blogSubQuery,
+                      (g) => [g.label, g.description || "", ...(g.keywords || [])]
+                  ).map(({ item, score, positions }) => ({ ...item, _score: score, _positions: positions }))
+                : BLOG_GUIDES;
+            const label = blogSubQuery ? `Guides matching "${blogSubQuery}"` : "All Guides";
+            if (matched.length > 0) {
+                secs.push({ id: "blog-guides", label, items: matched });
+            }
+        } else if (isCategoryMode) {
             // "#encoding", "#url", etc. — filter tools by category prefix
             const filtered = categorySlug ? ENRICHED_TOOLS.filter((t) => t.category.startsWith(categorySlug)) : ENRICHED_TOOLS;
             const sectionLabel = categorySlug ? `${categorySlug.charAt(0).toUpperCase()}${categorySlug.slice(1)} tools` : "All tools";
@@ -180,7 +196,7 @@ export default function CommandPalette({ open, onClose }) {
         const smartItem = smartDetection ? [{ kind: "smart", detection: smartDetection }] : [];
         const all = [...smartItem, ...secs.flatMap((s) => s.items)];
         return { sections: secs, selectables: all };
-    }, [query, isCategoryMode, isCommandMode, categorySlug, actions, commands, smartDetection]);
+    }, [query, isBlogMode, blogSubQuery, isCategoryMode, isCommandMode, categorySlug, actions, commands, smartDetection]);
 
     // Reset on open
     useEffect(() => {
@@ -302,6 +318,12 @@ export default function CommandPalette({ open, onClose }) {
                     {isCategoryMode && (
                         <CategoryFilterChip onMouseDown={() => setQuery("")}>
                             #{categorySlug || "filter"}
+                            <ChipX aria-hidden>×</ChipX>
+                        </CategoryFilterChip>
+                    )}
+                    {isBlogMode && (
+                        <CategoryFilterChip onMouseDown={() => setQuery("")}>
+                            📘 blog
                             <ChipX aria-hidden>×</ChipX>
                         </CategoryFilterChip>
                     )}
